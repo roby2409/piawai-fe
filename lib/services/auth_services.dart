@@ -118,8 +118,33 @@ class AuthService {
     return prefs.getString('token');
   }
 
+  // Di AuthService, update isLoggedIn():
   Future<bool> isLoggedIn() async {
-    final token = await getToken();
-    return token != null && token.isNotEmpty;
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    final expiredAt = prefs.getString('token_expired_at');
+
+    if (token == null || token.isEmpty) return false;
+
+    // Cek expiry kalau ada
+    if (expiredAt != null && expiredAt.isNotEmpty) {
+      final expiry = DateTime.tryParse(expiredAt);
+      if (expiry != null && DateTime.now().isAfter(expiry)) {
+        await prefs.clear(); // hapus session kadaluarsa
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  Future<bool> isOnboardingDone() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('onboarding_done') ?? false;
+  }
+
+  Future<void> setOnboardingDone() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('onboarding_done', true);
   }
 }

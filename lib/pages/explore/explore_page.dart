@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'cari_bantuan/detail_pekerja_page.dart';
 import 'siap_bantu/siap_bantu_page.dart';
 
 // ─────────────────────────────────────────
@@ -77,13 +78,46 @@ class _ExplorePageState extends State<ExplorePage>
                 controller: _tabController,
                 children: [
                   // Tab 1 — Cari Bantuan (nanti diganti)
-                  const Center(
-                    child: Text(
-                      'Cari Bantuan',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white,
+                  Center(
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => DetailPekerjaPage(
+                              pekerja: PekerjaDetail(
+                                nama: 'Budi Santoso',
+                                jenisKelamin: 'Pria',
+                                usia: 34,
+                                fotoUrl: null,
+                                tentang:
+                                    'Spesialis teknisi listrik bersertifikat...',
+                                noWa: '6281234567890',
+                                area: 'Jakarta Selatan & Sekitarnya',
+                                layananList: [
+                                  LayananDetail(
+                                    nama: 'Instalasi Listrik',
+                                    hargaJam: 'Rp 50.000',
+                                    hargaHari: 'Rp 350.000',
+                                    hargaProyek: 'Rp 500.000',
+                                  ),
+                                  LayananDetail(
+                                    nama: 'Service AC',
+                                    hargaJam: 'Rp 75.000',
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        'Cari Bantuan',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),

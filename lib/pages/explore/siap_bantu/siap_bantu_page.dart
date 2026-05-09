@@ -989,7 +989,11 @@ class _LayananSectionState extends State<_LayananSection> {
               title: const Text('Edit Layanan'),
               onTap: () {
                 Navigator.pop(context);
-                // TODO: edit
+                _showTambahLayananSheet(
+                  context,
+                  existing: _items[index],
+                  onSave: (item) => setState(() => _items[index] = item),
+                );
               },
             ),
             ListTile(
@@ -1011,20 +1015,9 @@ class _LayananSectionState extends State<_LayananSection> {
   }
 
   void _showTambahDialog(BuildContext context) {
-    // TODO: buka form tambah layanan
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Tambah Layanan'),
-        content: const Text('Form tambah layanan akan dibuat di sini.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Tutup'),
-          ),
-        ],
-      ),
+    _showTambahLayananSheet(
+      context,
+      onSave: (item) => setState(() => _items.add(item)),
     );
   }
 
@@ -1207,6 +1200,408 @@ class _HargaChip extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────
+// TAMBAH LAYANAN BOTTOM SHEET
+// Panggil dengan: _showTambahLayananSheet(context)
+// ─────────────────────────────────────────
+
+void _showTambahLayananSheet(
+  BuildContext context, {
+  _LayananItem? existing, // isi kalau mode edit
+  void Function(_LayananItem)? onSave,
+}) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true, // penting biar keyboard tidak nutup form
+    backgroundColor: Colors.transparent,
+    builder: (_) => _TambahLayananSheet(existing: existing, onSave: onSave),
+  );
+}
+
+class _TambahLayananSheet extends StatefulWidget {
+  final _LayananItem? existing;
+  final void Function(_LayananItem)? onSave;
+
+  const _TambahLayananSheet({this.existing, this.onSave});
+
+  @override
+  State<_TambahLayananSheet> createState() => _TambahLayananSheetState();
+}
+
+class _TambahLayananSheetState extends State<_TambahLayananSheet> {
+  final _namaController = TextEditingController();
+  final _deskripsiController = TextEditingController();
+  final _jamController = TextEditingController();
+  final _hariController = TextEditingController();
+  final _proyekController = TextEditingController();
+
+  bool _showTarifError = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.existing != null) {
+      final e = widget.existing!;
+      _namaController.text = e.nama;
+      _deskripsiController.text = e.deskripsi;
+      _jamController.text = _stripRp(e.hargaJam);
+      _hariController.text = _stripRp(e.hargaHari);
+      _proyekController.text = _stripRp(e.hargaProyek);
+    }
+  }
+
+  String _stripRp(String? val) {
+    if (val == null) return '';
+    return val.replaceAll(RegExp(r'[^0-9]'), '');
+  }
+
+  @override
+  void dispose() {
+    _namaController.dispose();
+    _deskripsiController.dispose();
+    _jamController.dispose();
+    _hariController.dispose();
+    _proyekController.dispose();
+    super.dispose();
+  }
+
+  bool get _tarifValid =>
+      _jamController.text.trim().isNotEmpty ||
+      _hariController.text.trim().isNotEmpty ||
+      _proyekController.text.trim().isNotEmpty;
+
+  bool get _canSave => _namaController.text.trim().isNotEmpty && _tarifValid;
+
+  String? _formatHarga(String raw) {
+    final clean = raw.trim();
+    if (clean.isEmpty) return null;
+    // format: "Rp 45k" kalau >= 1000, else "Rp X"
+    final num = int.tryParse(clean) ?? 0;
+    if (num == 0) return null;
+    if (num >= 1000) {
+      final k = num ~/ 1000;
+      final sisa = num % 1000;
+      return sisa == 0 ? 'Rp ${k}k' : 'Rp ${num}';
+    }
+    return 'Rp $num';
+  }
+
+  void _onSimpan() {
+    setState(() => _showTarifError = !_tarifValid);
+    if (!_canSave) return;
+
+    final item = _LayananItem(
+      nama: _namaController.text.trim(),
+      deskripsi: _deskripsiController.text.trim(),
+      hargaJam: _formatHarga(_jamController.text),
+      hargaHari: _formatHarga(_hariController.text),
+      hargaProyek: _formatHarga(_proyekController.text),
+    );
+
+    widget.onSave?.call(item);
+    Navigator.pop(context);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      padding: EdgeInsets.fromLTRB(20, 0, 20, 20 + bottomInset),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // ── Drag handle ──
+          Center(
+            child: Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+
+          // ── Header ──
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                widget.existing != null ? 'Edit Layanan' : 'Tambah Layanan',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  child: const Icon(Icons.close, size: 22, color: Colors.grey),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+
+          // ── Scroll area ──
+          ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.65,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Nama Layanan
+                  _FieldLabel('Nama Layanan'),
+                  const SizedBox(height: 6),
+                  _InputField(
+                    controller: _namaController,
+                    hint: 'Contoh: Tukang Kebun',
+                    onChanged: (_) => setState(() {}),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Deskripsi
+                  _FieldLabel('Deskripsi'),
+                  const SizedBox(height: 6),
+                  _InputField(
+                    controller: _deskripsiController,
+                    hint: 'Jelaskan layanan yang Anda tawarkan...',
+                    maxLines: 4,
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Tarif
+                  const Text(
+                    'Tarif Layanan',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 2),
+                  const Text(
+                    'Isi minimal satu tarif',
+                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
+                  const SizedBox(height: 10),
+
+                  _FieldLabel('Per Jam'),
+                  const SizedBox(height: 6),
+                  _TarifField(
+                    controller: _jamController,
+                    onChanged: (_) => setState(() {}),
+                  ),
+                  const SizedBox(height: 12),
+
+                  _FieldLabel('Per Hari'),
+                  const SizedBox(height: 6),
+                  _TarifField(
+                    controller: _hariController,
+                    onChanged: (_) => setState(() {}),
+                  ),
+                  const SizedBox(height: 12),
+
+                  _FieldLabel('Per Proyek'),
+                  const SizedBox(height: 6),
+                  _TarifField(
+                    controller: _proyekController,
+                    onChanged: (_) => setState(() {}),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Error tarif
+                  AnimatedCrossFade(
+                    duration: const Duration(milliseconds: 200),
+                    crossFadeState: _showTarifError && !_tarifValid
+                        ? CrossFadeState.showFirst
+                        : CrossFadeState.showSecond,
+                    firstChild: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFFBEB),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: const Color(0xFFFDE68A)),
+                      ),
+                      child: const Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(
+                            Icons.warning_amber_rounded,
+                            size: 16,
+                            color: Color(0xFFD97706),
+                          ),
+                          SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'Minimal satu tarif harus diisi (Jam, Hari, atau Proyek)',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Color(0xFF92400E),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    secondChild: const SizedBox.shrink(),
+                  ),
+
+                  const SizedBox(height: 8),
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          // ── Simpan Button ──
+          SizedBox(
+            width: double.infinity,
+            height: 52,
+            child: ElevatedButton(
+              onPressed: _canSave ? _onSimpan : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: kPrimary,
+                disabledBackgroundColor: const Color(0xFFD1D5DB),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 0,
+              ),
+              child: const Text(
+                'Simpan Layanan',
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────
+class _FieldLabel extends StatelessWidget {
+  final String text;
+  const _FieldLabel(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+    );
+  }
+}
+
+class _InputField extends StatelessWidget {
+  final TextEditingController controller;
+  final String hint;
+  final int maxLines;
+  final void Function(String)? onChanged;
+
+  const _InputField({
+    required this.controller,
+    required this.hint,
+    this.maxLines = 1,
+    this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller,
+      maxLines: maxLines,
+      onChanged: onChanged,
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: const TextStyle(fontSize: 13, color: Colors.grey),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 12,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: kPrimary),
+        ),
+      ),
+    );
+  }
+}
+
+class _TarifField extends StatelessWidget {
+  final TextEditingController controller;
+  final void Function(String)? onChanged;
+
+  const _TarifField({required this.controller, this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller,
+      keyboardType: TextInputType.number,
+      onChanged: onChanged,
+      decoration: InputDecoration(
+        hintText: '0',
+        hintStyle: const TextStyle(fontSize: 13, color: Colors.grey),
+        prefixIcon: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Rp',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey[700],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(width: 1, height: 20, color: Colors.grey[300]),
+            ],
+          ),
+        ),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 14,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: kPrimary),
         ),
       ),
     );
