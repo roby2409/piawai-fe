@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
-  final String baseUrl = 'http://192.168.18.62/apigoogle/auth';
+  final String baseUrl = 'http://192.168.18.35/apigoogle/auth';
 
   // ── Google Sign In instance ──────────────────────────────────────────────
   final GoogleSignIn _googleSignIn = GoogleSignIn(
