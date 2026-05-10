@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-const Color kPrimary = Color(0xFF1a56db);
+import 'package:piawai/core/constants.dart';
 
 // ─────────────────────────────────────────
 // ONBOARDING SCREEN
@@ -72,7 +71,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final isDark = page.isDark;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0d1b3e) : Colors.white,
+      backgroundColor: isDark ? const Color(0xFFF0FBF4) : Colors.white,
       body: SafeArea(
         child: Column(
           children: [
@@ -410,7 +409,7 @@ class _Grid2x2Dark extends StatelessWidget {
               Expanded(
                 flex: 2,
                 child: _PlaceholderBox(
-                  color: const Color(0xFF0d1b3e),
+                  color: kBgOuter,
                   icon: Icons.construction_outlined,
                   iconColor: Colors.white54,
                   borderRadius: 16,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:piawai/core/constants.dart';
 
 import 'cari_bantuan/detail_pekerja_page.dart';
 import 'siap_bantu/siap_bantu_page.dart';
@@ -32,7 +33,7 @@ class _ExplorePageState extends State<ExplorePage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0d1b3e), // background gelap
+      backgroundColor: kBgOuter, // background gelap
       body: SafeArea(
         child: Column(
           children: [
@@ -42,26 +43,26 @@ class _ExplorePageState extends State<ExplorePage>
               margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.15), // background pill
+                color: kSecondary,
                 borderRadius: BorderRadius.circular(30),
               ),
               child: TabBar(
                 controller: _tabController,
                 indicator: BoxDecoration(
-                  color: const Color(0xFF1a56db), // active pill biru
+                  color: kPrimary,
                   borderRadius: BorderRadius.circular(26),
                 ),
                 indicatorSize: TabBarIndicatorSize.tab,
                 dividerColor: Colors.transparent,
                 labelColor: Colors.white,
-                unselectedLabelColor: Colors.white70,
+                unselectedLabelColor: Color(0xFF04a5ba),
                 labelStyle: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                 ),
                 unselectedLabelStyle: const TextStyle(
                   fontSize: 14,
-                  fontWeight: FontWeight.w400,
+                  fontWeight: FontWeight.w600,
                 ),
                 tabs: const [
                   Tab(text: 'Cari Bantuan'),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:piawai/services/auth_services.dart';
 
+import 'core/constants.dart';
 import 'pages/auth/auth_screen.dart';
 import 'pages/main_page.dart';
 import 'pages/onboarding/onboarding_screen.dart';
@@ -21,7 +23,10 @@ class MyApp extends StatelessWidget {
       navigatorKey: navigatorKey, // ← tambah ini
       debugShowCheckedModeBanner: false,
       title: 'Piawai',
-      theme: ThemeData(primarySwatch: Colors.blue),
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        textTheme: GoogleFonts.poppinsTextTheme(), // ← semua text pakai Poppins
+      ),
       home: const _AuthGate(),
     );
   }
@@ -84,7 +89,7 @@ class _AuthGateState extends State<_AuthGate> {
   Widget build(BuildContext context) {
     // Splash screen sementara nunggu cek session
     return const Scaffold(
-      backgroundColor: Color(0xFF0d1b3e),
+      backgroundColor: kBgOuter,
       body: Center(child: CircularProgressIndicator(color: Colors.white)),
     );
   }

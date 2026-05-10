@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-const Color kPrimary = Color(0xFF1a56db);
+import 'package:piawai/core/constants.dart';
 
 // ─────────────────────────────────────────
 // MODEL (sesuaikan dengan model yang sudah ada)

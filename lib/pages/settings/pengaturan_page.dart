@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:piawai/core/constants.dart';
 import 'package:piawai/pages/auth/auth_screen.dart';
 import 'package:piawai/services/auth_services.dart';
-
-const Color kPrimary = Color(0xFF1a56db);
 
 // ─────────────────────────────────────────
 // PENGATURAN PAGE
@@ -13,9 +12,9 @@ class PengaturanPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF3F4F6),
+      backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: kWhite,
         elevation: 0,
         title: const Text(
           'Pengaturan',
@@ -35,11 +34,9 @@ class PengaturanPage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // ── Profile Card ──
           _ProfileCard(),
           const SizedBox(height: 24),
 
-          // ── Akun ──
           _SectionLabel(label: 'Akun'),
           const SizedBox(height: 8),
           _SettingsGroup(
@@ -58,7 +55,6 @@ class PengaturanPage extends StatelessWidget {
           ),
           const SizedBox(height: 24),
 
-          // ── Aplikasi ──
           _SectionLabel(label: 'Aplikasi'),
           const SizedBox(height: 8),
           _SettingsGroup(
@@ -73,7 +69,6 @@ class PengaturanPage extends StatelessWidget {
           ),
           const SizedBox(height: 24),
 
-          // ── Bantuan ──
           _SectionLabel(label: 'Bantuan'),
           const SizedBox(height: 8),
           _SettingsGroup(
@@ -97,7 +92,6 @@ class PengaturanPage extends StatelessWidget {
           ),
           const SizedBox(height: 24),
 
-          // ── Keluar ──
           _LogoutButton(
             onTap: () async {
               final confirm = await showDialog<bool>(
@@ -111,7 +105,10 @@ class PengaturanPage extends StatelessWidget {
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(context, false),
-                      child: const Text('Batal'),
+                      child: Text(
+                        'Batal',
+                        style: TextStyle(color: Colors.grey[600]),
+                      ),
                     ),
                     TextButton(
                       onPressed: () => Navigator.pop(context, true),
@@ -134,7 +131,6 @@ class PengaturanPage extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-          // ── Versi ──
           const Center(
             child: Text(
               'Versi 2.4.1 (2024)',
@@ -157,12 +153,18 @@ class _ProfileCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: kBgCard,
         borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         children: [
-          // Avatar
           Container(
             width: 56,
             height: 56,
@@ -172,14 +174,12 @@ class _ProfileCard extends StatelessWidget {
             ),
             child: ClipOval(
               child: Container(
-                color: const Color(0xFFE5E7EB),
-                child: const Icon(Icons.person, size: 32, color: Colors.grey),
+                color: kBgCard,
+                child: const Icon(Icons.person, size: 32, color: kPrimary),
               ),
             ),
           ),
           const SizedBox(width: 14),
-
-          // Name & email
           const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -221,7 +221,7 @@ class _SectionLabel extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────
-// SETTINGS GROUP (kartu berisi beberapa item)
+// SETTINGS GROUP
 // ─────────────────────────────────────────
 class _SettingsGroup extends StatelessWidget {
   final List<_SettingsItem> items;
@@ -231,22 +231,21 @@ class _SettingsGroup extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: kBgCard,
         borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
         children: List.generate(items.length, (i) {
-          final item = items[i];
           final isLast = i == items.length - 1;
           return Column(
             children: [
-              item,
+              items[i],
               if (!isLast)
-                const Divider(
+                Divider(
                   height: 1,
-                  indent: 56,
-                  endIndent: 0,
-                  color: Color(0xFFF3F4F6),
+                  indent: 6,
+                  endIndent: 6,
+                  color: const Color(0xFFEEF0F0),
                 ),
             ],
           );
@@ -281,19 +280,16 @@ class _SettingsItem extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         child: Row(
           children: [
-            // Icon box
             Container(
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: const Color(0xFFF3F4F6),
+                color: kBgCard,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Icon(icon, size: 18, color: Colors.black54),
+              child: Icon(icon, size: 18, color: kPrimary),
             ),
             const SizedBox(width: 14),
-
-            // Label
             Expanded(
               child: Text(
                 label,
@@ -303,8 +299,6 @@ class _SettingsItem extends StatelessWidget {
                 ),
               ),
             ),
-
-            // Trailing value (opsional)
             if (trailing != null) ...[
               Text(
                 trailing!,
@@ -312,8 +306,6 @@ class _SettingsItem extends StatelessWidget {
               ),
               const SizedBox(width: 4),
             ],
-
-            // Chevron
             const Icon(Icons.chevron_right, size: 18, color: Colors.grey),
           ],
         ),

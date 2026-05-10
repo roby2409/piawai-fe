@@ -2,8 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-
-const Color kPrimary = Color(0xFF1a56db);
+import 'package:piawai/core/constants.dart';
 
 class SiapBantuPage extends StatefulWidget {
   const SiapBantuPage({super.key});
@@ -51,10 +50,6 @@ class _SiapBantuPageState extends State<SiapBantuPage> {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: const BorderRadius.only(
-        topLeft: Radius.circular(24),
-        topRight: Radius.circular(24),
-      ),
       child: Container(
         decoration: const BoxDecoration(
           color: Colors.white,
@@ -65,32 +60,6 @@ class _SiapBantuPageState extends State<SiapBantuPage> {
         ),
         child: Column(
           children: [
-            // ── Header ──
-            Container(
-              alignment: Alignment.center,
-              width: double.infinity,
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
-              decoration: const BoxDecoration(color: Color(0xFF0d1b3e)),
-              child: const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Mode Siap Bantu',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 4),
-                  Text(
-                    'Anda terdaftar sebagai penyedia jasa',
-                    style: TextStyle(color: Colors.white70, fontSize: 13),
-                  ),
-                ],
-              ),
-            ),
-
             // ── Body: Sidebar + Content ──
             Expanded(
               child: Row(
@@ -99,7 +68,15 @@ class _SiapBantuPageState extends State<SiapBantuPage> {
                   // Left Sidebar
                   Container(
                     width: 72,
-                    color: const Color(0xFFF8F9FA),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border(
+                        right: BorderSide(
+                          color: Colors.grey.shade200, // ← garis tipis pemisah
+                          width: 1,
+                        ),
+                      ),
+                    ),
                     child: ListView.builder(
                       itemCount: _sidebarItems.length,
                       itemBuilder: (context, index) {
@@ -111,8 +88,9 @@ class _SiapBantuPageState extends State<SiapBantuPage> {
                             height: 68,
                             decoration: BoxDecoration(
                               color: isActive
-                                  ? Colors.white
+                                  ? const Color(0xFFE0F7F5)
                                   : Colors.transparent,
+
                               border: Border(
                                 left: BorderSide(
                                   color: isActive
@@ -128,7 +106,9 @@ class _SiapBantuPageState extends State<SiapBantuPage> {
                                 Icon(
                                   item.icon,
                                   size: 22,
-                                  color: isActive ? kPrimary : Colors.grey,
+                                  color: isActive
+                                      ? kPrimary
+                                      : Color(0xff9E9E9E),
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
@@ -346,7 +326,7 @@ class _KontakSectionState extends State<_KontakSection> {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       physics: const ClampingScrollPhysics(),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -480,15 +460,15 @@ class _KontakSectionState extends State<_KontakSection> {
               ),
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
 
           // Tips Keamanan
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: const Color(0xFFEFF6FF),
+              color: kBgCard,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFBFDBFE)),
+              border: Border.all(color: kPrimary, width: 1),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -498,22 +478,19 @@ class _KontakSectionState extends State<_KontakSection> {
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       Text(
                         'Tips Keamanan',
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          color: kPrimary,
+                          color: Colors.grey[800],
                         ),
                       ),
                       SizedBox(height: 4),
                       Text(
                         'Piawai tidak pernah meminta password atau kode OTP Anda melalui WhatsApp, Email, maupun telepon. Pastikan komunikasi hanya terjadi di dalam aplikasi untuk keamanan ekstra.',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Color(0xFF1e40af),
-                        ),
+                        style: TextStyle(fontSize: 12, color: Colors.grey[700]),
                       ),
                     ],
                   ),
@@ -619,7 +596,7 @@ class _AreaSectionState extends State<_AreaSection> {
           Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFFE5E7EB)),
+              border: Border.all(color: kGrey),
             ),
             clipBehavior: Clip.antiAlias,
             child: Column(
@@ -745,7 +722,7 @@ class _AreaSectionState extends State<_AreaSection> {
           SliderTheme(
             data: SliderTheme.of(context).copyWith(
               activeTrackColor: kPrimary,
-              inactiveTrackColor: const Color(0xFFE5E7EB),
+              inactiveTrackColor: kGrey,
               thumbColor: kPrimary,
               thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 12),
               overlayShape: const RoundSliderOverlayShape(overlayRadius: 20),
@@ -1112,7 +1089,7 @@ class _LayananCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: kGrey),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1709,7 +1686,7 @@ class _ProfilSectionState extends State<_ProfilSection> {
             decoration: BoxDecoration(
               color: const Color(0xFFF8F9FA),
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: const Color(0xFFE5E7EB)),
+              border: Border.all(color: kGrey),
             ),
             child: Column(
               children: [
@@ -1736,7 +1713,7 @@ class _ProfilSectionState extends State<_ProfilSection> {
                           child: _fotoBytes != null
                               ? Image.memory(_fotoBytes!, fit: BoxFit.cover)
                               : Container(
-                                  color: const Color(0xFFE5E7EB),
+                                  color: kGrey,
                                   child: const Icon(
                                     Icons.person,
                                     size: 52,
@@ -1891,10 +1868,7 @@ class _GenderButton extends StatelessWidget {
           decoration: BoxDecoration(
             color: isSelected ? const Color(0xFFEFF6FF) : Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: isSelected ? kPrimary : const Color(0xFFE5E7EB),
-              width: isSelected ? 2 : 1,
-            ),
+            border: Border.all(color: isSelected ? kPrimary : kGrey, width: 1),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -1951,7 +1925,7 @@ class _StatusSectionState extends State<_StatusSection> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: const Color(0xFFE5E7EB)),
+              border: Border.all(color: kGrey),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1989,7 +1963,7 @@ class _StatusSectionState extends State<_StatusSection> {
                     activeColor: Colors.white,
                     activeTrackColor: kPrimary,
                     inactiveThumbColor: Colors.white,
-                    inactiveTrackColor: const Color(0xFFE5E7EB),
+                    inactiveTrackColor: kGrey,
                   ),
                 ),
               ],
@@ -2007,9 +1981,7 @@ class _StatusSectionState extends State<_StatusSection> {
                   : const Color(0xFFF3F4F6),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: _isAvailable
-                    ? const Color(0xFFBFDBFE)
-                    : const Color(0xFFE5E7EB),
+                color: _isAvailable ? const Color(0xFFBFDBFE) : kGrey,
               ),
             ),
             child: Row(
