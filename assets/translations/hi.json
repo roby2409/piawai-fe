@@ -1,0 +1,57 @@
+{
+  "app_name": "WA Paste Any Number",
+  "home": {
+    "auto_clean_badge": "ऑटो क्लीन फॉर्मेट",
+    "number_hint": "कोई भी नंबर पेस्ट करें या टाइप करें",
+    "recent_label": "हाल के:",
+    "optional_label": "वैकल्पिक: संदेश के साथ भेजें",
+    "message_hint": "संदेश टाइप करें (वैकल्पिक)",
+    "open_whatsapp": "व्हाट्सएप खोलें",
+    "works_messy_formats": "ऐसे गड़बड़ नंबर भी काम करेंगे:",
+    "advertisement": "विज्ञापन",
+    "error_empty_number": "कृपया फ़ोन नंबर दर्ज करें",
+    "error_no_whatsapp": "व्हाट्सएप इंस्टॉल नहीं है",
+    "auto_clean_hint": "किसी भी फ़ॉर्मेट में नंबर पेस्ट करें, यह अपने आप साफ हो जाएगा"
+  },
+  "history": {
+    "title": "इतिहास",
+    "empty": "अभी तक कोई इतिहास नहीं",
+    "empty_sub": "आपके द्वारा चैट किए गए नंबर यहां दिखेंगे",
+    "selected_number": "चयनित नंबर",
+    "message_label": "संदेश",
+    "message_hint": "संदेश टाइप करें (वैकल्पिक)",
+    "open_whatsapp": "व्हाट्सएप खोलें",
+    "advertisement": "विज्ञापन"
+  },
+  "settings": {
+    "title": "सेटिंग्स",
+    "section_general": "सामान्य",
+    "section_history": "इतिहास",
+    "section_support": "हमें सपोर्ट करें",
+    "section_info": "जानकारी",
+    "language": "भाषा",
+    "language_sub": "हिंदी",
+    "clear_history": "इतिहास साफ़ करें",
+    "clear_history_sub": "सभी चैट इतिहास हटाएं",
+    "clear_confirm_title": "क्या आप सुनिश्चित हैं?",
+    "clear_confirm_sub": "यह सभी इतिहास हटा देगा। यह क्रिया पूर्ववत नहीं की जा सकती।",
+    "delete": "हटाएं",
+    "cancel": "रद्द करें",
+    "rate_app": "ऐप रेट करें",
+    "rate_app_sub": "ऐप पसंद आया? हमें रेट करें!",
+    "share_app": "ऐप शेयर करें",
+    "share_app_sub": "दोस्तों के साथ शेयर करें",
+    "about": "के बारे में",
+    "about_sub": "WA Paste Any Number v1.0.0",
+    "by": "rigofficial द्वारा",
+    "advertisement": "विज्ञापन"
+  },
+  "language": {
+    "title": "भाषा",
+    "search_hint": "भाषा खोजें...",
+    "english": "अंग्रेज़ी",
+    "indonesia": "इंडोनेशियाई",
+    "arabic": "अरबी",
+    "hindi": "हिंदी"
+  }
+}

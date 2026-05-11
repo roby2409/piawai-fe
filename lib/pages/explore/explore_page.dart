@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:piawai/core/constants.dart';
 
 import 'cari_bantuan/detail_pekerja_page.dart';
+import 'cari_bantuan/map_page.dart';
 import 'siap_bantu/siap_bantu_page.dart';
 
 // ─────────────────────────────────────────
@@ -33,12 +34,24 @@ class _ExplorePageState extends State<ExplorePage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: kBgOuter, // background gelap
+      backgroundColor: kPrimary, // background gelap
       body: SafeArea(
-        child: Column(
+        child: Stack(
           children: [
+            // ── Content ──
+            // Positioned.fill(
+            //   child: TabBarView(
+            //     controller: _tabController,
+            //     children: [MapPage(), SiapBantuPage()],
+            //   ),
+            // ),
+
             // ── Tab Bar ──
             // Ganti TabBar dengan ini
+            TabBarView(
+              controller: _tabController,
+              children: [MapPage(), SiapBantuPage()],
+            ),
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
               padding: const EdgeInsets.all(4),
@@ -67,64 +80,6 @@ class _ExplorePageState extends State<ExplorePage>
                 tabs: const [
                   Tab(text: 'Cari Bantuan'),
                   Tab(text: 'Siap Bantu'),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 10),
-
-            // ── Content ──
-            Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  // Tab 1 — Cari Bantuan (nanti diganti)
-                  Center(
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => DetailPekerjaPage(
-                              pekerja: PekerjaDetail(
-                                nama: 'Budi Santoso',
-                                jenisKelamin: 'Pria',
-                                usia: 34,
-                                fotoUrl: null,
-                                tentang:
-                                    'Spesialis teknisi listrik bersertifikat...',
-                                noWa: '6281234567890',
-                                area: 'Jakarta Selatan & Sekitarnya',
-                                layananList: [
-                                  LayananDetail(
-                                    nama: 'Instalasi Listrik',
-                                    hargaJam: 'Rp 50.000',
-                                    hargaHari: 'Rp 350.000',
-                                    hargaProyek: 'Rp 500.000',
-                                  ),
-                                  LayananDetail(
-                                    nama: 'Service AC',
-                                    hargaJam: 'Rp 75.000',
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                      child: Text(
-                        'Cari Bantuan',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  // Tab 2 — Siap Bantu dengan rounded card
-                  SiapBantuPage(),
                 ],
               ),
             ),

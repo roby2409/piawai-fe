@@ -1,0 +1,57 @@
+{
+  "app_name": "WA Paste Any Number",
+  "home": {
+    "auto_clean_badge": "Auto Clean Format",
+    "number_hint": "Paste or type any number",
+    "recent_label": "Recent:",
+    "optional_label": "Optional: Send with a message",
+    "message_hint": "Type a message (optional)",
+    "open_whatsapp": "OPEN WHATSAPP",
+    "works_messy_formats": "Works with messy formats like:",
+    "advertisement": "ADVERTISEMENT",
+    "error_empty_number": "Please enter a phone number",
+    "error_no_whatsapp": "WhatsApp is not installed",
+    "auto_clean_hint": "Paste any number format, it will be cleaned automatically"
+  },
+  "history": {
+    "title": "History",
+    "empty": "No history yet",
+    "empty_sub": "Numbers you chat will appear here",
+    "selected_number": "SELECTED NUMBER",
+    "message_label": "Message",
+    "message_hint": "Type a message (optional)",
+    "open_whatsapp": "OPEN WHATSAPP",
+    "advertisement": "ADVERTISEMENT"
+  },
+  "settings": {
+    "title": "Settings",
+    "section_general": "General",
+    "section_history": "History",
+    "section_support": "Support Us",
+    "section_info": "Info",
+    "language": "Language",
+    "language_sub": "English",
+    "clear_history": "Clear History",
+    "clear_history_sub": "Delete all chat history",
+    "clear_confirm_title": "Are you sure?",
+    "clear_confirm_sub": "This will delete all history. This action cannot be undone.",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "rate_app": "Rate App",
+    "rate_app_sub": "Love the app? Rate us!",
+    "share_app": "Share App",
+    "share_app_sub": "Share with friends",
+    "about": "About",
+    "about_sub": "WA Paste Any Number v1.0.0",
+    "by": "by rigofficial",
+    "advertisement": "ADVERTISEMENT"
+  },
+  "language": {
+    "title": "Language",
+    "search_hint": "Search language...",
+    "english": "English",
+    "indonesia": "Indonesia",
+    "arabic": "Arabic",
+    "hindi": "Hindi"
+  }
+}

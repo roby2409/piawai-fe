@@ -1,0 +1,57 @@
+{
+  "app_name": "WA Paste Any Number",
+  "home": {
+    "auto_clean_badge": "Format Otomatis",
+    "number_hint": "Tempel atau ketik nomor apapun",
+    "recent_label": "Terbaru:",
+    "optional_label": "Opsional: Kirim dengan pesan",
+    "message_hint": "Ketik pesan (opsional)",
+    "open_whatsapp": "BUKA WHATSAPP",
+    "works_messy_formats": "Bisa dipakai meski formatnya berantakan, seperti:",
+    "advertisement": "IKLAN",
+    "error_empty_number": "Masukkan nomor telepon terlebih dahulu",
+    "error_no_whatsapp": "WhatsApp tidak terinstal",
+    "auto_clean_hint": "Tempel nomor dalam format apa pun, akan otomatis dibersihkan"
+  },
+  "history": {
+    "title": "Riwayat",
+    "empty": "Belum ada riwayat",
+    "empty_sub": "Nomor yang kamu chat akan muncul di sini",
+    "selected_number": "NOMOR DIPILIH",
+    "message_label": "Pesan",
+    "message_hint": "Ketik pesan (opsional)",
+    "open_whatsapp": "BUKA WHATSAPP",
+    "advertisement": "IKLAN"
+  },
+  "settings": {
+    "title": "Pengaturan",
+    "section_general": "Umum",
+    "section_history": "Riwayat",
+    "section_support": "Dukung Kami",
+    "section_info": "Info",
+    "language": "Bahasa",
+    "language_sub": "Indonesia",
+    "clear_history": "Hapus Riwayat",
+    "clear_history_sub": "Hapus semua riwayat chat",
+    "clear_confirm_title": "Apakah kamu yakin?",
+    "clear_confirm_sub": "Ini akan menghapus semua riwayat. Tindakan ini tidak dapat dibatalkan.",
+    "delete": "Hapus",
+    "cancel": "Batal",
+    "rate_app": "Beri Nilai",
+    "rate_app_sub": "Suka aplikasinya? Beri nilai kami!",
+    "share_app": "Bagikan Aplikasi",
+    "share_app_sub": "Bagikan ke teman",
+    "about": "Tentang",
+    "about_sub": "WA Paste Any Number v1.0.0",
+    "by": "oleh rigofficial",
+    "advertisement": "IKLAN"
+  },
+  "language": {
+    "title": "Bahasa",
+    "search_hint": "Cari bahasa...",
+    "english": "Inggris",
+    "indonesia": "Indonesia",
+    "arabic": "Arab",
+    "hindi": "Hindi"
+  }
+}

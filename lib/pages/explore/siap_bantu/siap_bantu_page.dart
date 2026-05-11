@@ -58,12 +58,40 @@ class _SiapBantuPageState extends State<SiapBantuPage> {
             topRight: Radius.circular(24),
           ),
         ),
-        child: Column(
+        child: Stack(
           children: [
+            Container(
+              height: 180,
+              alignment: Alignment.center,
+              width: double.infinity,
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
+              decoration: const BoxDecoration(color: Color(0xFF0d1b3e)),
+              child: const Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    'Mode Siap Bantu',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    'Anda terdaftar sebagai penyedia jasa',
+                    style: TextStyle(color: Colors.white70, fontSize: 13),
+                  ),
+                  SizedBox(height: 20),
+                ],
+              ),
+            ),
             // ── Body: Sidebar + Content ──
-            Expanded(
+            Container(
+              padding: EdgeInsets.only(top: 160),
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   // Left Sidebar
                   Container(
@@ -76,6 +104,9 @@ class _SiapBantuPageState extends State<SiapBantuPage> {
                           width: 1,
                         ),
                       ),
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(24),
+                      ),
                     ),
                     child: ListView.builder(
                       itemCount: _sidebarItems.length,
@@ -85,7 +116,7 @@ class _SiapBantuPageState extends State<SiapBantuPage> {
                         return GestureDetector(
                           onTap: () => setState(() => _selectedIndex = index),
                           child: Container(
-                            height: 68,
+                            height: 78,
                             decoration: BoxDecoration(
                               color: isActive
                                   ? const Color(0xFFE0F7F5)
@@ -98,6 +129,11 @@ class _SiapBantuPageState extends State<SiapBantuPage> {
                                       : Colors.transparent,
                                   width: 3,
                                 ),
+                              ),
+                              borderRadius: BorderRadius.only(
+                                topLeft: index == 0
+                                    ? Radius.circular(24)
+                                    : Radius.zero,
                               ),
                             ),
                             child: Column(
@@ -132,7 +168,12 @@ class _SiapBantuPageState extends State<SiapBantuPage> {
                   // Right Content
                   Expanded(
                     child: Container(
-                      color: Colors.white,
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.only(
+                          topRight: Radius.circular(24),
+                        ),
+                      ),
                       child: _buildContent(),
                     ),
                   ),
