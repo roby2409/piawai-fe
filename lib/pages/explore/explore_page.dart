@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:piawai/core/constants.dart';
-
-import 'cari_bantuan/detail_pekerja_page.dart';
 import 'cari_bantuan/map_page.dart';
 import 'siap_bantu/siap_bantu_page.dart';
 
@@ -50,7 +48,21 @@ class _ExplorePageState extends State<ExplorePage>
             // Ganti TabBar dengan ini
             TabBarView(
               controller: _tabController,
-              children: [MapPage(), SiapBantuPage()],
+              children: [
+                // Center(
+                //   child: Text(
+                //     'Fitur ini sedang dalam pengembangan. Sabar ya!',
+                //     textAlign: TextAlign.center,
+                //     style: TextStyle(
+                //       color: Colors.white,
+                //       fontSize: 16,
+                //       fontWeight: FontWeight.w500,
+                //     ),
+                //   ),
+                // ),
+                MapPage(),
+                SiapBantuPage(),
+              ],
             ),
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),

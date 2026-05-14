@@ -1,6 +1,9 @@
 // lib/core/constants.dart
 import 'package:flutter/material.dart';
 
+const String baseUrl = 'http://192.168.18.63/apigoogle';
+// const String baseUrl = 'https://www.piawai.com'; // for public release, ganti ini aja
+
 const Color kPrimary = Color(0xFF04A5BA);
 const Color kSecondary = Color(0xFFBFF6EE);
 const Color kBgOuter = Color(0xFFF5F5F5);
