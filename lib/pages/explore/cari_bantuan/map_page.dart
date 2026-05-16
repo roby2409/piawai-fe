@@ -1,279 +1,21 @@
+import 'dart:math';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:piawai/core/constants.dart';
+import 'package:piawai/core/helper.dart';
 import 'package:piawai/pages/widgets/map_component.dart';
+import 'package:piawai/pages/widgets/permission_ui.dart';
+import 'package:piawai/services/explore_services.dart';
+import 'package:piawai/services/worker_services.dart';
 
-// ─────────────────────────────────────────
-// Model
-// ─────────────────────────────────────────
-class Worker {
-  final String name;
-  final String job;
-  final String phone;
-  final String experience;
-  final double rating;
-  final LatLng position;
-  final Color color;
-  final String avatar; // emoji fallback
-  final String? photoUrl; // network photo (optional)
-  final String price;
-
-  const Worker({
-    required this.name,
-    required this.job,
-    required this.phone,
-    required this.experience,
-    required this.rating,
-    required this.position,
-    required this.color,
-    required this.avatar,
-    this.photoUrl,
-    required this.price,
-  });
-}
-
-// ─────────────────────────────────────────
-// Static Data
-// ─────────────────────────────────────────
-final List<Worker> allWorkers = [
-  Worker(
-    name: 'Budi Santoso',
-    job: 'Tukang Cuci',
-    phone: '0812-3456-7890',
-    experience: '3 tahun',
-    rating: 4.8,
-    position: const LatLng(-2.9720, 104.7700),
-    color: const Color(0xFF1565C0),
-    avatar: '👨',
-    photoUrl: 'https://randomuser.me/api/portraits/men/32.jpg',
-    price: 'Rp 50.000/hari',
-  ),
-  Worker(
-    name: 'Sari Dewi',
-    job: 'Tukang Cuci',
-    phone: '0813-2345-6789',
-    experience: '5 tahun',
-    rating: 4.9,
-    position: const LatLng(-2.9800, 104.7780),
-    color: const Color(0xFF1565C0),
-    avatar: '👩',
-    photoUrl: 'https://randomuser.me/api/portraits/women/44.jpg',
-    price: 'Rp 60.000/hari',
-  ),
-  Worker(
-    name: 'Ahmad Rizki',
-    job: 'Tukang Listrik',
-    phone: '0814-3456-7891',
-    experience: '7 tahun',
-    rating: 4.7,
-    position: const LatLng(-2.9680, 104.7820),
-    color: const Color(0xFFFF9800),
-    avatar: '👷',
-    photoUrl: 'https://randomuser.me/api/portraits/men/55.jpg',
-    price: 'Rp 150.000/hari',
-  ),
-  Worker(
-    name: 'Rina Kusuma',
-    job: 'Tukang Masak',
-    phone: '0815-4567-8902',
-    experience: '4 tahun',
-    rating: 4.6,
-    position: const LatLng(-2.9850, 104.7650),
-    color: const Color(0xFFE91E63),
-    avatar: '👩‍🍳',
-    photoUrl: 'https://randomuser.me/api/portraits/women/68.jpg',
-    price: 'Rp 80.000/hari',
-  ),
-  Worker(
-    name: 'Dimas Arya',
-    job: 'Tukang Bangunan',
-    phone: '0816-5678-9013',
-    experience: '10 tahun',
-    rating: 4.5,
-    position: const LatLng(-2.9760, 104.7830),
-    color: const Color(0xFF795548),
-    avatar: '👷‍♂️',
-    photoUrl: 'https://randomuser.me/api/portraits/men/71.jpg',
-    price: 'Rp 120.000/hari',
-  ),
-  Worker(
-    name: 'Audi Setiawan',
-    job: 'Tukang Ledeng & Pompa Air',
-    phone: '0817-6789-0124',
-    experience: '2 tahun',
-    rating: 4.4,
-    position: const LatLng(-2.9700, 104.7760),
-    color: const Color(0xFF1565C0),
-    avatar: '👨‍🔧',
-    photoUrl: 'https://randomuser.me/api/portraits/men/22.jpg',
-    price: 'Rp 45.000/hari',
-  ),
-  Worker(
-    name: 'Hendra Wijaya',
-    job: 'Tukang Listrik',
-    phone: '0818-7890-1235',
-    experience: '6 tahun',
-    rating: 4.8,
-    position: const LatLng(-2.9820, 104.7710),
-    color: const Color(0xFFFF9800),
-    avatar: '👨‍🔧',
-    photoUrl: 'https://randomuser.me/api/portraits/men/11.jpg',
-    price: 'Rp 140.000/hari',
-  ),
-  Worker(
-    name: 'Putri Amelia',
-    job: 'Tukang Masak',
-    phone: '0819-8901-2346',
-    experience: '3 tahun',
-    rating: 4.7,
-    position: const LatLng(-2.9740, 104.7690),
-    color: const Color(0xFFE91E63),
-    avatar: '👩‍🍳',
-    photoUrl: 'https://randomuser.me/api/portraits/women/12.jpg',
-    price: 'Rp 90.000/hari',
-  ),
-];
-
-const List<String> jobCategories = [
-  'Semua',
-  'Tukang Cuci',
-  'Tukang Listrik',
-  'Tukang Masak',
-  'Tukang Bangunan',
-];
-
-// ─────────────────────────────────────────
-// App Entry (wrap in MaterialApp)
-// ─────────────────────────────────────────
-class CariPekerjaApp extends StatelessWidget {
-  const CariPekerjaApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF1565C0)),
-        fontFamily: 'Roboto',
-      ),
-      home: const MainShell(),
-    );
-  }
-}
-
-// ─────────────────────────────────────────
-// Main Shell with bottom nav
-// ─────────────────────────────────────────
-class MainShell extends StatefulWidget {
-  const MainShell({super.key});
-
-  @override
-  State<MainShell> createState() => _MainShellState();
-}
-
-class _MainShellState extends State<MainShell> {
-  int _currentIndex = 0;
-
-  final List<Widget> _pages = const [MapPage(), SettingsPage()];
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: _pages[_currentIndex],
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withAlpha(18),
-              blurRadius: 12,
-              offset: const Offset(0, -2),
-            ),
-          ],
-        ),
-        child: SafeArea(
-          top: false,
-          child: SizedBox(
-            height: 64,
-            child: Row(
-              children: [
-                _NavItem(
-                  icon: Icons.explore_outlined,
-                  iconActive: Icons.explore,
-                  label: 'Eksplor',
-                  isActive: _currentIndex == 0,
-                  onTap: () => setState(() => _currentIndex = 0),
-                ),
-                _NavItem(
-                  icon: Icons.settings_outlined,
-                  iconActive: Icons.settings,
-                  label: 'Pengaturan',
-                  isActive: _currentIndex == 1,
-                  onTap: () => setState(() => _currentIndex = 1),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _NavItem extends StatelessWidget {
-  final IconData icon;
-  final IconData iconActive;
-  final String label;
-  final bool isActive;
-  final VoidCallback onTap;
-
-  const _NavItem({
-    required this.icon,
-    required this.iconActive,
-    required this.label,
-    required this.isActive,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        behavior: HitTestBehavior.opaque,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              isActive ? iconActive : icon,
-              color: isActive ? kPrimary : Colors.grey,
-              size: 24,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                color: isActive ? kPrimary : Colors.grey,
-                fontSize: 12,
-                fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// Placeholder settings page
-class SettingsPage extends StatelessWidget {
-  const SettingsPage({super.key});
-  @override
-  Widget build(BuildContext context) => const Center(child: Text('Pengaturan'));
-}
+import 'filter_page.dart';
+import 'models/explore_model.dart';
+import 'models/worker_model.dart';
+import 'profile_page.dart';
+import 'search_page.dart';
 
 // ─────────────────────────────────────────
 // Map Screen
@@ -289,16 +31,183 @@ enum _LocationState { checking, denied, deniedForever, granted }
 
 class _MapPageState extends State<MapPage> {
   final MapController _mapController = MapController();
-
-  LatLng? _myLocation; // nullable, gak ada default
+  final _workerService = ExploreService();
+  LatLng? _myLocation;
   bool _isLoadingLocation = false;
   _LocationState _locationState = _LocationState.checking;
-  Worker? _selectedWorker; // ← tambah ini
-  String _selectedCategory = 'Semua'; // ← tambah ini
+  WorkerExploreModel? _selectedWorker;
 
-  List<Worker> get _filteredWorkers => _selectedCategory == 'Semua'
-      ? allWorkers
-      : allWorkers.where((w) => w.job == _selectedCategory).toList();
+  // ── Filter state ──
+  FilterResult? _activeFilter;
+
+  String _searchQuery = '';
+  bool _isLoading = true;
+  String? _errorMessage;
+  ExploreModel? _explore;
+
+  Future<void> _loadAll() async {
+    if (_myLocation == null) return;
+    try {
+      setState(() {
+        _isLoading = true;
+        _errorMessage = null;
+      });
+
+      final explore = await _workerService.fetchWorkerExplore(
+        lat: _myLocation!.latitude,
+        lng: _myLocation!.longitude,
+        radius: _activeFilter?.radiusKm ?? 5,
+        q: _searchQuery.isEmpty ? null : _searchQuery,
+        gender: (_activeFilter?.gender == 'Semua')
+            ? null
+            : _activeFilter?.gender,
+        ageMin: _activeFilter?.ageRange.start.round(),
+        ageMax: _activeFilter?.ageRange.end.round(),
+      );
+
+      setState(() {
+        _explore = explore;
+        _isLoading = false;
+      });
+
+      // ← ganti addPostFrameCallback lama dengan ini
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+
+        final radiusM = (_activeFilter?.radiusKm ?? 5) * 1000;
+        final radiusDeg = radiusM / 111320;
+
+        final bounds = LatLngBounds.fromPoints([
+          LatLng(_myLocation!.latitude + radiusDeg, _myLocation!.longitude),
+          LatLng(_myLocation!.latitude - radiusDeg, _myLocation!.longitude),
+          LatLng(_myLocation!.latitude, _myLocation!.longitude + radiusDeg),
+          LatLng(_myLocation!.latitude, _myLocation!.longitude - radiusDeg),
+        ]);
+
+        // _mapController.fitCamera(
+        //   CameraFit.bounds(
+        //     bounds: bounds,
+        //     padding: const EdgeInsets.all(40),
+        //     minZoom: 12,
+        //   ),
+        // );
+      });
+    } catch (e) {
+      setState(() {
+        _errorMessage = e.toString();
+        _isLoading = false;
+      });
+    }
+  }
+
+  // ── Active chips: hanya tampil kalau filter aktif ──
+  List<_ActiveChipData> get _activeChips {
+    if (_activeFilter == null) return [];
+    final f = _activeFilter!;
+    final chips = <_ActiveChipData>[];
+
+    if (f.gender != 'Semua') {
+      chips.add(
+        _ActiveChipData(
+          icon: Icons.wc,
+          label: f.gender,
+          onRemove: () async {
+            setState(() {
+              _activeFilter = FilterResult(
+                gender: 'Semua',
+                ageRange: f.ageRange,
+                location: f.location,
+                radiusKm: f.radiusKm,
+              );
+            });
+            await _loadAll();
+          },
+        ),
+      );
+    }
+
+    // Umur — tampil kalau bukan default (18–55)
+    if (f.ageRange.start != 18 || f.ageRange.end != 55) {
+      chips.add(
+        _ActiveChipData(
+          icon: Icons.cake_outlined,
+          label: '${f.ageRange.start.round()}–${f.ageRange.end.round()} thn',
+          onRemove: () async {
+            setState(() {
+              _activeFilter = FilterResult(
+                gender: f.gender,
+                ageRange: const RangeValues(18, 55),
+                location: f.location,
+                radiusKm: f.radiusKm,
+              );
+            });
+            await _loadAll();
+          },
+        ),
+      );
+    }
+
+    // Radius — tampil kalau bukan default (15 km)
+    if (f.radiusKm != 15) {
+      chips.add(
+        _ActiveChipData(
+          icon: Icons.location_on_outlined,
+          label: 'Radius: ${f.radiusKm.round()} km',
+          onRemove: () async {
+            setState(() {
+              _activeFilter = FilterResult(
+                gender: f.gender,
+                ageRange: f.ageRange,
+                location: f.location,
+                radiusKm: 15,
+              );
+            });
+            await _loadAll();
+          },
+        ),
+      );
+    }
+
+    return chips;
+  }
+
+  bool get _hasActiveFilter => _activeChips.isNotEmpty;
+
+  // ── Buka filter page ──
+  Future<void> _openFilter() async {
+    final result = await Navigator.push<FilterResult>(
+      context,
+      MaterialPageRoute(
+        builder: (_) =>
+            FilterPage(myLocation: _myLocation, initialFilter: _activeFilter),
+        fullscreenDialog: true,
+      ),
+    );
+    if (result != null && mounted) {
+      setState(() => _activeFilter = result);
+      await _loadAll();
+    }
+  }
+
+  Future<void> _openSearch() async {
+    await Navigator.push(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (_, animation, __) => SearchPage(
+          initialQuery: _searchQuery,
+          onSearch: (query) {
+            setState(() {
+              _searchQuery = query;
+            });
+          },
+        ),
+        transitionsBuilder: (_, animation, __, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+        transitionDuration: const Duration(milliseconds: 200),
+      ),
+    );
+  }
 
   @override
   void initState() {
@@ -335,35 +244,36 @@ class _MapPageState extends State<MapPage> {
       final position = await Geolocator.getCurrentPosition();
       setState(() {
         _myLocation = LatLng(position.latitude, position.longitude);
+        print(
+          'myLocation: ${_myLocation?.latitude}, ${_myLocation?.longitude}',
+        );
         _isLoadingLocation = false;
       });
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          _mapController.move(_myLocation!, 14.5);
-        }
-      });
+      // Jangan move di sini — tunggu sampai _loadAll selesai dan FlutterMap sudah render
+      await _loadAll(); // ← pindah ke sini, setelah lokasi dapat
     } catch (e) {
       setState(() => _isLoadingLocation = false);
     }
   }
 
+  double _zoomFromRadius(double radiusKm) {
+    return 14 - (log(radiusKm) / log(2));
+  }
+
   @override
   Widget build(BuildContext context) {
-    // ── Checking permission ──
     if (_locationState == _LocationState.checking) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    // ── Permission belum dikasih ──
     if (_locationState == _LocationState.denied ||
         _locationState == _LocationState.deniedForever) {
-      return _PermissionUI(
+      return PermissionUI(
         isDeniedForever: _locationState == _LocationState.deniedForever,
         onRequest: _requestPermission,
       );
     }
 
-    // ── Loading GPS ──
     if (_isLoadingLocation || _myLocation == null) {
       return const Scaffold(
         body: Center(
@@ -382,16 +292,36 @@ class _MapPageState extends State<MapPage> {
       );
     }
 
-    // ── Map ──
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    // ── Error ──
+    if (_errorMessage != null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.error_outline, color: Colors.red, size: 40),
+            const SizedBox(height: 8),
+            Text(_errorMessage!, style: const TextStyle(color: Colors.red)),
+            const SizedBox(height: 12),
+            ElevatedButton(onPressed: _loadAll, child: const Text('Coba Lagi')),
+          ],
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: const Color(0xFFDEEAF7),
       body: Stack(
         children: [
+          // ── Map ──
           FlutterMap(
             mapController: _mapController,
             options: MapOptions(
               initialCenter: _myLocation!,
-              initialZoom: 14.5,
+              initialZoom: _zoomFromRadius(_activeFilter?.radiusKm ?? 5),
               onTap: (_, __) => setState(() => _selectedWorker = null),
             ),
             children: [
@@ -400,7 +330,8 @@ class _MapPageState extends State<MapPage> {
                 circles: [
                   CircleMarker(
                     point: _myLocation!,
-                    radius: 110,
+                    radius: (_activeFilter?.radiusKm ?? 5) * 1000, // km → meter
+                    useRadiusInMeter: true, // ← wajib ini
                     color: kPrimary.withOpacity(0.1),
                     borderColor: kPrimary.withOpacity(0.4),
                     borderStrokeWidth: 1.5,
@@ -415,15 +346,24 @@ class _MapPageState extends State<MapPage> {
                     height: 56,
                     child: const _MyLocationDot(),
                   ),
-                  ..._filteredWorkers.map(
+                  ...(_explore?.workers ?? []).map(
                     (worker) => Marker(
-                      point: worker.position,
+                      point: LatLng(
+                        double.parse(worker.lat ?? '0'),
+                        double.parse(worker.lng ?? '0'),
+                      ),
                       width: 70,
                       height: 80,
                       child: GestureDetector(
                         onTap: () {
                           setState(() => _selectedWorker = worker);
-                          _mapController.move(worker.position, 15.5);
+                          _mapController.move(
+                            LatLng(
+                              double.parse(worker.lat ?? '0'),
+                              double.parse(worker.lng ?? '0'),
+                            ),
+                            15.5,
+                          );
                         },
                         child: _WorkerPhotoMarker(
                           worker: worker,
@@ -450,43 +390,73 @@ class _MapPageState extends State<MapPage> {
                   vertical: 10,
                 ),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 65),
-                    _SearchBar(
-                      onChanged: (val) {
-                        final match = jobCategories.firstWhere(
-                          (cat) =>
-                              cat.toLowerCase().contains(val.toLowerCase()),
-                          orElse: () => 'Semua',
-                        );
-                        setState(() => _selectedCategory = match);
-                      },
+
+                    // Search bar + tombol filter
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _SearchBar(
+                            query: _searchQuery,
+                            onTap: _openSearch,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        // Tombol filter — badge merah kalau ada filter aktif
+                        _FilterButton(
+                          hasActiveFilter: _hasActiveFilter,
+                          onTap: _openFilter,
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 15),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: [
-                          _LocationChip(
-                            icon: Icons.location_on_outlined,
-                            label: 'Radius: 5 km',
-                            onTap: () {},
-                          ),
-                          const SizedBox(width: 8),
-                          _LocationChip(
-                            icon: Icons.male,
-                            label: 'Umur',
-                            onTap: () {},
-                          ),
-                          const SizedBox(width: 8),
-                          _LocationChip(
-                            icon: Icons.male,
-                            label: 'Gender',
-                            onTap: () {},
-                          ),
-                        ],
+
+                    // ── Active filter chips (hanya muncul kalau ada filter) ──
+                    if (_activeChips.isNotEmpty) ...[
+                      const SizedBox(height: 10),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            ..._activeChips.map(
+                              (chip) => Padding(
+                                padding: const EdgeInsets.only(right: 8),
+                                child: _ActiveFilterChip(data: chip),
+                              ),
+                            ),
+                            // Tombol clear all
+                            GestureDetector(
+                              onTap: () async {
+                                setState(() => _activeFilter = null);
+                                await _loadAll();
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.red.shade50,
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(
+                                    color: Colors.red.shade200,
+                                  ),
+                                ),
+                                child: Text(
+                                  'Hapus semua',
+                                  style: TextStyle(
+                                    color: Colors.red.shade600,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
+                    ],
                   ],
                 ),
               ),
@@ -526,7 +496,7 @@ class _MapPageState extends State<MapPage> {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  '${_filteredWorkers.length} pekerja ditemukan',
+                  '${_explore?.total ?? 0} pekerja ditemukan',
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
@@ -542,109 +512,180 @@ class _MapPageState extends State<MapPage> {
 }
 
 // ─────────────────────────────────────────
-// Search Bar
+// Helper model untuk chip aktif
 // ─────────────────────────────────────────
-class _SearchBar extends StatelessWidget {
-  final ValueChanged<String> onChanged;
-  const _SearchBar({required this.onChanged});
+class _ActiveChipData {
+  final IconData icon;
+  final String label;
+  final VoidCallback onRemove;
 
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: kGrey, width: 1),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withAlpha(20),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 14),
-                  child: Icon(Icons.search, color: Colors.grey[700], size: 22),
-                ),
-                Expanded(
-                  child: TextField(
-                    onChanged: onChanged,
-                    decoration: InputDecoration(
-                      hintText: 'Cari Pekerja...',
-                      hintStyle: TextStyle(
-                        color: Colors.grey[700],
-                        fontSize: 15,
-                      ),
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.symmetric(vertical: 14),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        SizedBox(width: 10),
-        // Filter icon button
-        Container(
-          width: 60,
-          height: 50,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: kGrey, width: 1),
-          ),
-          child: Icon(Icons.tune, color: Colors.grey[800], size: 20),
-        ),
-      ],
-    );
-  }
+  const _ActiveChipData({
+    required this.icon,
+    required this.label,
+    required this.onRemove,
+  });
 }
 
 // ─────────────────────────────────────────
-// Location Chip
+// Tombol Filter (dengan badge kalau aktif)
 // ─────────────────────────────────────────
-class _LocationChip extends StatelessWidget {
-  final IconData icon;
-  final String label;
+class _FilterButton extends StatelessWidget {
+  final bool hasActiveFilter;
   final VoidCallback onTap;
 
-  const _LocationChip({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
+  const _FilterButton({required this.hasActiveFilter, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: kGrey, width: 1),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, color: kPrimary, size: 16),
-            const SizedBox(width: 5),
-            Text(
-              label,
-              style: TextStyle(
-                color: Colors.grey[700],
-                fontWeight: FontWeight.w600,
-                fontSize: 13,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            width: 46,
+            height: 46,
+            decoration: BoxDecoration(
+              color: hasActiveFilter ? kPrimary : Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Icon(
+              Icons.tune_rounded,
+              color: hasActiveFilter ? Colors.white : Colors.black87,
+              size: 22,
+            ),
+          ),
+          // Badge merah kalau ada filter aktif
+          if (hasActiveFilter)
+            Positioned(
+              top: -4,
+              right: -4,
+              child: Container(
+                width: 12,
+                height: 12,
+                decoration: const BoxDecoration(
+                  color: Colors.red,
+                  shape: BoxShape.circle,
+                ),
               ),
             ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────
+// Chip filter aktif (dengan tombol X)
+// ─────────────────────────────────────────
+class _ActiveFilterChip extends StatelessWidget {
+  final _ActiveChipData data;
+
+  const _ActiveFilterChip({required this.data});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.only(left: 10, right: 6, top: 6, bottom: 6),
+      decoration: BoxDecoration(
+        color: kWhite,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: kPrimary.withOpacity(0.3)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(data.icon, size: 13, color: kPrimary),
+          const SizedBox(width: 5),
+          Text(
+            data.label,
+            style: TextStyle(
+              color: Colors.grey[900],
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(width: 4),
+          GestureDetector(
+            onTap: data.onRemove,
+            child: const Icon(Icons.close, size: 14, color: kPrimary),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────
+// Search Bar
+// ─────────────────────────────────────────
+class _SearchBar extends StatelessWidget {
+  final String query; // teks aktif dari search (kosong = placeholder)
+  final VoidCallback onTap;
+
+  const _SearchBar({required this.query, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final hasQuery = query.isNotEmpty;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 46,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(20),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 14),
+              child: Icon(Icons.search, color: Colors.black45, size: 20),
+            ),
+            Expanded(
+              child: Text(
+                hasQuery ? query : 'Cari Pekerja...',
+                style: TextStyle(
+                  color: hasQuery ? Colors.black87 : Colors.grey[500],
+                  fontSize: 15,
+                  fontWeight: hasQuery ? FontWeight.w600 : FontWeight.normal,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            // Indikator ada query aktif
+            if (hasQuery)
+              Padding(
+                padding: const EdgeInsets.only(right: 12),
+                child: Container(
+                  width: 20,
+                  height: 20,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFE5E7EB),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.close,
+                    size: 13,
+                    color: Colors.black54,
+                  ),
+                ),
+              ),
           ],
         ),
       ),
@@ -656,7 +697,7 @@ class _LocationChip extends StatelessWidget {
 // Worker Photo Marker
 // ─────────────────────────────────────────
 class _WorkerPhotoMarker extends StatelessWidget {
-  final Worker worker;
+  final WorkerExploreModel worker;
   final bool isSelected;
 
   const _WorkerPhotoMarker({required this.worker, required this.isSelected});
@@ -686,13 +727,13 @@ class _WorkerPhotoMarker extends StatelessWidget {
             ],
           ),
           child: ClipOval(
-            child: worker.photoUrl != null
+            child: worker.avatarUrl != null
                 ? Image.network(
-                    worker.photoUrl!,
+                    imageUrl(worker.avatarUrl!),
                     fit: BoxFit.cover,
                     errorBuilder: (_, __, ___) => Center(
                       child: Text(
-                        worker.avatar,
+                        "👨",
                         style: TextStyle(fontSize: isSelected ? 22 : 18),
                       ),
                     ),
@@ -700,7 +741,7 @@ class _WorkerPhotoMarker extends StatelessWidget {
                       if (loadingProgress == null) return child;
                       return Center(
                         child: Text(
-                          worker.avatar,
+                          "👨",
                           style: TextStyle(fontSize: isSelected ? 22 : 18),
                         ),
                       );
@@ -708,7 +749,7 @@ class _WorkerPhotoMarker extends StatelessWidget {
                   )
                 : Center(
                     child: Text(
-                      worker.avatar,
+                      "👨",
                       style: TextStyle(fontSize: isSelected ? 22 : 18),
                     ),
                   ),
@@ -822,7 +863,7 @@ class _MyLocationDotState extends State<_MyLocationDot>
 // Bottom Sheet
 // ─────────────────────────────────────────
 class _WorkerBottomSheet extends StatelessWidget {
-  final Worker worker;
+  final WorkerExploreModel worker;
   final VoidCallback onClose;
   final VoidCallback onViewProfile;
 
@@ -876,20 +917,20 @@ class _WorkerBottomSheet extends StatelessWidget {
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(12),
-                    child: worker.photoUrl != null
+                    child: worker.avatarUrl != null
                         ? Image.network(
-                            worker.photoUrl!,
+                            imageUrl(worker.avatarUrl!),
                             fit: BoxFit.cover,
                             errorBuilder: (_, __, ___) => Center(
                               child: Text(
-                                worker.avatar,
+                                "👨",
                                 style: const TextStyle(fontSize: 28),
                               ),
                             ),
                           )
                         : Center(
                             child: Text(
-                              worker.avatar,
+                              "👨",
                               style: const TextStyle(fontSize: 28),
                             ),
                           ),
@@ -902,7 +943,7 @@ class _WorkerBottomSheet extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        worker.name,
+                        worker.fullName,
                         style: const TextStyle(
                           fontWeight: FontWeight.w700,
                           fontSize: 17,
@@ -911,7 +952,7 @@ class _WorkerBottomSheet extends StatelessWidget {
                       ),
                       const SizedBox(height: 3),
                       Text(
-                        worker.job,
+                        worker.services.join(', '),
                         style: const TextStyle(
                           color: Colors.black54,
                           fontSize: 13,
@@ -923,7 +964,7 @@ class _WorkerBottomSheet extends StatelessWidget {
                           const Icon(Icons.star, color: Colors.amber, size: 15),
                           const SizedBox(width: 3),
                           Text(
-                            '${worker.rating}',
+                            '${worker.distanceKm.toStringAsFixed(1)} km',
                             style: const TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
@@ -931,7 +972,7 @@ class _WorkerBottomSheet extends StatelessWidget {
                           ),
                           const SizedBox(width: 10),
                           Text(
-                            worker.price,
+                            '${worker.age} thn',
                             style: const TextStyle(
                               fontSize: 12,
                               color: kPrimary,
@@ -981,289 +1022,6 @@ class _WorkerBottomSheet extends StatelessWidget {
           ),
           SizedBox(height: MediaQuery.of(context).padding.bottom),
         ],
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────
-// Profile Page (unchanged structure, updated styling)
-// ─────────────────────────────────────────
-class ProfilePage extends StatelessWidget {
-  final Worker worker;
-  const ProfilePage({super.key, required this.worker});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F8FF),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black87),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text(
-          'Profil Pekerja',
-          style: TextStyle(
-            color: Colors.black87,
-            fontWeight: FontWeight.w700,
-            fontSize: 16,
-          ),
-        ),
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            // Avatar
-            Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: kPrimary, width: 3),
-              ),
-              child: ClipOval(
-                child: worker.photoUrl != null
-                    ? Image.network(
-                        worker.photoUrl!,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Center(
-                          child: Text(
-                            worker.avatar,
-                            style: const TextStyle(fontSize: 40),
-                          ),
-                        ),
-                      )
-                    : Center(
-                        child: Text(
-                          worker.avatar,
-                          style: const TextStyle(fontSize: 40),
-                        ),
-                      ),
-              ),
-            ),
-            const SizedBox(height: 14),
-            Text(
-              worker.name,
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w800,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              worker.job,
-              style: const TextStyle(
-                color: kPrimary,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 6),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.star, color: Colors.amber, size: 18),
-                const SizedBox(width: 4),
-                Text(
-                  '${worker.rating}',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 15,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            _InfoCard(worker: worker),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton.icon(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: kPrimary,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  elevation: 0,
-                ),
-                icon: const Icon(Icons.phone_outlined),
-                label: Text(
-                  'Hubungi ${worker.name.split(' ').first}',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 15,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _InfoCard extends StatelessWidget {
-  final Worker worker;
-  const _InfoCard({required this.worker});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(15),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          _InfoRow(
-            icon: Icons.phone_outlined,
-            label: 'Nomor HP',
-            value: worker.phone,
-          ),
-          const Divider(height: 20),
-          _InfoRow(
-            icon: Icons.work_outline,
-            label: 'Pengalaman',
-            value: worker.experience,
-          ),
-          const Divider(height: 20),
-          _InfoRow(
-            icon: Icons.attach_money,
-            label: 'Harga',
-            value: worker.price,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _InfoRow extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String value;
-  const _InfoRow({
-    required this.icon,
-    required this.label,
-    required this.value,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(icon, color: kPrimary, size: 20),
-        const SizedBox(width: 12),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              label,
-              style: const TextStyle(fontSize: 11, color: Colors.grey),
-            ),
-            Text(
-              value,
-              style: const TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 14,
-                color: Colors.black87,
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
-class _PermissionUI extends StatelessWidget {
-  final bool isDeniedForever;
-  final VoidCallback onRequest;
-
-  const _PermissionUI({required this.isDeniedForever, required this.onRequest});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFEFF6FF),
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: const Icon(
-                  Icons.location_off_outlined,
-                  size: 64,
-                  color: kPrimary,
-                ),
-              ),
-              const SizedBox(height: 32),
-              const Text(
-                'Izin Lokasi Diperlukan',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                isDeniedForever
-                    ? 'Izin lokasi ditolak permanen. Buka pengaturan untuk mengaktifkan.'
-                    : 'Aplikasi butuh akses lokasi untuk menampilkan pekerja di sekitar Anda.',
-                style: const TextStyle(fontSize: 14, color: Colors.grey),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 32),
-              SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: ElevatedButton(
-                  onPressed: isDeniedForever
-                      ? () => Geolocator.openAppSettings()
-                      : onRequest,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: kPrimary,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: Text(
-                    isDeniedForever
-                        ? 'Buka Pengaturan'
-                        : 'Izinkan Akses Lokasi',
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

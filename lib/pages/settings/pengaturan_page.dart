@@ -1,16 +1,77 @@
 import 'package:flutter/material.dart';
 import 'package:piawai/core/constants.dart';
 import 'package:piawai/pages/auth/auth_screen.dart';
+import 'package:piawai/pages/explore/siap_bantu/models/worker_profile_model.dart';
 import 'package:piawai/services/auth_services.dart';
+import 'package:piawai/services/worker_services.dart';
 
 // ─────────────────────────────────────────
 // PENGATURAN PAGE
 // ─────────────────────────────────────────
-class PengaturanPage extends StatelessWidget {
+class PengaturanPage extends StatefulWidget {
   const PengaturanPage({super.key});
 
   @override
+  State<PengaturanPage> createState() => _PengaturanPageState();
+}
+
+class _PengaturanPageState extends State<PengaturanPage> {
+  final _workerService = WorkerService();
+
+  // state untuk data
+  WorkerProfileModel? _profile;
+  bool _isLoading = true;
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAll();
+  }
+
+  Future<void> _loadAll() async {
+    try {
+      setState(() {
+        _isLoading = true;
+        _errorMessage = null;
+      });
+
+      final profile = await _workerService.fetchProfile();
+
+      setState(() {
+        _profile = profile;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _errorMessage = e.toString();
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // ── Loading ──
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    // ── Error ──
+    if (_errorMessage != null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.error_outline, color: Colors.red, size: 40),
+            const SizedBox(height: 8),
+            Text(_errorMessage!, style: const TextStyle(color: Colors.red)),
+            const SizedBox(height: 12),
+            ElevatedButton(onPressed: _loadAll, child: const Text('Coba Lagi')),
+          ],
+        ),
+      );
+    }
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
@@ -34,7 +95,7 @@ class PengaturanPage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          _ProfileCard(),
+          ProfileCard(profile: _profile!),
           const SizedBox(height: 24),
 
           _SectionLabel(label: 'Akun'),
@@ -147,7 +208,10 @@ class PengaturanPage extends StatelessWidget {
 // ─────────────────────────────────────────
 // PROFILE CARD
 // ─────────────────────────────────────────
-class _ProfileCard extends StatelessWidget {
+class ProfileCard extends StatelessWidget {
+  final WorkerProfileModel profile;
+  const ProfileCard({super.key, required this.profile});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -180,16 +244,16 @@ class _ProfileCard extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 14),
-          const Column(
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Alex Johnson',
+                profile.fullName,
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
               ),
               SizedBox(height: 3),
               Text(
-                'alex.johnson@email.com',
+                profile.username,
                 style: TextStyle(fontSize: 13, color: Colors.grey),
               ),
             ],
