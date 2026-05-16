@@ -29,7 +29,7 @@ class MapPage extends StatefulWidget {
 
 enum _LocationState { checking, denied, deniedForever, granted }
 
-class _MapPageState extends State<MapPage> {
+class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
   final MapController _mapController = MapController();
   final _workerService = ExploreService();
   LatLng? _myLocation;
@@ -261,7 +261,11 @@ class _MapPageState extends State<MapPage> {
   }
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     if (_locationState == _LocationState.checking) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
