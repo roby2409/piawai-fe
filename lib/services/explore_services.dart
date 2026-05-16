@@ -59,4 +59,24 @@ class ExploreService {
     final data = _handleResponse(response);
     return ExploreModel.fromJson(data);
   }
+
+  // Tambah method ini di ExploreService
+
+  Future<List<String>> fetchSuggestions({String q = '', int limit = 8}) async {
+    final queryParams = <String, String>{
+      if (q.isNotEmpty) 'q': q,
+      'limit': limit.toString(),
+    };
+
+    final uri = Uri.parse(
+      '$baseUrl/explore/suggest',
+    ).replace(queryParameters: queryParams);
+
+    final response = await http.get(uri, headers: await _authHeaders());
+    final data = _handleResponse(response);
+
+    // Response: { "suggestions": ["Tukang Cuci", "Tukang Listrik", ...] }
+    final list = data['suggestions'] as List<dynamic>? ?? [];
+    return list.map((e) => e.toString()).toList();
+  }
 }

@@ -195,10 +195,11 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
       PageRouteBuilder(
         pageBuilder: (_, animation, __) => SearchPage(
           initialQuery: _searchQuery,
-          onSearch: (query) {
+          onSearch: (query) async {
             setState(() {
               _searchQuery = query;
             });
+            await _loadAll();
           },
         ),
         transitionsBuilder: (_, animation, __, child) {
@@ -405,6 +406,13 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                           child: _SearchBar(
                             query: _searchQuery,
                             onTap: _openSearch,
+                            onClear: () async {
+                              // ← tambah ini
+                              setState(() {
+                                _searchQuery = '';
+                              });
+                              await _loadAll();
+                            },
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -631,10 +639,11 @@ class _ActiveFilterChip extends StatelessWidget {
 // Search Bar
 // ─────────────────────────────────────────
 class _SearchBar extends StatelessWidget {
-  final String query; // teks aktif dari search (kosong = placeholder)
+  final String query;
   final VoidCallback onTap;
+  final VoidCallback? onClear; // ← tambah ini
 
-  const _SearchBar({required this.query, required this.onTap});
+  const _SearchBar({required this.query, required this.onTap, this.onClear});
 
   @override
   Widget build(BuildContext context) {
@@ -672,21 +681,25 @@ class _SearchBar extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            // Indikator ada query aktif
+            // Icon close — tap terpisah dari onTap parent
             if (hasQuery)
-              Padding(
-                padding: const EdgeInsets.only(right: 12),
-                child: Container(
-                  width: 20,
-                  height: 20,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFE5E7EB),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.close,
-                    size: 13,
-                    color: Colors.black54,
+              GestureDetector(
+                onTap: onClear, // ← tidak bubble ke parent GestureDetector
+                behavior: HitTestBehavior.opaque,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Container(
+                    width: 20,
+                    height: 20,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFE5E7EB),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.close,
+                      size: 13,
+                      color: Colors.black54,
+                    ),
                   ),
                 ),
               ),

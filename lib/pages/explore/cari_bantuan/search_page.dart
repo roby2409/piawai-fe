@@ -1,15 +1,10 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:piawai/core/constants.dart';
+import 'package:piawai/services/explore_services.dart';
 
-// ─────────────────────────────────────────
-// Search Page
-// Dipanggil dari MapPage saat user tap search bar
-// ─────────────────────────────────────────
 class SearchPage extends StatefulWidget {
-  /// Callback saat user submit pencarian (pilih saran / enter)
   final ValueChanged<String> onSearch;
-
-  /// Query awal (opsional)
   final String initialQuery;
 
   const SearchPage({super.key, required this.onSearch, this.initialQuery = ''});
@@ -21,34 +16,19 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   late final TextEditingController _ctrl;
   late final FocusNode _focusNode;
+  final _exploreService = ExploreService();
 
-  // ── Suggestions statis (bisa diganti dari API) ──
-  static const _allSuggestions = [
-    'Tukang Ledeng',
-    'Tukang Cat Rumah',
-    'Tukang Kayu Professional',
-    'Tukang Listrik 24 Jam',
-    'Tukang Kebun',
-    'Tukang Cuci',
-    'Tukang Bangunan',
-    'Tukang Masak',
-    'Cleaning Service',
-    'Servis AC',
-    'Jasa Pindahan',
-    'Tukang Las',
-  ];
-
-  // ── Recent searches (simpan di state; bisa pakai SharedPreferences) ──
-  final List<String> _recents = ['Sedot WC', 'Servis AC', 'Cleaning Service'];
+  Timer? _debounce;
 
   String _query = '';
+  List<String> _suggestions = [];
+  bool _isLoadingSuggestions = false;
 
-  List<String> get _suggestions {
-    if (_query.isEmpty) return [];
-    return _allSuggestions
-        .where((s) => s.toLowerCase().contains(_query.toLowerCase()))
-        .toList();
-  }
+  final List<String> _recents = ['Sedot WC', 'Servis AC', 'Cleaning Service'];
+
+  bool get _showSuggestions => _suggestions.isNotEmpty;
+  bool get _showRecents =>
+      !_showSuggestions && _recents.isNotEmpty && _query.isEmpty;
 
   @override
   void initState() {
@@ -56,17 +36,39 @@ class _SearchPageState extends State<SearchPage> {
     _query = widget.initialQuery;
     _ctrl = TextEditingController(text: widget.initialQuery);
     _focusNode = FocusNode();
-    // Auto-focus keyboard
     WidgetsBinding.instance.addPostFrameCallback(
       (_) => _focusNode.requestFocus(),
     );
+    // Load popular suggestions saat pertama buka
+    _fetchSuggestions('');
   }
 
   @override
   void dispose() {
+    _debounce?.cancel();
     _ctrl.dispose();
     _focusNode.dispose();
     super.dispose();
+  }
+
+  void _onQueryChanged(String val) {
+    setState(() => _query = val);
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 400), () {
+      _fetchSuggestions(val);
+    });
+  }
+
+  Future<void> _fetchSuggestions(String q) async {
+    setState(() => _isLoadingSuggestions = true);
+    try {
+      final results = await _exploreService.fetchSuggestions(q: q);
+      if (mounted) setState(() => _suggestions = results);
+    } catch (_) {
+      if (mounted) setState(() => _suggestions = []);
+    } finally {
+      if (mounted) setState(() => _isLoadingSuggestions = false);
+    }
   }
 
   void _submit(String value) {
@@ -79,9 +81,9 @@ class _SearchPageState extends State<SearchPage> {
 
   void _addRecent(String value) {
     setState(() {
-      _recents.remove(value); // hindari duplikat
+      _recents.remove(value);
       _recents.insert(0, value);
-      if (_recents.length > 8) _recents.removeLast(); // max 8
+      if (_recents.length > 8) _recents.removeLast();
     });
   }
 
@@ -93,33 +95,25 @@ class _SearchPageState extends State<SearchPage> {
         TextPosition(offset: value.length),
       );
     });
+    _fetchSuggestions(value);
   }
 
-  void _removeRecent(String value) {
-    setState(() => _recents.remove(value));
-  }
-
-  void _clearAllRecents() {
-    setState(() => _recents.clear());
-  }
+  void _removeRecent(String value) => setState(() => _recents.remove(value));
+  void _clearAllRecents() => setState(() => _recents.clear());
 
   @override
   Widget build(BuildContext context) {
-    final showSuggestions = _suggestions.isNotEmpty;
-    final showRecents = !showSuggestions && _recents.isNotEmpty;
-
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Search bar row ──
+            // ── Search bar ──
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               child: Row(
                 children: [
-                  // Back button
                   IconButton(
                     icon: const Icon(Icons.arrow_back, color: Colors.black87),
                     onPressed: () => Navigator.of(context).pop(),
@@ -130,7 +124,6 @@ class _SearchPageState extends State<SearchPage> {
                     ),
                   ),
                   const SizedBox(width: 4),
-                  // Search field
                   Expanded(
                     child: Container(
                       height: 46,
@@ -161,19 +154,22 @@ class _SearchPageState extends State<SearchPage> {
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.symmetric(vertical: 13),
                         ),
-                        onChanged: (val) => setState(() => _query = val),
+                        onChanged: _onQueryChanged,
                         onSubmitted: _submit,
                       ),
                     ),
                   ),
-                  // Clear button (muncul kalau ada teks)
                   if (_query.isNotEmpty) ...[
                     const SizedBox(width: 8),
                     GestureDetector(
                       onTap: () {
-                        setState(() => _query = '');
+                        setState(() {
+                          _query = '';
+                          _suggestions = [];
+                        });
                         _ctrl.clear();
                         _focusNode.requestFocus();
+                        _fetchSuggestions('');
                       },
                       child: Container(
                         width: 30,
@@ -194,8 +190,15 @@ class _SearchPageState extends State<SearchPage> {
               ),
             ),
 
-            // ── Divider ──
-            const Divider(height: 1, color: Color(0xFFF0F0F0)),
+            // Loading bar tipis
+            if (_isLoadingSuggestions)
+              const LinearProgressIndicator(
+                minHeight: 2,
+                backgroundColor: Colors.transparent,
+                color: kPrimary,
+              )
+            else
+              const Divider(height: 1, color: Color(0xFFF0F0F0)),
 
             // ── Content ──
             Expanded(
@@ -203,21 +206,21 @@ class _SearchPageState extends State<SearchPage> {
                 keyboardDismissBehavior:
                     ScrollViewKeyboardDismissBehavior.onDrag,
                 children: [
-                  // ── Suggestions ──
-                  if (showSuggestions) ...[
+                  // Suggestions dari API
+                  if (_showSuggestions) ...[
                     const SizedBox(height: 8),
                     ..._suggestions.map(
-                      (suggestion) => _SuggestionTile(
+                      (s) => _SuggestionTile(
                         query: _query,
-                        suggestion: suggestion,
-                        onTap: () => _submit(suggestion),
-                        onFill: () => _fillQuery(suggestion),
+                        suggestion: s,
+                        onTap: () => _submit(s),
+                        onFill: () => _fillQuery(s),
                       ),
                     ),
                   ],
 
-                  // ── Recent searches ──
-                  if (showRecents) ...[
+                  // Recent searches
+                  if (_showRecents) ...[
                     const SizedBox(height: 16),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -265,8 +268,11 @@ class _SearchPageState extends State<SearchPage> {
                     ),
                   ],
 
-                  // ── Empty state ──
-                  if (!showSuggestions && !showRecents && _query.isNotEmpty)
+                  // Empty state
+                  if (!_showSuggestions &&
+                      !_showRecents &&
+                      _query.isNotEmpty &&
+                      !_isLoadingSuggestions)
                     _EmptyState(query: _query),
                 ],
               ),
@@ -278,9 +284,6 @@ class _SearchPageState extends State<SearchPage> {
   }
 }
 
-// ─────────────────────────────────────────
-// Suggestion Tile
-// ─────────────────────────────────────────
 class _SuggestionTile extends StatelessWidget {
   final String query;
   final String suggestion;
@@ -307,7 +310,6 @@ class _SuggestionTile extends StatelessWidget {
             Expanded(
               child: _HighlightedText(full: suggestion, query: query),
             ),
-            // Tombol ↗ isi ke search bar
             GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: onFill,
@@ -327,9 +329,6 @@ class _SuggestionTile extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────
-// Highlighted Text (bold bagian yang match)
-// ─────────────────────────────────────────
 class _HighlightedText extends StatelessWidget {
   final String full;
   final String query;
@@ -338,23 +337,21 @@ class _HighlightedText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (query.isEmpty) {
+    if (query.isEmpty)
       return Text(
         full,
         style: const TextStyle(fontSize: 15, color: Colors.black87),
       );
-    }
 
     final lowerFull = full.toLowerCase();
     final lowerQuery = query.toLowerCase();
     final matchStart = lowerFull.indexOf(lowerQuery);
 
-    if (matchStart == -1) {
+    if (matchStart == -1)
       return Text(
         full,
         style: const TextStyle(fontSize: 15, color: Colors.black87),
       );
-    }
 
     final matchEnd = matchStart + query.length;
 
@@ -385,9 +382,6 @@ class _HighlightedText extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────
-// Recent Search Chip
-// ─────────────────────────────────────────
 class _RecentChip extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
@@ -433,9 +427,6 @@ class _RecentChip extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────
-// Empty State
-// ─────────────────────────────────────────
 class _EmptyState extends StatelessWidget {
   final String query;
   const _EmptyState({required this.query});
