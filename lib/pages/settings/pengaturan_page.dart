@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:piawai/core/constants.dart';
+import 'package:piawai/core/helper.dart';
 import 'package:piawai/pages/auth/auth_screen.dart';
 import 'package:piawai/pages/explore/siap_bantu/models/worker_profile_model.dart';
+import 'package:piawai/pages/settings/informasi_pribadi_page.dart';
+import 'package:piawai/pages/settings/kata_password_page.dart';
 import 'package:piawai/services/auth_services.dart';
 import 'package:piawai/services/worker_services.dart';
+
+import 'bantuan_page.dart';
 
 // ─────────────────────────────────────────
 // PENGATURAN PAGE
@@ -52,6 +57,25 @@ class _PengaturanPageState extends State<PengaturanPage> {
 
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF5F5F5),
+      appBar: AppBar(
+        backgroundColor: kWhite,
+        elevation: 0,
+        title: const Text(
+          'Pengaturan',
+          style: TextStyle(
+            color: kPrimary,
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+      body: _buildContent(context),
+    );
+  }
+
+  Widget _buildContent(BuildContext context) {
     // ── Loading ──
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -72,135 +96,143 @@ class _PengaturanPageState extends State<PengaturanPage> {
         ),
       );
     }
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
-      appBar: AppBar(
-        backgroundColor: kWhite,
-        elevation: 0,
-        title: const Text(
-          'Pengaturan',
-          style: TextStyle(
-            color: kPrimary,
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        ProfileCard(profile: _profile!),
+        const SizedBox(height: 24),
+
+        _SectionLabel(label: 'Akun'),
+        const SizedBox(height: 8),
+        _SettingsGroup(
+          items: [
+            _SettingsItem(
+              icon: Icons.person_outline,
+              label: 'Informasi Pribadi',
+              onTap: () async {
+                final changed = await Navigator.push<bool>(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => InformasiPribadiPage(
+                      currentUsername: _profile!.username,
+                    ),
+                  ),
+                );
+                if (changed == true) {
+                  _loadAll();
+                }
+              },
+            ),
+            _SettingsItem(
+              icon: Icons.shield_outlined,
+              label: 'Kata Sandi & Keamanan',
+              onTap: () async {
+                final changed = await Navigator.push<bool>(
+                  context,
+                  MaterialPageRoute(builder: (_) => KataPasswordPage()),
+                );
+                if (changed == true) {
+                  _loadAll();
+                }
+              },
+            ),
+          ],
+        ),
+        const SizedBox(height: 24),
+
+        _SectionLabel(label: 'Aplikasi'),
+        const SizedBox(height: 8),
+        _SettingsGroup(
+          items: [
+            _SettingsItem(
+              icon: Icons.language,
+              label: 'Bahasa',
+              trailing: 'Indonesia',
+              onTap: () {},
+            ),
+          ],
+        ),
+        const SizedBox(height: 24),
+
+        _SectionLabel(label: 'Bantuan'),
+        const SizedBox(height: 8),
+        _SettingsGroup(
+          items: [
+            _SettingsItem(
+              icon: Icons.help_outline,
+              label: 'Pusat Bantuan',
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const PusatBantuanPage()),
+              ),
+            ),
+            _SettingsItem(
+              icon: Icons.privacy_tip_outlined,
+              label: 'Kebijakan Privasi',
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const KebijakanPrivasiPage()),
+              ),
+            ),
+            _SettingsItem(
+              icon: Icons.description_outlined,
+              label: 'Syarat & Ketentuan',
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const SyaratKetentuanPage()),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 24),
+
+        _LogoutButton(
+          onTap: () async {
+            final confirm = await showDialog<bool>(
+              context: context,
+              builder: (_) => AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                title: const Text('Keluar'),
+                content: const Text('Apakah Anda yakin ingin keluar?'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    child: Text(
+                      'Batal',
+                      style: TextStyle(color: Colors.grey[600]),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, true),
+                    child: const Text(
+                      'Keluar',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ),
+                ],
+              ),
+            );
+            if (confirm != true) return;
+            await AuthService().signOut();
+            if (!context.mounted) return;
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const AuthScreen()),
+            );
+          },
+        ),
+        const SizedBox(height: 16),
+
+        const Center(
+          child: Text(
+            'Versi 2.4.1 (2024)',
+            style: TextStyle(fontSize: 12, color: Colors.grey),
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.more_vert, color: Colors.black87),
-            onPressed: () {},
-          ),
-        ],
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          ProfileCard(profile: _profile!),
-          const SizedBox(height: 24),
-
-          _SectionLabel(label: 'Akun'),
-          const SizedBox(height: 8),
-          _SettingsGroup(
-            items: [
-              _SettingsItem(
-                icon: Icons.person_outline,
-                label: 'Informasi Pribadi',
-                onTap: () {},
-              ),
-              _SettingsItem(
-                icon: Icons.shield_outlined,
-                label: 'Kata Sandi & Keamanan',
-                onTap: () {},
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-
-          _SectionLabel(label: 'Aplikasi'),
-          const SizedBox(height: 8),
-          _SettingsGroup(
-            items: [
-              _SettingsItem(
-                icon: Icons.language,
-                label: 'Bahasa',
-                trailing: 'Indonesia',
-                onTap: () {},
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-
-          _SectionLabel(label: 'Bantuan'),
-          const SizedBox(height: 8),
-          _SettingsGroup(
-            items: [
-              _SettingsItem(
-                icon: Icons.help_outline,
-                label: 'Pusat Bantuan',
-                onTap: () {},
-              ),
-              _SettingsItem(
-                icon: Icons.privacy_tip_outlined,
-                label: 'Kebijakan Privasi',
-                onTap: () {},
-              ),
-              _SettingsItem(
-                icon: Icons.description_outlined,
-                label: 'Syarat & Ketentuan',
-                onTap: () {},
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-
-          _LogoutButton(
-            onTap: () async {
-              final confirm = await showDialog<bool>(
-                context: context,
-                builder: (_) => AlertDialog(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  title: const Text('Keluar'),
-                  content: const Text('Apakah Anda yakin ingin keluar?'),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, false),
-                      child: Text(
-                        'Batal',
-                        style: TextStyle(color: Colors.grey[600]),
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, true),
-                      child: const Text(
-                        'Keluar',
-                        style: TextStyle(color: Colors.red),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-              if (confirm != true) return;
-              await AuthService().signOut();
-              if (!context.mounted) return;
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => const AuthScreen()),
-              );
-            },
-          ),
-          const SizedBox(height: 16),
-
-          const Center(
-            child: Text(
-              'Versi 2.4.1 (2024)',
-              style: TextStyle(fontSize: 12, color: Colors.grey),
-            ),
-          ),
-          const SizedBox(height: 24),
-        ],
-      ),
+        const SizedBox(height: 24),
+      ],
     );
   }
 }
@@ -229,20 +261,24 @@ class ProfileCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Container(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: kPrimary.withOpacity(0.3), width: 2),
-            ),
-            child: ClipOval(
-              child: Container(
-                color: kBgCard,
-                child: const Icon(Icons.person, size: 32, color: kPrimary),
-              ),
-            ),
-          ),
+          profile.avatarUrl != null
+              ? ClipOval(
+                  child: Image.network(
+                    width: 56,
+                    height: 56,
+                    imageUrl(profile.avatarUrl!),
+                    fit: BoxFit.cover,
+                    // Loading placeholder
+                    loadingBuilder: (_, child, progress) => progress == null
+                        ? child
+                        : const Center(
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                    // Error fallback
+                    errorBuilder: (_, __, ___) => profilePlaceholder(),
+                  ),
+                )
+              : profilePlaceholder(),
           const SizedBox(width: 14),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -259,6 +295,23 @@ class ProfileCard extends StatelessWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  Container profilePlaceholder() {
+    return Container(
+      width: 56,
+      height: 56,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: kPrimary.withOpacity(0.3), width: 2),
+      ),
+      child: ClipOval(
+        child: Container(
+          color: kBgCard,
+          child: const Icon(Icons.person, size: 32, color: kPrimary),
+        ),
       ),
     );
   }
