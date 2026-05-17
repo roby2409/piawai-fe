@@ -1,50 +1,8 @@
 {
-  "app_name": "WA Paste Any Number",
-  "home": {
-    "auto_clean_badge": "تنظيف تلقائي للتنسيق",
-    "number_hint": "الصق أو اكتب أي رقم",
-    "recent_label": "الأخيرة:",
-    "optional_label": "اختياري: إرسال مع رسالة",
-    "message_hint": "اكتب رسالة (اختياري)",
-    "open_whatsapp": "فتح واتساب",
-    "works_messy_formats": "يعمل حتى مع الأرقام غير المرتبة مثل:",
-    "advertisement": "إعلان",
-    "error_empty_number": "الرجاء إدخال رقم هاتف",
-    "error_no_whatsapp": "واتساب غير مثبت",
-    "auto_clean_hint": "يمكنك لصق أي رقم بأي تنسيق وسيتم تنظيفه تلقائيًا"
-  },
-  "history": {
-    "title": "السجل",
-    "empty": "لا يوجد سجل بعد",
-    "empty_sub": "ستظهر الأرقام التي تحادثت معها هنا",
-    "selected_number": "الرقم المحدد",
-    "message_label": "رسالة",
-    "message_hint": "اكتب رسالة (اختياري)",
-    "open_whatsapp": "فتح واتساب",
-    "advertisement": "إعلان"
-  },
+  "app_name": "Piawai",
   "settings": {
-    "title": "الإعدادات",
-    "section_general": "عام",
-    "section_history": "السجل",
-    "section_support": "ادعمنا",
-    "section_info": "معلومات",
-    "language": "اللغة",
-    "language_sub": "العربية",
-    "clear_history": "مسح السجل",
-    "clear_history_sub": "حذف كل سجل المحادثات",
-    "clear_confirm_title": "هل أنت متأكد؟",
-    "clear_confirm_sub": "سيؤدي هذا إلى حذف كل السجل. لا يمكن التراجع عن هذا الإجراء.",
-    "delete": "حذف",
-    "cancel": "إلغاء",
-    "rate_app": "قيّم التطبيق",
-    "rate_app_sub": "هل تحب التطبيق؟ قيّمنا!",
-    "share_app": "شارك التطبيق",
-    "share_app_sub": "شارك مع الأصدقاء",
-    "about": "حول",
-    "about_sub": "WA Paste Any Number v1.0.0",
-    "by": "بواسطة rigofficial",
-    "advertisement": "إعلان"
+    "language": "Language",
+    "account": "Account"
   },
   "language": {
     "title": "اللغة",

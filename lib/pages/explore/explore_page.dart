@@ -36,33 +36,9 @@ class _ExplorePageState extends State<ExplorePage>
       body: SafeArea(
         child: Stack(
           children: [
-            // ── Content ──
-            // Positioned.fill(
-            //   child: TabBarView(
-            //     controller: _tabController,
-            //     children: [MapPage(), SiapBantuPage()],
-            //   ),
-            // ),
-
-            // ── Tab Bar ──
-            // Ganti TabBar dengan ini
             TabBarView(
               controller: _tabController,
-              children: [
-                // Center(
-                //   child: Text(
-                //     'Fitur ini sedang dalam pengembangan. Sabar ya!',
-                //     textAlign: TextAlign.center,
-                //     style: TextStyle(
-                //       color: Colors.white,
-                //       fontSize: 16,
-                //       fontWeight: FontWeight.w500,
-                //     ),
-                //   ),
-                // ),
-                MapPage(),
-                SiapBantuPage(),
-              ],
+              children: [MapPage(), SiapBantuPage()],
             ),
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),

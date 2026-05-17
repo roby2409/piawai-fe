@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:piawai/core/constants.dart';
 import 'package:piawai/core/helper.dart';
@@ -8,6 +9,7 @@ import 'package:piawai/pages/settings/kata_password_page.dart';
 import 'package:piawai/services/auth_services.dart';
 import 'package:piawai/services/worker_services.dart';
 
+import 'language_page.dart';
 import 'bantuan_page.dart';
 
 // ─────────────────────────────────────────
@@ -144,11 +146,19 @@ class _PengaturanPageState extends State<PengaturanPage> {
         const SizedBox(height: 8),
         _SettingsGroup(
           items: [
+            // State tambahan di _PengaturanPageState:
+
+            // Ganti SettingsItem Bahasa:
             _SettingsItem(
               icon: Icons.language,
-              label: 'Bahasa',
-              trailing: 'Indonesia',
-              onTap: () {},
+              label: 'settings.language'.tr(),
+              trailing: context.locale.languageCode,
+              onTap: () async {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LanguagePage()),
+                );
+              },
             ),
           ],
         ),

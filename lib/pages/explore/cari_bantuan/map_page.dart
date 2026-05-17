@@ -9,7 +9,6 @@ import 'package:piawai/core/helper.dart';
 import 'package:piawai/pages/widgets/map_component.dart';
 import 'package:piawai/pages/widgets/permission_ui.dart';
 import 'package:piawai/services/explore_services.dart';
-import 'package:piawai/services/worker_services.dart';
 
 import 'filter_page.dart';
 import 'models/explore_model.dart';
@@ -65,6 +64,8 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
         ageMax: _activeFilter?.ageRange.end.round(),
       );
 
+      if (!mounted) return; // ← add
+
       setState(() {
         _explore = explore;
         _isLoading = false;
@@ -93,6 +94,7 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
         // );
       });
     } catch (e) {
+      if (!mounted) return; // ← add
       setState(() {
         _errorMessage = e.toString();
         _isLoading = false;
@@ -218,6 +220,7 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
 
   Future<void> _checkPermission() async {
     final permission = await Geolocator.checkPermission();
+    if (!mounted) return; // ← add (after await)
     if (permission == LocationPermission.deniedForever) {
       setState(() => _locationState = _LocationState.deniedForever);
     } else if (permission == LocationPermission.denied) {
@@ -230,6 +233,7 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
 
   Future<void> _requestPermission() async {
     final permission = await Geolocator.requestPermission();
+    if (!mounted) return; // ← add (after await)
     if (permission == LocationPermission.always ||
         permission == LocationPermission.whileInUse) {
       setState(() => _locationState = _LocationState.granted);
@@ -240,19 +244,18 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
   }
 
   Future<void> _getCurrentLocation() async {
+    if (!mounted) return; // ← add
     setState(() => _isLoadingLocation = true);
     try {
       final position = await Geolocator.getCurrentPosition();
+      if (!mounted) return; // ← add (after await)
       setState(() {
         _myLocation = LatLng(position.latitude, position.longitude);
-        print(
-          'myLocation: ${_myLocation?.latitude}, ${_myLocation?.longitude}',
-        );
         _isLoadingLocation = false;
       });
-      // Jangan move di sini — tunggu sampai _loadAll selesai dan FlutterMap sudah render
-      await _loadAll(); // ← pindah ke sini, setelah lokasi dapat
+      await _loadAll();
     } catch (e) {
+      if (!mounted) return; // ← add
       setState(() => _isLoadingLocation = false);
     }
   }

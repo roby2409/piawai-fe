@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:piawai/core/constants.dart';
-
+import 'package:easy_localization/easy_localization.dart';
 import 'explore/explore_page.dart';
 import 'settings/pengaturan_page.dart';
 
@@ -13,16 +13,21 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   int _currentIndex = 0;
-
-  // ← hapus final List<Widget> _pages
+  int _historyRefreshKey = 0;
 
   @override
   Widget build(BuildContext context) {
+    final locale = context.locale;
     return Scaffold(
-      body: IndexedStack(
-        // ← ganti ini
+      body: // MainPage
+      IndexedStack(
         index: _currentIndex,
-        children: const [ExplorePage(), PengaturanPage()],
+        children: [
+          ExplorePage(
+            key: ValueKey('history_${locale.languageCode}_$_historyRefreshKey'),
+          ),
+          PengaturanPage(key: ValueKey(locale.languageCode)),
+        ],
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
@@ -39,7 +44,13 @@ class _MainPageState extends State<MainPage> {
           backgroundColor: Colors.white,
           elevation: 0, // ← matiin shadow default, pakai shadow dari Container
           currentIndex: _currentIndex,
-          onTap: (index) => setState(() => _currentIndex = index),
+          onTap: (index) {
+            setState(() {
+              if (index == 1)
+                _historyRefreshKey++; // ← increment tiap buka history
+              _currentIndex = index;
+            });
+          },
           selectedItemColor: kPrimary,
           unselectedItemColor: Colors.grey,
           selectedLabelStyle: const TextStyle(
