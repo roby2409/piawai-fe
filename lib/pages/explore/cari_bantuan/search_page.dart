@@ -148,7 +148,7 @@ class _SearchPageState extends State<SearchPage> {
                           ),
                           prefixIcon: Icon(
                             Icons.search,
-                            color: Colors.black45,
+                            color: kPrimary,
                             size: 20,
                           ),
                           border: InputBorder.none,
@@ -181,7 +181,7 @@ class _SearchPageState extends State<SearchPage> {
                         child: const Icon(
                           Icons.close,
                           size: 16,
-                          color: Colors.black54,
+                          color: kPrimary,
                         ),
                       ),
                     ),
@@ -367,7 +367,7 @@ class _HighlightedText extends StatelessWidget {
           TextSpan(
             text: full.substring(matchStart, matchEnd),
             style: const TextStyle(
-              color: Colors.black38,
+              color: kPrimary,
               fontWeight: FontWeight.w400,
             ),
           ),
@@ -418,7 +418,7 @@ class _RecentChip extends StatelessWidget {
             const SizedBox(width: 6),
             GestureDetector(
               onTap: onRemove,
-              child: const Icon(Icons.close, size: 14, color: Colors.black45),
+              child: const Icon(Icons.close, size: 14, color: kPrimary),
             ),
           ],
         ),
@@ -437,7 +437,7 @@ class _EmptyState extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 60, horizontal: 32),
       child: Column(
         children: [
-          Icon(Icons.search_off_rounded, size: 52, color: Colors.grey[300]),
+          Icon(Icons.search_off_rounded, size: 52, color: kPrimary),
           const SizedBox(height: 16),
           Text(
             'Tidak ada hasil untuk\n"$query"',
