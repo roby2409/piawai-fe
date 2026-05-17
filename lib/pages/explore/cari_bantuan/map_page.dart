@@ -562,6 +562,7 @@ class _FilterButton extends StatelessWidget {
             height: 46,
             decoration: BoxDecoration(
               color: hasActiveFilter ? kPrimary : Colors.white,
+              border: Border.all(color: kGrey),
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
@@ -659,6 +660,7 @@ class _SearchBar extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: kGrey),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withAlpha(20),
@@ -669,15 +671,15 @@ class _SearchBar extends StatelessWidget {
         ),
         child: Row(
           children: [
-            const Padding(
+            Padding(
               padding: EdgeInsets.symmetric(horizontal: 14),
-              child: Icon(Icons.search, color: Colors.black45, size: 20),
+              child: Icon(Icons.search, color: Colors.grey[900], size: 20),
             ),
             Expanded(
               child: Text(
                 hasQuery ? query : 'Cari Pekerja...',
                 style: TextStyle(
-                  color: hasQuery ? Colors.black87 : Colors.grey[500],
+                  color: Colors.grey[900],
                   fontSize: 15,
                   fontWeight: hasQuery ? FontWeight.w600 : FontWeight.normal,
                 ),

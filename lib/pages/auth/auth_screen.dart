@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:piawai/core/constants.dart';
 import 'package:piawai/pages/main_page.dart';
+import 'package:piawai/pages/widgets/input_field.dart';
 import 'package:piawai/services/auth_services.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -24,6 +26,9 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
   final _authService = AuthService();
 
   bool _isLoading = false;
+  bool _showLoginPassword = false;
+  bool _showRegisterPassword = false;
+  bool _showConfirmRegisterPassword = false;
 
   @override
   void initState() {
@@ -149,6 +154,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Stack(
           children: [
@@ -159,12 +165,17 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                 // Logo
                 const Column(
                   children: [
-                    Icon(Icons.compare_arrows, size: 50, color: Colors.blue),
+                    Image(
+                      height: 80,
+                      width: 80,
+                      image: AssetImage("assets/icons/logo.png"),
+                    ),
                     SizedBox(height: 8),
                     Text(
                       'Piawai',
                       style: TextStyle(
                         fontSize: 28,
+                        color: kPrimary,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -175,9 +186,10 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                 // Tabs
                 TabBar(
                   controller: _tabController,
-                  labelColor: Colors.blue,
+                  labelColor: kPrimary,
+                  dividerColor: Colors.grey[300],
                   unselectedLabelColor: Colors.grey,
-                  indicatorColor: Colors.blue,
+                  indicatorColor: kPrimary,
                   tabs: const [
                     Tab(text: 'Masuk'),
                     Tab(text: 'Daftar'),
@@ -221,30 +233,39 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
           ),
 
           const SizedBox(height: 20),
-          const Center(child: Text('atau masuk dengan email')),
+          orDivider(),
           const SizedBox(height: 20),
 
-          TextField(
+          InputField(
+            label: 'Email or username',
             controller: _emailController,
             keyboardType: TextInputType.emailAddress,
-            decoration: InputDecoration(
-              labelText: 'Email',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
+            hint: 'Masukkan email atau username Anda',
+            prefixIcon: Icons.email,
           ),
           const SizedBox(height: 20),
 
-          TextField(
+          InputField(
             controller: _passwordController,
-            obscureText: true,
-            decoration: InputDecoration(
-              labelText: 'Password',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+            label: 'Password',
+            hint: 'Masukkan password Anda',
+            prefixIcon: Icons.lock_outline,
+            obscure: !_showLoginPassword,
+            suffixIcon: IconButton(
+              icon: Icon(
+                _showLoginPassword
+                    ? Icons.visibility_off_outlined
+                    : Icons.visibility_outlined,
+                color: kPrimary,
+                size: 20,
               ),
+              onPressed: () =>
+                  setState(() => _showLoginPassword = !_showLoginPassword),
             ),
+            validator: (val) {
+              if (val == null || val.isEmpty) return 'Password wajib diisi';
+              return null;
+            },
           ),
           const SizedBox(height: 10),
 
@@ -252,7 +273,10 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
             alignment: Alignment.centerRight,
             child: TextButton(
               onPressed: () {},
-              child: const Text('Lupa password?'),
+              child: const Text(
+                'Lupa password?',
+                style: TextStyle(color: kPrimary, fontSize: 12),
+              ),
             ),
           ),
           const SizedBox(height: 10),
@@ -260,23 +284,53 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
           ElevatedButton(
             onPressed: _isLoading ? null : _handleLogin,
             style: ElevatedButton.styleFrom(
+              backgroundColor: kPrimary,
+              disabledBackgroundColor: const Color(0xFFD1D5DB),
+              foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 15),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Text('Masuk'),
+            child: const Text('Masuk', style: TextStyle(fontSize: 14)),
           ),
           const SizedBox(height: 20),
 
           Center(
             child: TextButton(
               onPressed: () => _tabController.animateTo(1),
-              child: const Text('Belum punya akun? Daftar'),
+              child: RichText(
+                text: TextSpan(
+                  style: const TextStyle(fontSize: 14),
+                  children: [
+                    TextSpan(
+                      text: "Belum punya akun? ",
+                      style: const TextStyle(color: Colors.grey),
+                    ),
+                    TextSpan(
+                      text: "Daftar sekarang",
+                      style: const TextStyle(color: kPrimary),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget orDivider() {
+    return Row(
+      children: [
+        Expanded(child: Divider(color: Colors.grey[300], thickness: 1.5)),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Text('or', style: TextStyle(color: Colors.grey, fontSize: 14)),
+        ),
+        Expanded(child: Divider(color: Colors.grey[300], thickness: 1.5)),
+      ],
     );
   }
 
@@ -296,65 +350,116 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
           ),
 
           const SizedBox(height: 20),
-          const Center(child: Text('atau daftar dengan email')),
+          orDivider(),
           const SizedBox(height: 20),
 
-          TextField(
+          InputField(
+            label: 'Username',
             controller: _usernameController,
-            decoration: InputDecoration(
-              labelText: 'Username',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
+            keyboardType: TextInputType.text,
+            hint: 'contoh: johndoe',
+            prefixIcon: Icons.person,
           ),
           const SizedBox(height: 20),
 
-          TextField(
+          InputField(
+            label: 'Email',
             controller: _emailRegController,
             keyboardType: TextInputType.emailAddress,
-            decoration: InputDecoration(
-              labelText: 'Email',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
+            hint: 'contoh: johndoe@example.com',
+            prefixIcon: Icons.email,
           ),
           const SizedBox(height: 20),
 
-          TextField(
-            controller: _passwordRegController,
-            obscureText: true,
-            decoration: InputDecoration(
-              labelText: 'Password',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+          InputField(
+            controller: _passwordController,
+            label: 'Password',
+            hint: 'Masukkan password Anda',
+            prefixIcon: Icons.lock_outline,
+            obscure: !_showRegisterPassword,
+            suffixIcon: IconButton(
+              icon: Icon(
+                _showRegisterPassword
+                    ? Icons.visibility_off_outlined
+                    : Icons.visibility_outlined,
+                color: kPrimary,
+                size: 20,
+              ),
+              onPressed: () => setState(
+                () => _showRegisterPassword = !_showRegisterPassword,
               ),
             ),
+            validator: (val) {
+              if (val == null || val.isEmpty) return 'Password wajib diisi';
+              return null;
+            },
           ),
           const SizedBox(height: 20),
 
-          TextField(
+          InputField(
             controller: _confirmPasswordController,
-            obscureText: true,
-            decoration: InputDecoration(
-              labelText: 'Konfirmasi Password',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+            label: 'Konfirmasi Password',
+            hint: 'Ulangi password',
+            prefixIcon: Icons.lock_outline,
+            obscure: !_showConfirmRegisterPassword,
+            suffixIcon: IconButton(
+              icon: Icon(
+                _showConfirmRegisterPassword
+                    ? Icons.visibility_off_outlined
+                    : Icons.visibility_outlined,
+                color: kPrimary,
+                size: 20,
+              ),
+              onPressed: () => setState(
+                () => _showConfirmRegisterPassword =
+                    !_showConfirmRegisterPassword,
               ),
             ),
+            validator: (val) {
+              if (val == null || val.isEmpty)
+                return 'Konfirmasi password wajib diisi';
+              if (val != _confirmPasswordController.text)
+                return 'Password tidak cocok';
+              return null;
+            },
           ),
           const SizedBox(height: 20),
 
           ElevatedButton(
             onPressed: _isLoading ? null : _handleRegister,
             style: ElevatedButton.styleFrom(
+              backgroundColor: kPrimary,
+              foregroundColor: Colors.white,
+              disabledBackgroundColor: kPrimary.withOpacity(0.5),
               padding: const EdgeInsets.symmetric(vertical: 15),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
             child: const Text('Daftar'),
+          ),
+
+          const SizedBox(height: 20),
+
+          Center(
+            child: TextButton(
+              onPressed: () => _tabController.animateTo(0),
+              child: RichText(
+                text: TextSpan(
+                  style: const TextStyle(fontSize: 14),
+                  children: [
+                    TextSpan(
+                      text: "Sudah punya akun? ",
+                      style: const TextStyle(color: Colors.grey),
+                    ),
+                    TextSpan(
+                      text: "Masuk sekarang",
+                      style: const TextStyle(color: kPrimary),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
         ],
       ),
@@ -376,28 +481,24 @@ class _GoogleSignInButton extends StatelessWidget {
     return OutlinedButton(
       onPressed: onPressed,
       style: OutlinedButton.styleFrom(
+        backgroundColor: Colors.grey[50],
+        disabledBackgroundColor: const Color(0xFFD1D5DB),
+        foregroundColor: Colors.black,
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        side: const BorderSide(color: Colors.grey),
+        side: const BorderSide(color: kPrimary),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           // Google logo SVG-style dengan warna asli
-          SizedBox(
-            width: 24,
-            height: 24,
-            child: CustomPaint(painter: _GoogleLogoPainter()),
+          Image(
+            height: 23,
+            width: 23,
+            image: AssetImage("assets/icons/google-logo.png"),
           ),
           const SizedBox(width: 12),
-          Text(
-            text,
-            style: const TextStyle(
-              color: Colors.black87,
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
+          Text(text, style: const TextStyle(color: Colors.black, fontSize: 14)),
         ],
       ),
     );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:piawai/core/constants.dart';
+import 'package:piawai/pages/widgets/input_field.dart';
 import 'package:piawai/services/user_services.dart';
 
 // ─────────────────────────────────────────
@@ -159,7 +160,7 @@ class _KataPasswordPageState extends State<KataPasswordPage> {
 
                         // Field password lama — hanya kalau sudah punya password
                         if (_hasPassword) ...[
-                          _InputField(
+                          InputField(
                             controller: _oldPasswordCtrl,
                             label: 'Password Lama',
                             hint: 'Masukkan password saat ini',
@@ -186,7 +187,7 @@ class _KataPasswordPageState extends State<KataPasswordPage> {
                           const SizedBox(height: 12),
                         ],
 
-                        _InputField(
+                        InputField(
                           controller: _newPasswordCtrl,
                           label: _hasPassword
                               ? 'Password Baru'
@@ -214,7 +215,7 @@ class _KataPasswordPageState extends State<KataPasswordPage> {
                           },
                         ),
                         const SizedBox(height: 12),
-                        _InputField(
+                        InputField(
                           controller: _confirmPasswordCtrl,
                           label: 'Konfirmasi Password',
                           hint: 'Ulangi password',
@@ -334,70 +335,6 @@ class _SectionCard extends StatelessWidget {
           const SizedBox(height: 14),
           child,
         ],
-      ),
-    );
-  }
-}
-
-class _InputField extends StatelessWidget {
-  final TextEditingController controller;
-  final String label;
-  final String hint;
-  final IconData prefixIcon;
-  final bool obscure;
-  final Widget? suffixIcon;
-  final String? Function(String?)? validator;
-
-  const _InputField({
-    required this.controller,
-    required this.label,
-    required this.hint,
-    required this.prefixIcon,
-    this.obscure = false,
-    this.suffixIcon,
-    this.validator,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return TextFormField(
-      controller: controller,
-      obscureText: obscure,
-      validator: validator,
-      style: const TextStyle(fontSize: 14, color: Colors.black87),
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: hint,
-        hintStyle: const TextStyle(color: Colors.black38, fontSize: 13),
-        labelStyle: const TextStyle(color: Colors.black54, fontSize: 13),
-        prefixIcon: Icon(prefixIcon, color: kPrimary, size: 18),
-        suffixIcon: suffixIcon,
-        filled: true,
-        fillColor: const Color(0xFFF8F9FA),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: kPrimary, width: 1.5),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Colors.red),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Colors.red, width: 1.5),
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 14,
-          vertical: 14,
-        ),
       ),
     );
   }

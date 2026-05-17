@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:piawai/core/constants.dart';
 import 'package:piawai/pages/explore/siap_bantu/models/service_model.dart';
+import 'package:piawai/pages/widgets/input_field.dart';
 import 'package:piawai/services/worker_services.dart';
 
 // ─────────────────────────────────────────
@@ -414,7 +415,7 @@ class _TambahLayananSheetState extends State<_TambahLayananSheet> {
                 children: [
                   _FieldLabel('Nama Layanan'),
                   const SizedBox(height: 6),
-                  _InputField(
+                  InputField(
                     controller: _namaController,
                     hint: 'Contoh: Tukang Kebun',
                     onChanged: (_) => setState(() {}),
@@ -423,7 +424,7 @@ class _TambahLayananSheetState extends State<_TambahLayananSheet> {
 
                   _FieldLabel('Deskripsi'),
                   const SizedBox(height: 6),
-                  _InputField(
+                  InputField(
                     controller: _deskripsiController,
                     hint: 'Jelaskan layanan yang Anda tawarkan...',
                     maxLines: 4,
@@ -680,49 +681,6 @@ class _FieldLabel extends StatelessWidget {
     return Text(
       text,
       style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
-    );
-  }
-}
-
-class _InputField extends StatelessWidget {
-  final TextEditingController controller;
-  final String hint;
-  final int maxLines;
-  final void Function(String)? onChanged;
-
-  const _InputField({
-    required this.controller,
-    required this.hint,
-    this.maxLines = 1,
-    this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
-      maxLines: maxLines,
-      onChanged: onChanged,
-      decoration: InputDecoration(
-        hintText: hint,
-        hintStyle: const TextStyle(fontSize: 13, color: Colors.grey),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 14,
-          vertical: 12,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: kPrimary),
-        ),
-      ),
     );
   }
 }

@@ -143,15 +143,15 @@ class _SiapBantuPageState extends State<SiapBantuPage> {
               alignment: Alignment.center,
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
-              decoration: const BoxDecoration(color: Color(0xFF0d1b3e)),
-              child: const Column(
+              decoration: BoxDecoration(color: kBgCard),
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Text(
                     'Mode Siap Bantu',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: kPrimary,
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                     ),
@@ -159,7 +159,7 @@ class _SiapBantuPageState extends State<SiapBantuPage> {
                   SizedBox(height: 4),
                   Text(
                     'Anda terdaftar sebagai penyedia jasa',
-                    style: TextStyle(color: Colors.white70, fontSize: 13),
+                    style: TextStyle(color: Colors.black87, fontSize: 13),
                   ),
                   SizedBox(height: 20),
                 ],
@@ -168,6 +168,7 @@ class _SiapBantuPageState extends State<SiapBantuPage> {
             // ── Body: Sidebar + Content ──
             Container(
               padding: EdgeInsets.only(top: 160),
+
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -182,6 +183,12 @@ class _SiapBantuPageState extends State<SiapBantuPage> {
                           width: 1,
                         ),
                       ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 8,
+                        ),
+                      ],
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(24),
                       ),
@@ -246,11 +253,17 @@ class _SiapBantuPageState extends State<SiapBantuPage> {
                   // Right Content
                   Expanded(
                     child: Container(
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.only(
                           topRight: Radius.circular(24),
                         ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 8,
+                          ),
+                        ],
                       ),
                       child: _buildContent(),
                     ),

@@ -201,6 +201,7 @@ class _PengaturanPageState extends State<PengaturanPage> {
             final confirm = await showDialog<bool>(
               context: context,
               builder: (_) => AlertDialog(
+                backgroundColor: kBgCard,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
