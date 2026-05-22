@@ -1,11 +1,13 @@
 import 'dart:math';
 import 'dart:ui' as ui;
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:piawai/core/constants.dart';
 import 'package:piawai/core/helper.dart';
+import 'package:piawai/pages/widgets/loading_detect_location.dart';
 import 'package:piawai/pages/widgets/map_component.dart';
 import 'package:piawai/pages/widgets/permission_ui.dart';
 import 'package:piawai/services/explore_services.dart';
@@ -32,6 +34,7 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
   final MapController _mapController = MapController();
   final _workerService = ExploreService();
   LatLng? _myLocation;
+  LatLng? _gpsLocation;
   bool _isLoadingLocation = false;
   _LocationState _locationState = _LocationState.checking;
   WorkerExploreModel? _selectedWorker;
@@ -170,24 +173,72 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
       );
     }
 
+    // Lokasi custom — tampil kalau bukan GPS location
+    if (f.locationLatLng != null &&
+        _gpsLocation != null &&
+        f.locationLatLng != _gpsLocation) {
+      chips.add(
+        _ActiveChipData(
+          icon: Icons.location_on_outlined,
+          label: f.location,
+          onRemove: () async {
+            setState(() {
+              _myLocation = _gpsLocation; // ← balik ke GPS
+              _activeFilter = FilterResult(
+                gender: f.gender,
+                ageRange: f.ageRange,
+                location: 'my_location'.tr(),
+                radiusKm: f.radiusKm,
+                locationLatLng: _gpsLocation,
+              );
+            });
+            await _loadAll();
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (!mounted || _gpsLocation == null) return;
+              _mapController.move(
+                _gpsLocation!,
+                _zoomFromRadius(_activeFilter?.radiusKm ?? 5),
+              );
+            });
+          },
+        ),
+      );
+    }
+
     return chips;
   }
 
   bool get _hasActiveFilter => _activeChips.isNotEmpty;
 
-  // ── Buka filter page ──
   Future<void> _openFilter() async {
-    final result = await Navigator.push<FilterResult>(
-      context,
-      MaterialPageRoute(
-        builder: (_) =>
-            FilterPage(myLocation: _myLocation, initialFilter: _activeFilter),
-        fullscreenDialog: true,
-      ),
-    );
-    if (result != null && mounted) {
-      setState(() => _activeFilter = result);
-      await _loadAll();
+    if (_myLocation != null) {
+      final result = await Navigator.push<FilterResult>(
+        context,
+        MaterialPageRoute(
+          builder: (_) => FilterPage(
+            myLocation: _myLocation!,
+            initialFilter: _activeFilter,
+          ),
+          fullscreenDialog: true,
+        ),
+      );
+      if (result != null && mounted) {
+        setState(() {
+          _activeFilter = result;
+          // ← update myLocation kalau user pilih lokasi custom
+          if (result.locationLatLng != null) {
+            _myLocation = result.locationLatLng;
+          }
+        });
+        await _loadAll();
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted || _myLocation == null) return;
+          _mapController.move(
+            _myLocation!,
+            _zoomFromRadius(_activeFilter?.radiusKm ?? 5),
+          );
+        });
+      }
     }
   }
 
@@ -251,6 +302,7 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
       if (!mounted) return; // ← add (after await)
       setState(() {
         _myLocation = LatLng(position.latitude, position.longitude);
+        _gpsLocation = _myLocation;
         _isLoadingLocation = false;
       });
       await _loadAll();
@@ -283,21 +335,7 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
     }
 
     if (_isLoadingLocation || _myLocation == null) {
-      return const Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircularProgressIndicator(color: kPrimary),
-              SizedBox(height: 16),
-              Text(
-                'Mendeteksi lokasi Anda...',
-                style: TextStyle(color: Colors.grey),
-              ),
-            ],
-          ),
-        ),
-      );
+      return Scaffold(body: Center(child: loadingCurrentLocation()));
     }
 
     if (_isLoading) {
@@ -443,8 +481,22 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                             // Tombol clear all
                             GestureDetector(
                               onTap: () async {
-                                setState(() => _activeFilter = null);
+                                setState(() {
+                                  _activeFilter = null;
+                                  _myLocation =
+                                      _gpsLocation ??
+                                      _myLocation; // ← balik ke GPS
+                                });
                                 await _loadAll();
+                                WidgetsBinding.instance.addPostFrameCallback((
+                                  _,
+                                ) {
+                                  if (!mounted || _myLocation == null) return;
+                                  _mapController.move(
+                                    _myLocation!,
+                                    _zoomFromRadius(5),
+                                  );
+                                });
                               },
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
@@ -511,7 +563,9 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  '${_explore?.total ?? 0} pekerja ditemukan',
+                  'cari_bantuan.worker_found'.tr(
+                    args: ['${_explore?.total ?? 0}'],
+                  ),
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,

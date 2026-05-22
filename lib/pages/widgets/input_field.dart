@@ -11,6 +11,8 @@ class InputField extends StatelessWidget {
   final Widget? suffixIcon;
   final String? Function(String?)? validator;
   final int maxLines;
+  final int? minLines; // ← tambah ini
+  final int? maxLength; // ← tambah ini
   final void Function(String)? onChanged;
 
   const InputField({
@@ -24,6 +26,8 @@ class InputField extends StatelessWidget {
     this.suffixIcon,
     this.validator,
     this.maxLines = 1,
+    this.minLines, // ← tambah ini
+    this.maxLength,
     this.onChanged,
   });
 
@@ -32,6 +36,8 @@ class InputField extends StatelessWidget {
     return TextFormField(
       controller: controller,
       maxLines: maxLines,
+      minLines: minLines, // ← tambah ini
+      maxLength: maxLength,
       onChanged: onChanged,
       obscureText: obscure,
       validator: validator,

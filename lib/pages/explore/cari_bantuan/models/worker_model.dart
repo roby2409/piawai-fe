@@ -18,9 +18,6 @@ class WorkerExploreModel {
   String? lat;
   String? lng;
   List<String> services;
-  int? minHargaJam;
-  int? minHargaHari;
-  int? minHargaProyek;
   double distanceKm;
 
   WorkerExploreModel({
@@ -36,9 +33,6 @@ class WorkerExploreModel {
     required this.lat,
     required this.lng,
     required this.services,
-    required this.minHargaJam,
-    required this.minHargaHari,
-    required this.minHargaProyek,
     required this.distanceKm,
   });
 
@@ -56,9 +50,6 @@ class WorkerExploreModel {
         lat: json["lat"],
         lng: json["lng"],
         services: List<String>.from(json["services"].map((x) => x)),
-        minHargaJam: json["min_harga_jam"],
-        minHargaHari: json["min_harga_hari"],
-        minHargaProyek: json["min_harga_proyek"],
         distanceKm: json["distance_km"]?.toDouble(),
       );
 
@@ -75,9 +66,6 @@ class WorkerExploreModel {
     "lat": lat,
     "lng": lng,
     "services": List<dynamic>.from(services.map((x) => x)),
-    "min_harga_jam": minHargaJam,
-    "min_harga_hari": minHargaHari,
-    "min_harga_proyek": minHargaProyek,
     "distance_km": distanceKm,
   };
 }

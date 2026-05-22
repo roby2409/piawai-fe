@@ -1,6 +1,7 @@
 // ─────────────────────────────────────────
 // Profile Page (unchanged structure, updated styling)
 // ─────────────────────────────────────────
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:piawai/core/constants.dart';
@@ -38,15 +39,15 @@ class PermissionUI extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 32),
-              const Text(
-                'Izin Lokasi Diperlukan',
+              Text(
+                'location_permission_need'.tr(),
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
               Text(
                 isDeniedForever
-                    ? 'Izin lokasi ditolak permanen. Buka pengaturan untuk mengaktifkan.'
-                    : 'Aplikasi butuh akses lokasi untuk menampilkan pekerja di sekitar Anda.',
+                    ? 'location_permanent'.tr()
+                    : 'the_app_need_location'.tr(),
                 style: const TextStyle(fontSize: 14, color: Colors.grey),
                 textAlign: TextAlign.center,
               ),
@@ -68,8 +69,8 @@ class PermissionUI extends StatelessWidget {
                   ),
                   child: Text(
                     isDeniedForever
-                        ? 'Buka Pengaturan'
-                        : 'Izinkan Akses Lokasi',
+                        ? 'open_settings'.tr()
+                        : 'allow_location_access'.tr(),
                     style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,

@@ -1,6 +1,7 @@
 // ─────────────────────────────────────────
 // TENTANG SECTION
 // ─────────────────────────────────────────
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:piawai/core/constants.dart';
 import 'package:piawai/pages/explore/siap_bantu/models/worker_profile_model.dart';
@@ -57,11 +58,9 @@ class TentangSectionState extends State<TentangSection> {
       widget.onDataChanged?.call();
     } catch (e) {
       setState(() => _isRefetching = false);
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Gagal memuat data: $e')));
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('general.fetch_failed'.tr(args: ['$e']))),
+      );
     }
   }
 
@@ -91,20 +90,20 @@ class TentangSectionState extends State<TentangSection> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Title
-              const Text(
-                'Tentang Saya',
+              Text(
+                'about_me'.tr(),
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 4),
-              const Text(
-                'Lengkapi informasi diri Anda untuk membangun kepercayaan dengan pelanggan.',
+              Text(
+                'complete_about_me'.tr(),
                 style: TextStyle(fontSize: 13, color: Colors.grey),
               ),
               const SizedBox(height: 20),
 
               // Bio Textarea
-              const Text(
-                'Bio & Pengalaman Profesional',
+              Text(
+                'bio_professional_experience'.tr(),
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 8),
@@ -123,8 +122,7 @@ class TentangSectionState extends State<TentangSection> {
                         }) => null, // hide default counter
                     onChanged: (_) => setState(() {}),
                     decoration: InputDecoration(
-                      hintText:
-                          'Ceritakan pengalaman dan keahlian Anda di sini untuk menarik perhatian pencari jasa...',
+                      hintText: 'field_hints.about_me_bio'.tr(),
                       hintStyle: const TextStyle(
                         fontSize: 13,
                         color: Colors.grey,
@@ -165,14 +163,14 @@ class TentangSectionState extends State<TentangSection> {
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: const Color(0xFFBFDBFE)),
                 ),
-                child: const Row(
+                child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Icon(Icons.info_outline, color: kPrimary, size: 18),
                     SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        'Profil yang lengkap dengan deskripsi yang menarik memiliki peluang 3x lebih besar untuk mendapatkan pesanan.',
+                        "field_hints.about_me_info".tr(),
                         style: TextStyle(
                           fontSize: 12,
                           color: Color(0xFF1e40af),
@@ -209,8 +207,8 @@ class TentangSectionState extends State<TentangSection> {
                             color: Colors.white,
                           ),
                         )
-                      : const Text(
-                          'Simpan Perubahan',
+                      : Text(
+                          'general.save_changes'.tr(),
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,

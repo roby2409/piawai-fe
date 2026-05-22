@@ -1,21 +1,30 @@
+import 'dart:convert';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:piawai/core/constants.dart';
+import 'package:piawai/pages/explore/siap_bantu/atur_lokasi_page.dart';
+import 'package:piawai/pages/widgets/loading_detect_location.dart';
 import 'package:piawai/pages/widgets/map_component.dart';
 
 // ── Model hasil filter ──
 class FilterResult {
-  final String gender; // 'Semua' | 'Pria' | 'Wanita'
+  final String gender;
   final RangeValues ageRange;
   final String location;
   final double radiusKm;
+  final LatLng? locationLatLng;
 
   const FilterResult({
     required this.gender,
     required this.ageRange,
     required this.location,
     required this.radiusKm,
+    this.locationLatLng,
   });
 }
 
@@ -23,32 +32,24 @@ class FilterResult {
 //  FILTER PAGE
 // ─────────────────────────────────────────────
 class FilterPage extends StatefulWidget {
-  /// Lokasi pengguna saat ini (opsional, buat preview map)
-  final LatLng? myLocation;
-
-  /// Nilai filter awal (opsional)
+  final LatLng myLocation;
   final FilterResult? initialFilter;
 
-  const FilterPage({super.key, this.myLocation, this.initialFilter});
+  const FilterPage({super.key, required this.myLocation, this.initialFilter});
 
   @override
   State<FilterPage> createState() => _FilterPageState();
 }
 
 class _FilterPageState extends State<FilterPage> {
-  // ── State filter ──
   late String _gender;
   late RangeValues _ageRange;
-  late TextEditingController _locationCtrl;
   late double _radius;
+  late LatLng _currentLocation;
+  late String _locationLabel;
+  bool _isLoadingCurrentLocation = false;
 
-  // Preview map
   final MapController _previewMapController = MapController();
-
-  // Default center kalau lokasi null (Jakarta Selatan)
-  static const _defaultCenter = LatLng(-6.2615, 106.8106);
-
-  LatLng get _mapCenter => widget.myLocation ?? _defaultCenter;
 
   @override
   void initState() {
@@ -56,42 +57,80 @@ class _FilterPageState extends State<FilterPage> {
     final init = widget.initialFilter;
     _gender = init?.gender ?? 'Semua';
     _ageRange = init?.ageRange ?? const RangeValues(18, 55);
-    _locationCtrl = TextEditingController(
-      text: init?.location ?? 'Jakarta Selatan',
-    );
     _radius = init?.radiusKm ?? 15;
+    _currentLocation = init?.locationLatLng ?? widget.myLocation;
+    _locationLabel = init?.location ?? 'my_location'.tr();
   }
 
-  @override
-  void dispose() {
-    _locationCtrl.dispose();
-    super.dispose();
-  }
-
-  void _reset() {
+  void _reset() async {
+    await _getCurrentLocation();
     setState(() {
       _gender = 'Semua';
       _ageRange = const RangeValues(18, 55);
-      _locationCtrl.text = 'Jakarta Selatan';
       _radius = 15;
     });
   }
 
   void _apply() {
-    final result = FilterResult(
-      gender: _gender,
-      ageRange: _ageRange,
-      location: _locationCtrl.text,
-      radiusKm: _radius,
+    Navigator.of(context).pop(
+      FilterResult(
+        gender: _gender,
+        ageRange: _ageRange,
+        location: _locationLabel,
+        radiusKm: _radius,
+        locationLatLng: _currentLocation,
+      ),
     );
-    Navigator.of(context).pop(result);
+  }
+
+  void _movePreviewMap(LatLng loc) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _previewMapController.move(loc, 12);
+    });
+  }
+
+  Future<void> _openLocationSearch() async {
+    final result = await Navigator.push<Map<String, dynamic>>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => AturLokasiPage(
+          initialLat: _currentLocation.latitude,
+          initialLng: _currentLocation.longitude,
+        ),
+      ),
+    );
+
+    if (result != null && mounted) {
+      setState(() {
+        _currentLocation = LatLng(result['lat'], result['lng']);
+        _locationLabel = result['area_label'] ?? '';
+      });
+      _movePreviewMap(_currentLocation);
+    }
+  }
+
+  Future<void> _getCurrentLocation() async {
+    if (!mounted) return; // ← add
+    setState(() => _isLoadingCurrentLocation = true);
+    try {
+      final position = await Geolocator.getCurrentPosition();
+      if (!mounted) return; // ← add (after await)
+      setState(() {
+        _currentLocation = LatLng(position.latitude, position.longitude);
+        _locationLabel = 'my_location'.tr();
+        _isLoadingCurrentLocation = false;
+      });
+      _movePreviewMap(_currentLocation);
+    } catch (e) {
+      if (!mounted) return; // ← add
+      setState(() => _isLoadingCurrentLocation = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      // ── Header ──
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -99,8 +138,8 @@ class _FilterPageState extends State<FilterPage> {
           icon: const Icon(Icons.close, color: Colors.black87),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Text(
-          'Filter',
+        title: Text(
+          'general.filter'.tr(),
           style: TextStyle(
             color: Colors.black87,
             fontWeight: FontWeight.w600,
@@ -111,8 +150,8 @@ class _FilterPageState extends State<FilterPage> {
         actions: [
           TextButton(
             onPressed: _reset,
-            child: const Text(
-              'Reset',
+            child: Text(
+              'general.reset'.tr(),
               style: TextStyle(
                 color: Colors.black54,
                 fontSize: 15,
@@ -124,15 +163,14 @@ class _FilterPageState extends State<FilterPage> {
       ),
       body: Column(
         children: [
-          // ── Scrollable content ──
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 1. Jenis Kelamin
-                  _SectionLabel('Jenis Kelamin'),
+                  // 1. Gender
+                  _SectionLabel('fields.gender'.tr()),
                   const SizedBox(height: 12),
                   _GenderToggle(
                     selected: _gender,
@@ -145,7 +183,7 @@ class _FilterPageState extends State<FilterPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _SectionLabel('Rentang Umur'),
+                      _SectionLabel('fields.age_range'.tr()),
                       Text(
                         '${_ageRange.start.round()} - ${_ageRange.end.round()} Tahun',
                         style: const TextStyle(
@@ -167,46 +205,105 @@ class _FilterPageState extends State<FilterPage> {
                   const SizedBox(height: 28),
 
                   // 3. Lokasi
-                  _SectionLabel('Lokasi'),
+                  _SectionLabel('fields.location'.tr()),
                   const SizedBox(height: 12),
-                  _LocationSearchField(controller: _locationCtrl),
-                  const SizedBox(height: 10),
                   GestureDetector(
-                    onTap: () {
-                      // TODO: ambil lokasi saat ini
-                    },
-                    child: Row(
-                      children: const [
-                        Icon(Icons.my_location, color: kPrimary, size: 18),
-                        SizedBox(width: 6),
-                        Text(
-                          'Gunakan Lokasi Saat Ini',
-                          style: TextStyle(
-                            color: kPrimary,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14,
+                    onTap: _openLocationSearch,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 13,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF5F7FA),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: const Color(0xFFE0E7F0)),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.search,
+                            color: Colors.black38,
+                            size: 20,
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              _locationLabel,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.black87,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const Icon(
+                            Icons.chevron_right,
+                            color: Colors.black38,
+                            size: 18,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      GestureDetector(
+                        onTap: _getCurrentLocation,
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.my_location,
+                              color: kPrimary,
+                              size: 18,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              'fields.use_current_location'.tr(),
+                              style: const TextStyle(
+                                color: kPrimary,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 14),
-                  // Mini map preview
-                  _MapPreview(
-                    center: _mapCenter,
-                    radiusKm: _radius,
-                    mapController: _previewMapController,
+                  Stack(
+                    alignment: AlignmentGeometry.center,
+                    children: [
+                      _MapPreview(
+                        center: _currentLocation,
+                        radiusKm: _radius,
+                        mapController: _previewMapController,
+                        onLocationChanged: (latLng) {
+                          // ← add this
+                          setState(() {
+                            _currentLocation = latLng;
+                            _locationLabel = 'custom_location'.tr();
+                          });
+                        },
+                      ),
+                      if (_isLoadingCurrentLocation) loadingCurrentLocation(),
+                    ],
                   ),
 
                   const SizedBox(height: 28),
 
-                  // 4. Radius Pencarian
+                  // 4. Radius
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _SectionLabel('Radius Pencarian'),
+                      _SectionLabel('search_radius'.tr()),
                       Text(
-                        '${_radius.round()} km',
+                        'general.radius_display'.tr(
+                          args: ['${_radius.round()}'],
+                        ),
                         style: const TextStyle(
                           color: kPrimary,
                           fontWeight: FontWeight.w700,
@@ -220,18 +317,18 @@ class _FilterPageState extends State<FilterPage> {
                     value: _radius,
                     min: 1,
                     max: 50,
-                    minLabel: '1km',
-                    maxLabel: '50km',
-                    onChanged: (val) => setState(() => _radius = val),
+                    minLabel: 'general.radius_display'.tr(args: ['1']),
+                    maxLabel: 'general.radius_display'.tr(args: ['50']),
+                    onChanged: (val) {
+                      setState(() => _radius = val);
+                      _movePreviewMap(_currentLocation);
+                    },
                   ),
-
                   const SizedBox(height: 24),
                 ],
               ),
             ),
           ),
-
-          // ── Tombol Tampilkan Hasil ──
           _ApplyButton(onTap: _apply),
         ],
       ),
@@ -240,8 +337,273 @@ class _FilterPageState extends State<FilterPage> {
 }
 
 // ─────────────────────────────────────────────
-//  SUB-WIDGETS
+// LOCATION SEARCH BOTTOM SHEET — Nominatim
 // ─────────────────────────────────────────────
+class _LocationSearchSheet extends StatefulWidget {
+  final LatLng myLocation;
+  const _LocationSearchSheet({required this.myLocation});
+
+  @override
+  State<_LocationSearchSheet> createState() => _LocationSearchSheetState();
+}
+
+class _LocationSearchSheetState extends State<_LocationSearchSheet> {
+  final _ctrl = TextEditingController();
+  final _focus = FocusNode();
+
+  List<Map<String, dynamic>> _results = [];
+  bool _isLoading = false;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _focus.requestFocus());
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    _focus.dispose();
+    super.dispose();
+  }
+
+  Future<void> _search(String query) async {
+    if (query.trim().isEmpty) {
+      setState(() {
+        _results = [];
+        _error = null;
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+
+    try {
+      final uri = Uri.parse(
+        'https://nominatim.openstreetmap.org/search'
+        '?q=${Uri.encodeComponent(query)}'
+        '&format=json&limit=6&addressdetails=1',
+      );
+
+      final response = await http
+          .get(
+            uri,
+            headers: {
+              'User-Agent': 'PiawaiApp/1.0', // wajib di Nominatim
+            },
+          )
+          .timeout(const Duration(seconds: 8));
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as List;
+        setState(() {
+          _results = data.map((e) => e as Map<String, dynamic>).toList();
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _error = 'search_location_failed'.tr();
+          _isLoading = false;
+        });
+      }
+    } catch (_) {
+      setState(() {
+        _error = 'general.no_connection'.tr();
+        _isLoading = false;
+      });
+    }
+  }
+
+  String _formatLabel(Map<String, dynamic> place) {
+    final address = place['address'] as Map<String, dynamic>? ?? {};
+    final parts = <String>[];
+    for (final key in [
+      'village',
+      'suburb',
+      'city_district',
+      'city',
+      'county',
+      'state',
+    ]) {
+      final val = address[key] as String?;
+      if (val != null && val.isNotEmpty && !parts.contains(val)) {
+        parts.add(val);
+        if (parts.length >= 3) break;
+      }
+    }
+    return parts.isNotEmpty
+        ? parts.join(', ')
+        : place['display_name'] as String;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return DraggableScrollableSheet(
+      expand: false,
+      initialChildSize: 0.85,
+      maxChildSize: 0.95,
+      builder: (_, scrollCtrl) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: Column(
+          children: [
+            Container(
+              margin: const EdgeInsets.only(top: 10, bottom: 14),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF2F4F7),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: TextField(
+                  controller: _ctrl,
+                  focusNode: _focus,
+                  style: const TextStyle(fontSize: 14, color: Colors.black87),
+                  decoration: InputDecoration(
+                    hintText: 'field_hints.search_location'.tr(),
+                    hintStyle: TextStyle(color: Colors.black38, fontSize: 14),
+                    prefixIcon: Icon(
+                      Icons.search,
+                      color: Colors.black45,
+                      size: 20,
+                    ),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(vertical: 13),
+                  ),
+                  onChanged: (val) {
+                    Future.delayed(const Duration(milliseconds: 500), () {
+                      if (_ctrl.text == val) _search(val);
+                    });
+                  },
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 12),
+            const Divider(height: 1),
+
+            Expanded(
+              child: _isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(color: kPrimary),
+                    )
+                  : _error != null
+                  ? Center(
+                      child: Text(
+                        _error!,
+                        style: const TextStyle(color: Colors.grey),
+                      ),
+                    )
+                  : ListView(
+                      controller: scrollCtrl,
+                      children: [
+                        // Opsi lokasi saya selalu ada di atas
+                        ListTile(
+                          leading: Container(
+                            width: 36,
+                            height: 36,
+                            decoration: BoxDecoration(
+                              color: kPrimary.withOpacity(0.1),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.my_location,
+                              color: kPrimary,
+                              size: 18,
+                            ),
+                          ),
+                          title: Text(
+                            'my_location'.tr(),
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
+                          ),
+                          subtitle: Text(
+                            'use_current_location'.tr(),
+                            style: TextStyle(fontSize: 12),
+                          ),
+                          onTap: () => Navigator.pop(context, {
+                            'lat': widget.myLocation.latitude,
+                            'lon': widget.myLocation.longitude,
+                            'label': 'my_location'.tr(),
+                          }),
+                        ),
+                        const Divider(height: 1, indent: 56),
+
+                        if (_results.isEmpty && _ctrl.text.isNotEmpty)
+                          Padding(
+                            padding: EdgeInsets.all(32),
+                            child: Center(
+                              child: Text(
+                                'location_not_found'.tr(),
+                                style: TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                          ),
+
+                        ..._results.map((place) {
+                          final label = _formatLabel(place);
+                          return Column(
+                            children: [
+                              ListTile(
+                                leading: Container(
+                                  width: 36,
+                                  height: 36,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.withOpacity(0.1),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.location_on_outlined,
+                                    color: Colors.black54,
+                                    size: 18,
+                                  ),
+                                ),
+                                title: Text(
+                                  label,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 14,
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                onTap: () => Navigator.pop(context, {
+                                  'lat': double.parse(place['lat'] as String),
+                                  'lon': double.parse(place['lon'] as String),
+                                  'label': label,
+                                }),
+                              ),
+                              const Divider(height: 1, indent: 56),
+                            ],
+                          );
+                        }),
+                      ],
+                    ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Sub-widgets ──
 
 class _SectionLabel extends StatelessWidget {
   final String text;
@@ -258,12 +620,17 @@ class _SectionLabel extends StatelessWidget {
   );
 }
 
-// ── Gender Toggle ──
 class _GenderToggle extends StatelessWidget {
   final String selected;
   final ValueChanged<String> onChanged;
-
   const _GenderToggle({required this.selected, required this.onChanged});
+
+  String displayOption(String value) {
+    if (value == 'Semua') return 'general.semua'.tr();
+    if (value == 'Pria') return 'general.man'.tr();
+    if (value == 'Wanita') return 'general.woman'.tr();
+    return value;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -274,7 +641,7 @@ class _GenderToggle extends StatelessWidget {
             (opt) => Padding(
               padding: const EdgeInsets.only(right: 8),
               child: _GenderChip(
-                label: opt,
+                label: displayOption(opt),
                 isSelected: selected == opt,
                 onTap: () => onChanged(opt),
               ),
@@ -289,7 +656,6 @@ class _GenderChip extends StatelessWidget {
   final String label;
   final bool isSelected;
   final VoidCallback onTap;
-
   const _GenderChip({
     required this.label,
     required this.isSelected,
@@ -324,13 +690,11 @@ class _GenderChip extends StatelessWidget {
   }
 }
 
-// ── Range Slider ──
 class _StyledRangeSlider extends StatelessWidget {
   final RangeValues values;
   final double min;
   final double max;
   final ValueChanged<RangeValues> onChanged;
-
   const _StyledRangeSlider({
     required this.values,
     required this.min,
@@ -359,7 +723,6 @@ class _StyledRangeSlider extends StatelessWidget {
   }
 }
 
-// ── Single Slider with min/max labels ──
 class _StyledSlider extends StatelessWidget {
   final double value;
   final double min;
@@ -367,7 +730,6 @@ class _StyledSlider extends StatelessWidget {
   final String minLabel;
   final String maxLabel;
   final ValueChanged<double> onChanged;
-
   const _StyledSlider({
     required this.value,
     required this.min,
@@ -413,57 +775,43 @@ class _StyledSlider extends StatelessWidget {
   }
 }
 
-// ── Location Search Field ──
-class _LocationSearchField extends StatelessWidget {
-  final TextEditingController controller;
-  const _LocationSearchField({required this.controller});
-
-  @override
-  Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
-      style: const TextStyle(fontSize: 14, color: Colors.black87),
-      decoration: InputDecoration(
-        hintText: 'Cari lokasi...',
-        hintStyle: const TextStyle(color: Colors.black38, fontSize: 14),
-        prefixIcon: const Icon(Icons.search, color: Colors.black38, size: 20),
-        contentPadding: const EdgeInsets.symmetric(vertical: 12),
-        filled: true,
-        fillColor: const Color(0xFFF5F7FA),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Color(0xFFE0E7F0)),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Color(0xFFE0E7F0)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: kPrimary, width: 1.5),
-        ),
-      ),
-    );
-  }
-}
-
-// ── Map Preview ──
-class _MapPreview extends StatelessWidget {
+class _MapPreview extends StatefulWidget {
   final LatLng center;
   final double radiusKm;
   final MapController mapController;
+  final ValueChanged<LatLng>? onLocationChanged; // ← add this
 
   const _MapPreview({
     required this.center,
     required this.radiusKm,
     required this.mapController,
+    this.onLocationChanged, // ← add this
   });
 
   @override
-  Widget build(BuildContext context) {
-    // radius dalam meter untuk CircleLayer
-    final radiusM = radiusKm * 1000;
+  State<_MapPreview> createState() => _MapPreviewState();
+}
 
+class _MapPreviewState extends State<_MapPreview> {
+  late LatLng _markerPoint;
+
+  @override
+  void initState() {
+    super.initState();
+    _markerPoint = widget.center;
+  }
+
+  @override
+  void didUpdateWidget(_MapPreview oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Sync if parent resets location
+    if (oldWidget.center != widget.center) {
+      setState(() => _markerPoint = widget.center);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(14),
       child: SizedBox(
@@ -471,21 +819,23 @@ class _MapPreview extends StatelessWidget {
         child: Stack(
           children: [
             FlutterMap(
-              mapController: mapController,
+              mapController: widget.mapController,
               options: MapOptions(
-                initialCenter: center,
+                initialCenter: _markerPoint,
                 initialZoom: 12,
-                interactionOptions: const InteractionOptions(
-                  flags: InteractiveFlag.none, // non-interaktif (preview)
-                ),
+                // ← Remove InteractiveFlag.none, allow pan + tap
+                onTap: (tapPosition, latLng) {
+                  setState(() => _markerPoint = latLng);
+                  widget.onLocationChanged?.call(latLng); // ← bubble up
+                },
               ),
               children: [
                 buildTileLayer(),
                 CircleLayer(
                   circles: [
                     CircleMarker(
-                      point: center,
-                      radius: radiusM,
+                      point: _markerPoint,
+                      radius: widget.radiusKm * 1000,
                       useRadiusInMeter: true,
                       color: kPrimary.withOpacity(0.12),
                       borderColor: kPrimary.withOpacity(0.5),
@@ -496,7 +846,7 @@ class _MapPreview extends StatelessWidget {
                 MarkerLayer(
                   markers: [
                     Marker(
-                      point: center,
+                      point: _markerPoint,
                       width: 24,
                       height: 24,
                       child: Container(
@@ -517,7 +867,7 @@ class _MapPreview extends StatelessWidget {
                 ),
               ],
             ),
-            // Badge "Pratinjau Jangkauan"
+            // ── Hint label ──
             Positioned(
               bottom: 10,
               left: 10,
@@ -539,16 +889,16 @@ class _MapPreview extends StatelessWidget {
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Icon(
-                      Icons.remove_red_eye_outlined,
+                  children: [
+                    const Icon(
+                      Icons.touch_app_outlined,
                       size: 14,
                       color: Colors.black54,
                     ),
-                    SizedBox(width: 5),
+                    const SizedBox(width: 5),
                     Text(
-                      'Pratinjau Jangkauan',
-                      style: TextStyle(
+                      'tap_map_for_move_point'.tr(),
+                      style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                         color: Colors.black87,
@@ -565,7 +915,6 @@ class _MapPreview extends StatelessWidget {
   }
 }
 
-// ── Apply Button ──
 class _ApplyButton extends StatelessWidget {
   final VoidCallback onTap;
   const _ApplyButton({required this.onTap});
@@ -593,8 +942,8 @@ class _ApplyButton extends StatelessWidget {
             ),
             elevation: 0,
           ),
-          child: const Text(
-            'Tampilkan Hasil',
+          child: Text(
+            'general.show_result'.tr(),
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w700,

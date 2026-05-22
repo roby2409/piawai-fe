@@ -64,8 +64,8 @@ class _PengaturanPageState extends State<PengaturanPage> {
       appBar: AppBar(
         backgroundColor: kWhite,
         elevation: 0,
-        title: const Text(
-          'Pengaturan',
+        title: Text(
+          'settings.title'.tr(),
           style: TextStyle(
             color: kPrimary,
             fontSize: 18,
@@ -104,13 +104,13 @@ class _PengaturanPageState extends State<PengaturanPage> {
         ProfileCard(profile: _profile!),
         const SizedBox(height: 24),
 
-        _SectionLabel(label: 'Akun'),
+        _SectionLabel(label: 'settings.account'.tr()),
         const SizedBox(height: 8),
         _SettingsGroup(
           items: [
             _SettingsItem(
               icon: Icons.person_outline,
-              label: 'Informasi Pribadi',
+              label: 'settings.account_section.personal_info'.tr(),
               onTap: () async {
                 final changed = await Navigator.push<bool>(
                   context,
@@ -127,7 +127,7 @@ class _PengaturanPageState extends State<PengaturanPage> {
             ),
             _SettingsItem(
               icon: Icons.shield_outlined,
-              label: 'Kata Sandi & Keamanan',
+              label: 'settings.account_section.security'.tr(),
               onTap: () async {
                 final changed = await Navigator.push<bool>(
                   context,
@@ -142,7 +142,7 @@ class _PengaturanPageState extends State<PengaturanPage> {
         ),
         const SizedBox(height: 24),
 
-        _SectionLabel(label: 'Aplikasi'),
+        _SectionLabel(label: 'settings.app_section.title'.tr()),
         const SizedBox(height: 8),
         _SettingsGroup(
           items: [
@@ -164,13 +164,13 @@ class _PengaturanPageState extends State<PengaturanPage> {
         ),
         const SizedBox(height: 24),
 
-        _SectionLabel(label: 'Bantuan'),
+        _SectionLabel(label: 'settings.help_section.title'.tr()),
         const SizedBox(height: 8),
         _SettingsGroup(
           items: [
             _SettingsItem(
               icon: Icons.help_outline,
-              label: 'Pusat Bantuan',
+              label: 'settings.help_section.help_center'.tr(),
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const PusatBantuanPage()),
@@ -178,7 +178,7 @@ class _PengaturanPageState extends State<PengaturanPage> {
             ),
             _SettingsItem(
               icon: Icons.privacy_tip_outlined,
-              label: 'Kebijakan Privasi',
+              label: 'settings.help_section.privacy_policy'.tr(),
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const KebijakanPrivasiPage()),
@@ -186,7 +186,7 @@ class _PengaturanPageState extends State<PengaturanPage> {
             ),
             _SettingsItem(
               icon: Icons.description_outlined,
-              label: 'Syarat & Ketentuan',
+              label: 'settings.help_section.terms'.tr(),
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const SyaratKetentuanPage()),
@@ -205,20 +205,20 @@ class _PengaturanPageState extends State<PengaturanPage> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
-                title: const Text('Keluar'),
-                content: const Text('Apakah Anda yakin ingin keluar?'),
+                title: Text('settings.logout'.tr()),
+                content: Text('settings.logout_confirm_message'.tr()),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.pop(context, false),
                     child: Text(
-                      'Batal',
+                      'settings.logout_cancel'.tr(),
                       style: TextStyle(color: Colors.grey[600]),
                     ),
                   ),
                   TextButton(
                     onPressed: () => Navigator.pop(context, true),
-                    child: const Text(
-                      'Keluar',
+                    child: Text(
+                      'settings.logout_confirm_title'.tr(),
                       style: TextStyle(color: Colors.red),
                     ),
                   ),
@@ -461,13 +461,13 @@ class _LogoutButton extends StatelessWidget {
           color: const Color(0xFFFEE2E2),
           borderRadius: BorderRadius.circular(14),
         ),
-        child: const Row(
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.logout, color: Colors.red, size: 20),
             SizedBox(width: 8),
             Text(
-              'Keluar',
+              'settings.logout'.tr(),
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,

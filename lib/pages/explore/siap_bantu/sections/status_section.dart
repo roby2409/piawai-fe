@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:piawai/core/constants.dart';
 import 'package:piawai/pages/explore/siap_bantu/models/worker_profile_model.dart';
@@ -37,11 +38,15 @@ class StatusSectionState extends State<StatusSection> {
       });
       widget.onDataChanged?.call();
       if (mounted) {
-        showOverlaySnackbar(context, 'Status berhasil disimpan');
+        showOverlaySnackbar(context, "siap_bantu.status_success_save".tr());
       }
     } catch (e) {
       if (mounted) {
-        showOverlaySnackbar(context, 'Gagal menyimpan: $e', isError: true);
+        showOverlaySnackbar(
+          context,
+          'general.save_failed'.tr(args: ['$e']),
+          isError: true,
+        );
       }
     } finally {
       setState(() => _isSaving = false);
@@ -57,8 +62,8 @@ class StatusSectionState extends State<StatusSection> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // ── Title ──
-          const Text(
-            'Status Kerja',
+          Text(
+            'siap_bantu.status_work'.tr(),
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
@@ -78,8 +83,8 @@ class StatusSectionState extends State<StatusSection> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Status Siap Menerima Kerja',
+                      Text(
+                        'siap_bantu.status_ready_work_accept'.tr(),
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
@@ -88,8 +93,8 @@ class StatusSectionState extends State<StatusSection> {
                       const SizedBox(height: 6),
                       Text(
                         _isAvailable
-                            ? 'Aktifkan untuk mulai terlihat oleh pencari jasa di sekitar Anda.'
-                            : 'Anda sedang tidak menerima pesanan baru saat ini.',
+                            ? 'siap_bantu.status_ready_work_accept'.tr()
+                            : 'siap_bantu.activate_to_start'.tr(),
                         style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                       ),
                     ],
@@ -139,8 +144,8 @@ class StatusSectionState extends State<StatusSection> {
                 Expanded(
                   child: Text(
                     _isAvailable
-                        ? 'Saat status aktif, profil Anda akan muncul di hasil pencarian pelanggan sesuai dengan area dan layanan yang Anda atur.'
-                        : 'Status tidak aktif. Profil Anda tidak akan muncul di pencarian pelanggan.',
+                        ? 'siap_bantu.status_is_active'.tr()
+                        : 'siap_bantu.status_is_not_active'.tr(),
                     style: TextStyle(
                       fontSize: 12,
                       color: _isAvailable
@@ -178,8 +183,8 @@ class StatusSectionState extends State<StatusSection> {
                         color: Colors.white,
                       ),
                     )
-                  : const Text(
-                      'Simpan Perubahan',
+                  : Text(
+                      'general.save_changes'.tr(),
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,

@@ -58,16 +58,16 @@ class _MainPageState extends State<MainPage> {
             fontSize: 12,
           ),
           unselectedLabelStyle: const TextStyle(fontSize: 12),
-          items: const [
+          items: [
             BottomNavigationBarItem(
               icon: Icon(Icons.explore_outlined),
               activeIcon: Icon(Icons.explore),
-              label: 'Eksplor',
+              label: 'explore'.tr(),
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.settings_outlined),
               activeIcon: Icon(Icons.settings),
-              label: 'Pengaturan',
+              label: 'settings.title'.tr(),
             ),
           ],
         ),

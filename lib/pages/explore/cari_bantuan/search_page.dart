@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:piawai/core/constants.dart';
 import 'package:piawai/services/explore_services.dart';
@@ -24,11 +25,9 @@ class _SearchPageState extends State<SearchPage> {
   List<String> _suggestions = [];
   bool _isLoadingSuggestions = false;
 
-  final List<String> _recents = ['Sedot WC', 'Servis AC', 'Cleaning Service'];
+  final List<String> _recents = [];
 
   bool get _showSuggestions => _suggestions.isNotEmpty;
-  bool get _showRecents =>
-      !_showSuggestions && _recents.isNotEmpty && _query.isEmpty;
 
   @override
   void initState() {
@@ -140,8 +139,8 @@ class _SearchPageState extends State<SearchPage> {
                           color: Colors.black87,
                           fontWeight: FontWeight.w500,
                         ),
-                        decoration: const InputDecoration(
-                          hintText: 'Cari pekerja...',
+                        decoration: InputDecoration(
+                          hintText: 'cari_bantuan.search_hint'.tr(),
                           hintStyle: TextStyle(
                             color: Colors.black38,
                             fontSize: 15,
@@ -219,58 +218,8 @@ class _SearchPageState extends State<SearchPage> {
                     ),
                   ],
 
-                  // Recent searches
-                  if (_showRecents) ...[
-                    const SizedBox(height: 16),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'Pencarian Terakhir',
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.black87,
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: _clearAllRecents,
-                            child: const Text(
-                              'Hapus Semua',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: kPrimary,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: _recents
-                            .map(
-                              (r) => _RecentChip(
-                                label: r,
-                                onTap: () => _submit(r),
-                                onRemove: () => _removeRecent(r),
-                              ),
-                            )
-                            .toList(),
-                      ),
-                    ),
-                  ],
-
                   // Empty state
                   if (!_showSuggestions &&
-                      !_showRecents &&
                       _query.isNotEmpty &&
                       !_isLoadingSuggestions)
                     _EmptyState(query: _query),
@@ -440,7 +389,7 @@ class _EmptyState extends StatelessWidget {
           Icon(Icons.search_off_rounded, size: 52, color: kPrimary),
           const SizedBox(height: 16),
           Text(
-            'Tidak ada hasil untuk\n"$query"',
+            'cari_bantuan.no_result_found_search'.tr(args: [query]),
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 15,

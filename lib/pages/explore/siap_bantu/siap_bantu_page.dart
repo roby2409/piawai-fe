@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:piawai/core/constants.dart';
 import 'package:piawai/pages/explore/siap_bantu/models/worker_profile_model.dart';
@@ -52,13 +53,28 @@ class _SiapBantuPageState extends State<SiapBantuPage> {
     }
   }
 
-  final List<_SidebarItem> _sidebarItems = const [
-    _SidebarItem(icon: Icons.person_outline, label: 'Profil'),
-    _SidebarItem(icon: Icons.phone_outlined, label: 'Kontak'),
-    _SidebarItem(icon: Icons.work_outline, label: 'Layanan'),
-    _SidebarItem(icon: Icons.location_on_outlined, label: 'Area'),
-    _SidebarItem(icon: Icons.wifi, label: 'Status'),
-    _SidebarItem(icon: Icons.info_outline, label: 'Tentang'),
+  final List<_SidebarItem> _sidebarItems = [
+    _SidebarItem(
+      icon: Icons.person_outline,
+      label: 'siap_bantu.sidebar.profil'.tr(),
+    ),
+    _SidebarItem(
+      icon: Icons.phone_outlined,
+      label: 'siap_bantu.sidebar.contact'.tr(),
+    ),
+    _SidebarItem(
+      icon: Icons.work_outline,
+      label: 'siap_bantu.sidebar.services'.tr(),
+    ),
+    _SidebarItem(
+      icon: Icons.location_on_outlined,
+      label: 'siap_bantu.sidebar.area'.tr(),
+    ),
+    _SidebarItem(icon: Icons.wifi, label: 'siap_bantu.sidebar.status'.tr()),
+    _SidebarItem(
+      icon: Icons.info_outline,
+      label: 'siap_bantu.sidebar.about'.tr(),
+    ),
   ];
 
   Widget _buildContent() {
@@ -139,7 +155,7 @@ class _SiapBantuPageState extends State<SiapBantuPage> {
         child: Stack(
           children: [
             Container(
-              height: 180,
+              height: 200,
               alignment: Alignment.center,
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
@@ -148,17 +164,25 @@ class _SiapBantuPageState extends State<SiapBantuPage> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Text(
-                    'Mode Siap Bantu',
-                    style: TextStyle(
-                      color: kPrimary,
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'siap_bantu.ready_help_mode'.tr(),
+                        style: TextStyle(
+                          color: kPrimary,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
                   SizedBox(height: 4),
                   Text(
-                    'Anda terdaftar sebagai penyedia jasa',
+                    textAlign: TextAlign.center,
+                    (_profile?.isProfileComplete ?? false)
+                        ? 'siap_bantu.profil_already_complete'.tr()
+                        : 'siap_bantu.profile_not_already'.tr(),
                     style: TextStyle(color: Colors.black87, fontSize: 13),
                   ),
                   SizedBox(height: 20),
@@ -167,7 +191,7 @@ class _SiapBantuPageState extends State<SiapBantuPage> {
             ),
             // ── Body: Sidebar + Content ──
             Container(
-              padding: EdgeInsets.only(top: 160),
+              padding: EdgeInsets.only(top: 180),
 
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.stretch,

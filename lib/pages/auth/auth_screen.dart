@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:piawai/core/constants.dart';
+import 'package:piawai/pages/auth/forgot_password_screen.dart';
 import 'package:piawai/pages/main_page.dart';
 import 'package:piawai/pages/widgets/input_field.dart';
 import 'package:piawai/services/auth_services.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -60,8 +62,8 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
 
       _showSnackbar(
         isNewUser
-            ? 'Selamat datang! Akun berhasil dibuat 🎉'
-            : 'Selamat datang kembali! ✅',
+            ? 'success_messages.register_account_success'.tr()
+            : 'success_messages.welcome_back'.tr(),
         isError: false,
       );
 
@@ -84,7 +86,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
     final password = _passwordController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
-      _showSnackbar('Email dan password wajib diisi');
+      _showSnackbar('email_password_required'.tr());
       return;
     }
 
@@ -93,7 +95,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
       await _authService.login(email, password);
       if (!mounted) return;
 
-      _showSnackbar('Login berhasil ✅', isError: false);
+      _showSnackbar('success_messages.login_success'.tr(), isError: false);
       // TODO: Navigate ke halaman utama
       Navigator.pushReplacement(
         context,
@@ -115,12 +117,12 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
     final confirmPassword = _confirmPasswordController.text.trim();
 
     if (username.isEmpty || email.isEmpty || password.isEmpty) {
-      _showSnackbar('Semua field wajib diisi');
+      _showSnackbar('validator.semua_fields_required'.tr());
       return;
     }
 
     if (password != confirmPassword) {
-      _showSnackbar('Password tidak cocok');
+      _showSnackbar('validator.password_not_match'.tr());
       return;
     }
 
@@ -129,7 +131,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
       await _authService.register(username, email, password);
       if (!mounted) return;
 
-      _showSnackbar('Registrasi berhasil! Silakan masuk ✅', isError: false);
+      _showSnackbar('success_messages.register_success'.tr(), isError: false);
       _tabController.animateTo(0); // Switch ke tab login
     } catch (e) {
       _showSnackbar(e.toString().replaceFirst('Exception: ', ''));
@@ -190,9 +192,9 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                   dividerColor: Colors.grey[300],
                   unselectedLabelColor: Colors.grey,
                   indicatorColor: kPrimary,
-                  tabs: const [
-                    Tab(text: 'Masuk'),
-                    Tab(text: 'Daftar'),
+                  tabs: [
+                    Tab(text: 'general.masuk'.tr()),
+                    Tab(text: 'general.daftar'.tr()),
                   ],
                 ),
 
@@ -228,7 +230,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
 
           // Google Sign In Button
           _GoogleSignInButton(
-            text: 'Sign in with Google',
+            text: 'sign_in_with_google'.tr(),
             onPressed: _isLoading ? null : _handleGoogleSignIn,
           ),
 
@@ -237,18 +239,18 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
           const SizedBox(height: 20),
 
           InputField(
-            label: 'Email or username',
+            label: 'fields.email_or_username'.tr(),
             controller: _emailController,
             keyboardType: TextInputType.emailAddress,
-            hint: 'Masukkan email atau username Anda',
+            hint: 'field_hints.email'.tr(),
             prefixIcon: Icons.email,
           ),
           const SizedBox(height: 20),
 
           InputField(
             controller: _passwordController,
-            label: 'Password',
-            hint: 'Masukkan password Anda',
+            label: 'fields.password'.tr(),
+            hint: 'field_hints.password'.tr(),
             prefixIcon: Icons.lock_outline,
             obscure: !_showLoginPassword,
             suffixIcon: IconButton(
@@ -263,7 +265,8 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                   setState(() => _showLoginPassword = !_showLoginPassword),
             ),
             validator: (val) {
-              if (val == null || val.isEmpty) return 'Password wajib diisi';
+              if (val == null || val.isEmpty)
+                return 'validator.password_required'.tr();
               return null;
             },
           ),
@@ -272,9 +275,16 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
           Align(
             alignment: Alignment.centerRight,
             child: TextButton(
-              onPressed: () {},
-              child: const Text(
-                'Lupa password?',
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const ForgotPasswordScreen(),
+                  ),
+                );
+              },
+              child: Text(
+                'lupa_password'.tr(),
                 style: TextStyle(color: kPrimary, fontSize: 12),
               ),
             ),
@@ -292,7 +302,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Text('Masuk', style: TextStyle(fontSize: 14)),
+            child: Text('general.masuk'.tr(), style: TextStyle(fontSize: 14)),
           ),
           const SizedBox(height: 20),
 
@@ -304,11 +314,11 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                   style: const TextStyle(fontSize: 14),
                   children: [
                     TextSpan(
-                      text: "Belum punya akun? ",
+                      text: 'belum_punya_akun'.tr(),
                       style: const TextStyle(color: Colors.grey),
                     ),
                     TextSpan(
-                      text: "Daftar sekarang",
+                      text: 'daftar_sekarang'.tr(),
                       style: const TextStyle(color: kPrimary),
                     ),
                   ],
@@ -327,7 +337,10 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
         Expanded(child: Divider(color: Colors.grey[300], thickness: 1.5)),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: Text('or', style: TextStyle(color: Colors.grey, fontSize: 14)),
+          child: Text(
+            'general.or'.tr(),
+            style: TextStyle(color: Colors.grey, fontSize: 14),
+          ),
         ),
         Expanded(child: Divider(color: Colors.grey[300], thickness: 1.5)),
       ],
@@ -345,7 +358,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
 
           // Google Sign Up Button
           _GoogleSignInButton(
-            text: 'Sign up with Google',
+            text: 'sign_up_with_google'.tr(),
             onPressed: _isLoading ? null : _handleGoogleSignIn,
           ),
 
@@ -354,27 +367,27 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
           const SizedBox(height: 20),
 
           InputField(
-            label: 'Username',
+            label: 'fields.username'.tr(),
             controller: _usernameController,
             keyboardType: TextInputType.text,
-            hint: 'contoh: johndoe',
+            hint: 'field_hints.username_example'.tr(),
             prefixIcon: Icons.person,
           ),
           const SizedBox(height: 20),
 
           InputField(
-            label: 'Email',
+            label: 'fields.email'.tr(),
             controller: _emailRegController,
             keyboardType: TextInputType.emailAddress,
-            hint: 'contoh: johndoe@example.com',
+            hint: 'field_hints.email_example'.tr(),
             prefixIcon: Icons.email,
           ),
           const SizedBox(height: 20),
 
           InputField(
             controller: _passwordController,
-            label: 'Password',
-            hint: 'Masukkan password Anda',
+            label: 'fields.password'.tr(),
+            hint: 'field_hints.password'.tr(),
             prefixIcon: Icons.lock_outline,
             obscure: !_showRegisterPassword,
             suffixIcon: IconButton(
@@ -390,7 +403,12 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
               ),
             ),
             validator: (val) {
-              if (val == null || val.isEmpty) return 'Password wajib diisi';
+              if (val == null || val.isEmpty) {
+                return 'validator.password_required'.tr();
+              }
+              if (val.length < 6) {
+                return 'validator.password_min'.tr();
+              }
               return null;
             },
           ),
@@ -398,8 +416,8 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
 
           InputField(
             controller: _confirmPasswordController,
-            label: 'Konfirmasi Password',
-            hint: 'Ulangi password',
+            label: 'fields.confirm_password'.tr(),
+            hint: 'field_hints.confirm_password'.tr(),
             prefixIcon: Icons.lock_outline,
             obscure: !_showConfirmRegisterPassword,
             suffixIcon: IconButton(
@@ -417,9 +435,9 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
             ),
             validator: (val) {
               if (val == null || val.isEmpty)
-                return 'Konfirmasi password wajib diisi';
+                return 'validator.confirm_password_required'.tr();
               if (val != _confirmPasswordController.text)
-                return 'Password tidak cocok';
+                return 'validator.password_not_match'.tr();
               return null;
             },
           ),
@@ -436,7 +454,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Text('Daftar'),
+            child: Text('general.daftar'.tr()),
           ),
 
           const SizedBox(height: 20),
@@ -449,11 +467,11 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                   style: const TextStyle(fontSize: 14),
                   children: [
                     TextSpan(
-                      text: "Sudah punya akun? ",
+                      text: "sudah_punya_akun".tr(),
                       style: const TextStyle(color: Colors.grey),
                     ),
                     TextSpan(
-                      text: "Masuk sekarang",
+                      text: "masuk_sekarang".tr(),
                       style: const TextStyle(color: kPrimary),
                     ),
                   ],
@@ -503,41 +521,4 @@ class _GoogleSignInButton extends StatelessWidget {
       ),
     );
   }
-}
-
-class _GoogleLogoPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()..style = PaintingStyle.fill;
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = size.width / 2;
-
-    // Gambar lingkaran latar
-    paint.color = Colors.white;
-    canvas.drawCircle(center, radius, paint);
-
-    // Huruf G sederhana dengan warna Google
-    final textPainter = TextPainter(
-      text: const TextSpan(
-        text: 'G',
-        style: TextStyle(
-          color: Color(0xFF4285F4),
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      textDirection: TextDirection.ltr,
-    );
-    textPainter.layout();
-    textPainter.paint(
-      canvas,
-      Offset(
-        center.dx - textPainter.width / 2,
-        center.dy - textPainter.height / 2,
-      ),
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

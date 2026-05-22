@@ -3,6 +3,7 @@
 // ─────────────────────────────────────────
 import 'dart:typed_data';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:piawai/core/constants.dart';
@@ -142,13 +143,13 @@ class ProfilSectionState extends State<ProfilSection> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // ── Title ──
-              const Text(
-                'Informasi Profil',
+              Text(
+                'siap_bantu.information_profile'.tr(),
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 4),
-              const Text(
-                'Lengkapi data diri Anda agar pemesan jasa merasa lebih percaya.',
+              Text(
+                'siap_bantu.information_profile_desc'.tr(),
                 style: TextStyle(fontSize: 13, color: Colors.grey),
               ),
               const SizedBox(height: 20),
@@ -242,8 +243,8 @@ class ProfilSectionState extends State<ProfilSection> {
                     const SizedBox(height: 12),
                     GestureDetector(
                       onTap: _pickImage,
-                      child: const Text(
-                        'Ubah Foto Profil',
+                      child: Text(
+                        'siap_bantu.change_profile_picture'.tr(),
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
@@ -257,15 +258,15 @@ class ProfilSectionState extends State<ProfilSection> {
               const SizedBox(height: 20),
 
               // ── Nama Lengkap ──
-              const Text(
-                'Nama Lengkap',
+              Text(
+                'fields.full_name'.tr(),
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 8),
               TextField(
                 controller: _fullNameController,
                 decoration: InputDecoration(
-                  hintText: 'Masukkan nama lengkap',
+                  hintText: 'field_hints.full_name'.tr(),
                   hintStyle: const TextStyle(fontSize: 13, color: Colors.grey),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -288,22 +289,22 @@ class ProfilSectionState extends State<ProfilSection> {
               const SizedBox(height: 20),
 
               // ── Jenis Kelamin ──
-              const Text(
-                'Jenis Kelamin',
+              Text(
+                'fields.gender'.tr(),
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 10),
               Row(
                 children: [
                   _GenderButton(
-                    label: 'Pria',
+                    label: 'general.man'.tr(),
                     icon: Icons.male,
                     isSelected: _jenisKelamin == 'Pria',
                     onTap: () => setState(() => _jenisKelamin = 'Pria'),
                   ),
                   const SizedBox(width: 12),
                   _GenderButton(
-                    label: 'Wanita',
+                    label: 'general.woman'.tr(),
                     icon: Icons.female,
                     isSelected: _jenisKelamin == 'Wanita',
                     onTap: () => setState(() => _jenisKelamin = 'Wanita'),
@@ -336,8 +337,8 @@ class ProfilSectionState extends State<ProfilSection> {
                             color: Colors.white,
                           ),
                         )
-                      : const Text(
-                          'Simpan Layanan',
+                      : Text(
+                          'general.save_changes'.tr(),
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,

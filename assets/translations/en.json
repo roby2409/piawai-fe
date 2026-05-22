@@ -1,14 +1,32 @@
 {
   "app_name": "Piawai",
   "settings": {
+    "title": "Settings",
     "language": "Language",
-    "account": "Account"
+    "account": "Account",
+    "account_section": {
+      "personal_info": "Personal Information",
+      "security": "Password & Security"
+    },
+    "app_section": {
+      "title": "Application"
+    },
+    "help_section": {
+      "title": "Help",
+      "help_center": "Help Center",
+      "privacy_policy": "Privacy Policy",
+      "terms": "Terms & Conditions"
+    },
+    "logout": "Sign Out",
+    "logout_confirm_title": "Sign Out",
+    "logout_confirm_message": "Are you sure you want to sign out?",
+    "logout_cancel": "Cancel"
   },
   "language": {
     "title": "Language",
     "search_hint": "Search language...",
     "english": "English",
-    "indonesia": "Indonesia",
+    "indonesia": "Indonesian",
     "arabic": "Arabic",
     "hindi": "Hindi"
   }

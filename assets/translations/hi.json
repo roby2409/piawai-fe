@@ -1,8 +1,26 @@
 {
   "app_name": "Piawai",
   "settings": {
-    "language": "Language",
-    "account": "Account"
+    "title": "सेटिंग्स",
+    "language": "भाषा",
+    "account": "खाता",
+    "account_section": {
+      "personal_info": "व्यक्तिगत जानकारी",
+      "security": "पासवर्ड और सुरक्षा"
+    },
+    "app_section": {
+      "title": "एप्लिकेशन"
+    },
+    "help_section": {
+      "title": "सहायता",
+      "help_center": "सहायता केंद्र",
+      "privacy_policy": "गोपनीयता नीति",
+      "terms": "नियम और शर्तें"
+    },
+    "logout": "साइन आउट",
+    "logout_confirm_title": "साइन आउट",
+    "logout_confirm_message": "क्या आप वाकई साइन आउट करना चाहते हैं?",
+    "logout_cancel": "रद्द करें"
   },
   "language": {
     "title": "भाषा",
@@ -10,6 +28,8 @@
     "english": "अंग्रेज़ी",
     "indonesia": "इंडोनेशियाई",
     "arabic": "अरबी",
-    "hindi": "हिंदी"
+    "hindi": "हिन्दी",
+    "malay": "मलय",
+    "chinese": "चीनी"
   }
 }

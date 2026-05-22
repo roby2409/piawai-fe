@@ -1,8 +1,26 @@
 {
   "app_name": "Piawai",
   "settings": {
-    "language": "Language",
-    "account": "Account"
+    "title": "الإعدادات",
+    "language": "اللغة",
+    "account": "الحساب",
+    "account_section": {
+      "personal_info": "المعلومات الشخصية",
+      "security": "كلمة المرور والأمان"
+    },
+    "app_section": {
+      "title": "التطبيق"
+    },
+    "help_section": {
+      "title": "المساعدة",
+      "help_center": "مركز المساعدة",
+      "privacy_policy": "سياسة الخصوصية",
+      "terms": "الشروط والأحكام"
+    },
+    "logout": "تسجيل الخروج",
+    "logout_confirm_title": "تسجيل الخروج",
+    "logout_confirm_message": "هل أنت متأكد أنك تريد تسجيل الخروج؟",
+    "logout_cancel": "إلغاء"
   },
   "language": {
     "title": "اللغة",
@@ -10,6 +28,8 @@
     "english": "الإنجليزية",
     "indonesia": "الإندونيسية",
     "arabic": "العربية",
-    "hindi": "الهندية"
+    "hindi": "الهندية",
+    "malay": "الملايو",
+    "chinese": "الصينية"
   }
 }

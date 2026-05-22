@@ -40,6 +40,15 @@ class WorkerService {
     return WorkerProfileModel.fromJson(data);
   }
 
+  Future<WorkerProfileModel> fetchOtherProfile(String username) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/profile/$username'),
+      headers: await _authHeaders(),
+    );
+    final data = _handleResponse(response);
+    return WorkerProfileModel.fromJson(data);
+  }
+
   Future<Map<String, dynamic>> updateProfile(
     Map<String, dynamic> payload,
   ) async {

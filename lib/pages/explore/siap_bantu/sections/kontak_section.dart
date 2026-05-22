@@ -1,6 +1,7 @@
 // ─────────────────────────────────────────
 // KONTAK SECTION
 // ─────────────────────────────────────────
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:piawai/core/constants.dart';
 import 'package:piawai/pages/explore/siap_bantu/models/worker_profile_model.dart';
@@ -68,9 +69,9 @@ class KontakSectionState extends State<KontakSection> {
     } catch (e) {
       setState(() => _isRefetching = false);
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Gagal memuat data: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('general.fetch_failed'.tr(args: ['$e']))),
+        );
       }
     }
   }
@@ -105,20 +106,20 @@ class KontakSectionState extends State<KontakSection> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Title
-              const Text(
-                'Informasi Kontak',
+              Text(
+                'siap_bantu.information_contact'.tr(),
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 4),
-              const Text(
-                'Pastikan nomor dan email Anda aktif agar tidak melewatkan tawaran bantuan.',
+              Text(
+                'siap_bantu.information_contact_desc'.tr(),
                 style: TextStyle(fontSize: 13, color: Colors.grey),
               ),
               const SizedBox(height: 20),
 
               // Nomor HP
-              const Text(
-                'Nomor HP (WhatsApp)',
+              Text(
+                'fields.phone_whatsapp'.tr(),
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 8),
@@ -126,33 +127,8 @@ class KontakSectionState extends State<KontakSection> {
                 controller: _phoneController,
                 keyboardType: TextInputType.phone,
                 decoration: InputDecoration(
-                  hintText: '81234567890',
+                  hintText: 'field_hints.phone_whatsapp'.tr(),
                   hintStyle: const TextStyle(fontSize: 13, color: Colors.grey),
-                  prefixIcon: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Flag Indonesia emoji
-                        const Text('🇮🇩', style: TextStyle(fontSize: 18)),
-                        const SizedBox(width: 8),
-                        Text(
-                          '+62',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.grey[700],
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Container(
-                          width: 1,
-                          height: 20,
-                          color: Colors.grey[300],
-                        ),
-                      ],
-                    ),
-                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
@@ -170,8 +146,8 @@ class KontakSectionState extends State<KontakSection> {
               const SizedBox(height: 16),
 
               // Email
-              const Text(
-                'Email',
+              Text(
+                "fields.email".tr(),
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 8),
@@ -203,15 +179,15 @@ class KontakSectionState extends State<KontakSection> {
               const SizedBox(height: 16),
 
               // Instagram (Opsional)
-              const Text(
-                'Instagram (Opsional)',
+              Text(
+                '${'fields.instagram'.tr()} (${'general.optional'.tr()})',
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 8),
               TextField(
                 controller: _igController,
                 decoration: InputDecoration(
-                  hintText: 'username_kamu',
+                  hintText: 'instagram_username'.tr(),
                   hintStyle: const TextStyle(fontSize: 13, color: Colors.grey),
                   prefixIcon: Padding(
                     padding: const EdgeInsets.all(12),
@@ -262,7 +238,7 @@ class KontakSectionState extends State<KontakSection> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Tips Keamanan',
+                            'secure_tips'.tr(),
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
@@ -271,7 +247,7 @@ class KontakSectionState extends State<KontakSection> {
                           ),
                           SizedBox(height: 4),
                           Text(
-                            'Piawai tidak pernah meminta password atau kode OTP Anda melalui WhatsApp, Email, maupun telepon. Pastikan komunikasi hanya terjadi di dalam aplikasi untuk keamanan ekstra.',
+                            'secure_tips_desc'.tr(),
                             style: TextStyle(
                               fontSize: 12,
                               color: Colors.grey[700],
@@ -309,8 +285,8 @@ class KontakSectionState extends State<KontakSection> {
                             color: Colors.white,
                           ),
                         )
-                      : const Text(
-                          'Simpan Perubahan',
+                      : Text(
+                          'general.save_changes'.tr(),
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,

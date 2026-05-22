@@ -56,14 +56,12 @@ class AuthService {
   // ── Google Sign In ───────────────────────────────────────────────────────
 
   Future<Map<String, dynamic>> signInWithGoogle() async {
-    // 1. Tampilkan dialog pilih akun Google
     final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
     if (googleUser == null) {
       throw Exception('Login Google dibatalkan');
     }
 
-    // 2. Ambil idToken
     final GoogleSignInAuthentication googleAuth =
         await googleUser.authentication;
     final String? idToken = googleAuth.idToken;
@@ -74,7 +72,6 @@ class AuthService {
       );
     }
 
-    // 3. Kirim idToken ke PHP backend
     final response = await http.post(
       Uri.parse('$baseUrl/auth/google'),
       headers: {'Content-Type': 'application/json'},
@@ -88,6 +85,60 @@ class AuthService {
       return data['data'];
     } else {
       throw Exception(data['message'] ?? 'Google login gagal');
+    }
+  }
+
+  // ── Forgot Password ──────────────────────────────────────────────────────
+
+  Future<void> forgotPassword(String email) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/auth/forgot-password'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email}),
+    );
+    final data = jsonDecode(response.body);
+    if (response.statusCode != 200) {
+      throw Exception(data['message'] ?? 'Gagal mengirim OTP');
+    }
+  }
+
+  // ── Verify OTP ───────────────────────────────────────────────────────────
+
+  Future<String> verifyOtp(String email, String otp) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/auth/verify-otp'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email, 'otp': otp}),
+    );
+    final data = jsonDecode(response.body);
+    if (response.statusCode == 200) {
+      return data['data']['reset_token'] as String;
+    } else {
+      throw Exception(data['message'] ?? 'OTP tidak valid');
+    }
+  }
+
+  // ── Reset Password ───────────────────────────────────────────────────────
+
+  Future<void> resetPassword(
+    String resetToken,
+    String password,
+    String passwordConfirmation,
+  ) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/auth/reset-password'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $resetToken',
+      },
+      body: jsonEncode({
+        'password': password,
+        'password_confirmation': passwordConfirmation,
+      }),
+    );
+    final data = jsonDecode(response.body);
+    if (response.statusCode != 200) {
+      throw Exception(data['message'] ?? 'Gagal reset password');
     }
   }
 
@@ -117,7 +168,6 @@ class AuthService {
     return prefs.getString('token');
   }
 
-  // Di AuthService, update isLoggedIn():
   Future<bool> isLoggedIn() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
@@ -125,11 +175,10 @@ class AuthService {
 
     if (token == null || token.isEmpty) return false;
 
-    // Cek expiry kalau ada
     if (expiredAt != null && expiredAt.isNotEmpty) {
       final expiry = DateTime.tryParse(expiredAt);
       if (expiry != null && DateTime.now().isAfter(expiry)) {
-        await prefs.clear(); // hapus session kadaluarsa
+        await prefs.clear();
         return false;
       }
     }

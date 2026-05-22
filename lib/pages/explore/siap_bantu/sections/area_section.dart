@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart' show LatLng;
@@ -65,11 +66,15 @@ class AreaSectionState extends State<AreaSection> {
       });
       widget.onDataChanged?.call();
       if (mounted) {
-        showOverlaySnackbar(context, 'Area berhasil disimpan');
+        showOverlaySnackbar(context, "service_area_success_added".tr());
       }
     } catch (e) {
       if (mounted) {
-        showOverlaySnackbar(context, 'Gagal menyimpan: $e', isError: true);
+        showOverlaySnackbar(
+          context,
+          'general.save_failed'.tr(args: ['$e']),
+          isError: true,
+        );
       }
     } finally {
       setState(() => _isSaving = false);
@@ -88,8 +93,8 @@ class AreaSectionState extends State<AreaSection> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Area Layanan',
+              Text(
+                'siap_bantu.area_services'.tr(),
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               GestureDetector(
@@ -111,10 +116,10 @@ class AreaSectionState extends State<AreaSection> {
                     });
                   }
                 },
-                child: const Row(
+                child: Row(
                   children: [
                     Text(
-                      'Atur Lokasi',
+                      "siap_bantu.setting_services".tr(),
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
@@ -129,8 +134,8 @@ class AreaSectionState extends State<AreaSection> {
             ],
           ),
           const SizedBox(height: 4),
-          const Text(
-            'Tentukan jangkauan kerja Anda',
+          Text(
+            'siap_bantu.define_scope_work'.tr(),
             style: TextStyle(fontSize: 13, color: Colors.grey),
           ),
           const SizedBox(height: 16),
@@ -174,7 +179,7 @@ class AreaSectionState extends State<AreaSection> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              _areaLabel ?? 'Lokasi belum diatur',
+                              _areaLabel ?? 'siap_bantu.location_not_set'.tr(),
                               style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
@@ -184,7 +189,7 @@ class AreaSectionState extends State<AreaSection> {
                             Text(
                               _lat != null && _lng != null
                                   ? '${_lat!.toStringAsFixed(4)}, ${_lng!.toStringAsFixed(4)}'
-                                  : 'Tap "Atur Lokasi" untuk menentukan titik',
+                                  : 'siap_bantu.tap_set_location'.tr(),
                               style: const TextStyle(
                                 fontSize: 12,
                                 color: Colors.grey,
@@ -205,8 +210,8 @@ class AreaSectionState extends State<AreaSection> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Radius Jangkauan',
+              Text(
+                "siap_bantu.radius_range".tr(),
                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
               ),
               Text(
@@ -237,21 +242,21 @@ class AreaSectionState extends State<AreaSection> {
               onChanged: (v) => setState(() => _radius = v),
             ),
           ),
-          const Padding(
+          Padding(
             padding: EdgeInsets.symmetric(horizontal: 4),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '1 km',
+                  'general.radius_display'.tr(args: ['1']),
                   style: TextStyle(fontSize: 11, color: Colors.grey),
                 ),
                 Text(
-                  '25 km',
+                  'general.radius_display'.tr(args: ['25']),
                   style: TextStyle(fontSize: 11, color: Colors.grey),
                 ),
                 Text(
-                  '50 km',
+                  'general.radius_display'.tr(args: ['50']),
                   style: TextStyle(fontSize: 11, color: Colors.grey),
                 ),
               ],
@@ -267,14 +272,14 @@ class AreaSectionState extends State<AreaSection> {
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: const Color(0xFFBFDBFE)),
             ),
-            child: const Row(
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Icon(Icons.info_outline, color: kPrimary, size: 20),
                 SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    'Radius ini menentukan seberapa jauh profil Anda akan muncul pada pencarian pelanggan. Anda hanya akan menerima notifikasi dari area ini.',
+                    "siap_bantu.radius_range_desc".tr(),
                     style: TextStyle(fontSize: 12, color: Color(0xFF1e40af)),
                   ),
                 ),
@@ -307,8 +312,8 @@ class AreaSectionState extends State<AreaSection> {
                         color: Colors.white,
                       ),
                     )
-                  : const Text(
-                      'Simpan Perubahan',
+                  : Text(
+                      'general.save_changes'.tr(),
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
@@ -404,7 +409,7 @@ class _LokasiBelumDiatur extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Lokasi belum diatur',
+                  'siap_bantu.location_not_set'.tr(),
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.5),
                     fontSize: 13,
@@ -412,7 +417,7 @@ class _LokasiBelumDiatur extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Tap "Atur Lokasi" untuk menentukan titik',
+                  'siap_bantu.tap_set_location'.tr(),
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.3),
                     fontSize: 11,

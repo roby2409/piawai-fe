@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:piawai/core/constants.dart';
 import 'package:piawai/pages/widgets/input_field.dart';
@@ -113,20 +114,21 @@ class _InformasiPribadiPageState extends State<InformasiPribadiPage> {
 
             _SectionCard(
               title: 'Username',
-              subtitle:
-                  'Username digunakan untuk login dan ditampilkan ke pengguna lain',
+              subtitle: 'settings.account_settings.username_description'.tr(),
               child: InputField(
                 controller: _usernameCtrl,
-                label: 'Username',
+                label: 'fields.username'.tr(),
                 hint: 'Masukkan username baru',
                 prefixIcon: Icons.alternate_email,
                 validator: (val) {
-                  if (val == null || val.trim().isEmpty)
-                    return 'Username tidak boleh kosong';
-                  if (val.trim().length < 3)
-                    return 'Username minimal 3 karakter';
+                  if (val == null || val.trim().isEmpty) {
+                    return 'validator.username_required'.tr();
+                  }
+                  if (val.trim().length < 3) {
+                    return 'validator.username_min'.tr();
+                  }
                   if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(val.trim())) {
-                    return 'Hanya huruf, angka, dan underscore';
+                    return 'validator.username_invalid'.tr();
                   }
                   return null;
                 },
@@ -158,8 +160,8 @@ class _InformasiPribadiPageState extends State<InformasiPribadiPage> {
                           strokeWidth: 2,
                         ),
                       )
-                    : const Text(
-                        'Simpan Perubahan',
+                    : Text(
+                        'general.save_changes'.tr(),
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,

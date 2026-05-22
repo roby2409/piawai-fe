@@ -1,7 +1,11 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:piawai/core/constants.dart';
 import 'package:piawai/pages/explore/siap_bantu/models/service_model.dart';
 import 'package:piawai/pages/widgets/input_field.dart';
+import 'package:piawai/pages/widgets/overlay_snackbar.dart';
+import 'package:piawai/services/config_services.dart';
 import 'package:piawai/services/worker_services.dart';
 
 // ─────────────────────────────────────────
@@ -32,7 +36,6 @@ class LayananSectionState extends State<LayananSection> {
     _items = widget.initialServices;
   }
 
-  // ── Refetch setelah CRUD ───────────────────────────────────────────────
   Future<void> _refetch() async {
     try {
       setState(() => _isRefetching = true);
@@ -45,28 +48,27 @@ class LayananSectionState extends State<LayananSection> {
     } catch (e) {
       setState(() => _isRefetching = false);
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Gagal memuat data: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('general.fetch_failed'.tr(args: ['$e']))),
+        );
       }
     }
   }
 
-  // ── Delete ─────────────────────────────────────────────────────────────
   Future<void> _deleteService(int id) async {
     try {
       await _workerService.deleteService(id);
       await _refetch();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Layanan berhasil dihapus')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('service_success_deleted'.tr())));
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Gagal menghapus: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('general.delete_failed'.tr(args: ['$e']))),
+        );
       }
     }
   }
@@ -92,27 +94,26 @@ class LayananSectionState extends State<LayananSection> {
             ),
             ListTile(
               leading: const Icon(Icons.edit_outlined, color: kPrimary),
-              title: const Text('Edit Layanan'),
+              title: Text('siap_bantu.edit_services'.tr()),
               onTap: () {
                 Navigator.pop(context);
-                // di _showMenuOptions bagian edit
                 _showTambahLayananSheet(
                   context,
                   existing: _items[index],
                   onSuccess: () => _refetch(),
                   onError: (msg) {
-                    ScaffoldMessenger.of(
-                      this.context,
-                    ).showSnackBar(SnackBar(content: Text('Gagal: $msg')));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('general.failed'.tr(args: [msg]))),
+                    );
                   },
                 );
               },
             ),
             ListTile(
               leading: const Icon(Icons.delete_outline, color: Colors.red),
-              title: const Text(
-                'Hapus Layanan',
-                style: TextStyle(color: Colors.red),
+              title: Text(
+                'siap_bantu.delete_services'.tr(),
+                style: const TextStyle(color: Colors.red),
               ),
               onTap: () {
                 Navigator.pop(context);
@@ -165,20 +166,22 @@ class LayananSectionState extends State<LayananSection> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ── Header Row ──
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'Layanan',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  Text(
+                    "your_services".tr(),
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   ElevatedButton.icon(
                     onPressed: () => _showTambahDialog(context),
                     icon: const Icon(Icons.add, size: 18),
-                    label: const Text(
-                      'Tambah',
-                      style: TextStyle(
+                    label: Text(
+                      'general.add'.tr(),
+                      style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                       ),
@@ -200,7 +203,6 @@ class LayananSectionState extends State<LayananSection> {
               ),
               const SizedBox(height: 16),
 
-              // ── List Layanan ──
               if (_items.isEmpty)
                 Center(
                   child: Padding(
@@ -213,9 +215,9 @@ class LayananSectionState extends State<LayananSection> {
                           color: Colors.grey[300],
                         ),
                         const SizedBox(height: 12),
-                        const Text(
-                          'Belum ada layanan',
-                          style: TextStyle(color: Colors.grey),
+                        Text(
+                          'siap_bantu.services_empty'.tr(),
+                          style: const TextStyle(color: Colors.grey),
                         ),
                       ],
                     ),
@@ -233,7 +235,6 @@ class LayananSectionState extends State<LayananSection> {
           ),
         ),
 
-        // ── Loading overlay saat refetch ──
         if (_isRefetching)
           const Positioned.fill(
             child: ColoredBox(
@@ -249,31 +250,44 @@ class LayananSectionState extends State<LayananSection> {
 // ─────────────────────────────────────────
 // TAMBAH / EDIT LAYANAN BOTTOM SHEET
 // ─────────────────────────────────────────
-
 void _showTambahLayananSheet(
   BuildContext context, {
   ServiceModel? existing,
   VoidCallback? onSuccess,
-  void Function(String)? onError, // ← tambah ini
+  void Function(String)? onError,
 }) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (_) => _TambahLayananSheet(
-      existing: existing,
-      onSuccess: onSuccess,
-      onError: onError, // ← pass ke sheet
+    builder: (_) => DraggableScrollableSheet(
+      // ← wrap dengan ini
+      initialChildSize: 0.75, // ← mulai dari 75% layar
+      minChildSize: 0.5, // ← minimum 50%
+      maxChildSize: 0.8, // ← bisa full screen
+      expand: false,
+      builder: (_, scrollController) => _TambahLayananSheet(
+        existing: existing,
+        onSuccess: onSuccess,
+        onError: onError,
+        scrollController: scrollController, // ← pass scroll controller
+      ),
     ),
   );
 }
 
 class _TambahLayananSheet extends StatefulWidget {
   final ServiceModel? existing;
-  final VoidCallback? onSuccess; // ← ganti onSave jadi onSuccess
+  final VoidCallback? onSuccess;
   final void Function(String)? onError;
+  final ScrollController? scrollController;
 
-  const _TambahLayananSheet({this.existing, this.onSuccess, this.onError});
+  const _TambahLayananSheet({
+    this.existing,
+    this.onSuccess,
+    this.onError,
+    this.scrollController, // ← tambah ini
+  });
 
   @override
   State<_TambahLayananSheet> createState() => _TambahLayananSheetState();
@@ -282,64 +296,109 @@ class _TambahLayananSheet extends StatefulWidget {
 class _TambahLayananSheetState extends State<_TambahLayananSheet> {
   final _namaController = TextEditingController();
   final _deskripsiController = TextEditingController();
-  final _jamController = TextEditingController();
-  final _hariController = TextEditingController();
-  final _proyekController = TextEditingController();
-
   final _workerService = WorkerService();
-  bool _showTarifError = false;
+
   bool _isSaving = false;
+  bool _isGenerating = false; // ← state loading Gemini
+
+  final _configService = ConfigService();
+  String kGeminiApiKey = "";
+
+  Future<void> _loadConfigServices() async {
+    final result = await _configService.getConfigKeys();
+    setState(() {
+      kGeminiApiKey = result["gemini_api_key"];
+    });
+  }
 
   @override
   void initState() {
     super.initState();
-    // ── Pre-fill kalau mode edit ──
     if (widget.existing != null) {
       final e = widget.existing!;
       _namaController.text = e.nama;
-      _deskripsiController.text = e.deskripsi;
-      _jamController.text = e.hargaJam > 0 ? e.hargaJam.toString() : '';
-      _hariController.text = e.hargaHari > 0 ? e.hargaHari.toString() : '';
-      _proyekController.text = e.hargaProyek != null
-          ? e.hargaProyek.toString()
-          : '';
+      _deskripsiController.text = e.deskripsi ?? "";
     }
+
+    _loadConfigServices();
   }
 
   @override
   void dispose() {
     _namaController.dispose();
     _deskripsiController.dispose();
-    _jamController.dispose();
-    _hariController.dispose();
-    _proyekController.dispose();
     super.dispose();
   }
 
-  bool get _tarifValid =>
-      _jamController.text.trim().isNotEmpty ||
-      _hariController.text.trim().isNotEmpty ||
-      _proyekController.text.trim().isNotEmpty;
+  bool get _canSave => _namaController.text.trim().isNotEmpty && !_isSaving;
 
-  bool get _canSave =>
-      _namaController.text.trim().isNotEmpty && _tarifValid && !_isSaving;
+  // ── Generate deskripsi dengan Gemini ──────────────────────────────────
+  Future<void> _generateDescription() async {
+    final nama = _namaController.text.trim();
+    if (nama.isEmpty) {
+      showOverlaySnackbar(
+        context,
+        'validator.service_name_required'.tr(),
+        isError: true,
+      );
+      return;
+    }
+    print("gemini apikey ${kGeminiApiKey}");
 
-  int? _parseHarga(String raw) {
-    final clean = raw.trim();
-    if (clean.isEmpty) return null;
-    return int.tryParse(clean);
+    setState(() => _isGenerating = true);
+
+    try {
+      final model = GenerativeModel(
+        model: 'gemini-3-flash-preview',
+        apiKey: kGeminiApiKey,
+      );
+
+      final prompt =
+          '''
+          Buatkan deskripsi untuk layanan jasa bernama "$nama" dalam bahasa Indonesia.
+
+          Ketentuan:
+          - Maksimal 500 karakter
+          - 2-3 kalimat
+          - Jelaskan jenis pekerjaan yang dilakukan
+          - Sertakan estimasi harga dengan kalimat "harga bisa nego"
+          - Tone santai dan meyakinkan
+          - Langsung ke poin, tanpa pembuka seperti "Berikut deskripsinya:"
+          - Jangan pakai tanda kutip atau simbol berlebihan
+
+          Contoh output yang benar:
+          Menerima jasa instalasi listrik rumah dan gedung komersial. Pengerjaan rapi, aman, dan bergaransi. Mulai dari Rp 150.000, harga bisa nego.
+
+          Contoh output yang benar:
+          Layanan cuci dan setrika baju panggilan ke rumah, minimal 3 kg. Cepat, wangi, dan terlipat rapi. Mulai Rp 7.000/kg, harga bisa nego.
+          ''';
+
+      final content = [Content.text(prompt)];
+      final response = await model.generateContent(content);
+      final text = response.text?.trim() ?? '';
+
+      if (text.isNotEmpty) {
+        setState(() => _deskripsiController.text = text);
+      }
+    } catch (e) {
+      if (mounted) {
+        showOverlaySnackbar(
+          context,
+          'Gagal generate deskripsi, coba lagi',
+          isError: true,
+        );
+      }
+    } finally {
+      setState(() => _isGenerating = false);
+    }
   }
 
   Future<void> _onSimpan() async {
-    setState(() => _showTarifError = !_tarifValid);
     if (!_canSave) return;
 
     final payload = {
       'nama': _namaController.text.trim(),
       'deskripsi': _deskripsiController.text.trim(),
-      'harga_jam': _parseHarga(_jamController.text) ?? 0,
-      'harga_hari': _parseHarga(_hariController.text) ?? 0,
-      'harga_proyek': _parseHarga(_proyekController.text),
       'is_active': true,
     };
 
@@ -350,7 +409,7 @@ class _TambahLayananSheetState extends State<_TambahLayananSheet> {
       } else {
         await _workerService.createService(payload);
       }
-      widget.onSuccess?.call(); // ← kasih tau parent buat refetch
+      widget.onSuccess?.call();
       if (mounted) Navigator.pop(context);
     } catch (e) {
       setState(() => _isSaving = false);
@@ -368,183 +427,205 @@ class _TambahLayananSheetState extends State<_TambahLayananSheet> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       padding: EdgeInsets.fromLTRB(20, 0, 20, 20 + bottomInset),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // ── Drag handle ──
-          Center(
-            child: Container(
-              width: 40,
-              height: 4,
-              margin: const EdgeInsets.symmetric(vertical: 12),
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-          ),
-
-          // ── Header ──
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                widget.existing != null ? 'Edit Layanan' : 'Tambah Layanan',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+      child: SingleChildScrollView(
+        controller: widget.scrollController,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Drag handle
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
                 ),
               ),
-              GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: const Icon(Icons.close, size: 22, color: Colors.grey),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-
-          // ── Scroll area ──
-          ConstrainedBox(
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height * 0.65,
             ),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _FieldLabel('Nama Layanan'),
-                  const SizedBox(height: 6),
-                  InputField(
-                    controller: _namaController,
-                    hint: 'Contoh: Tukang Kebun',
-                    onChanged: (_) => setState(() {}),
-                  ),
-                  const SizedBox(height: 16),
 
-                  _FieldLabel('Deskripsi'),
-                  const SizedBox(height: 6),
-                  InputField(
-                    controller: _deskripsiController,
-                    hint: 'Jelaskan layanan yang Anda tawarkan...',
-                    maxLines: 4,
+            // Header
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  widget.existing != null
+                      ? 'siap_bantu.edit_services'.tr()
+                      : 'siap_bantu.add_services'.tr(),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
-                  const SizedBox(height: 16),
+                ),
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: const Icon(Icons.close, size: 22, color: Colors.grey),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
 
-                  const Text(
-                    'Tarif Layanan',
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(height: 2),
-                  const Text(
-                    'Isi minimal satu tarif',
-                    style: TextStyle(fontSize: 12, color: Colors.grey),
-                  ),
-                  const SizedBox(height: 10),
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.65,
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Nama layanan
+                    _FieldLabel('fields.service_name'.tr()),
+                    const SizedBox(height: 6),
+                    InputField(
+                      controller: _namaController,
+                      hint: 'field_hints.service_name_example'.tr(),
+                      onChanged: (_) => setState(() {}),
+                    ),
+                    const SizedBox(height: 16),
 
-                  _FieldLabel('Per Jam'),
-                  const SizedBox(height: 6),
-                  _TarifField(
-                    controller: _jamController,
-                    onChanged: (_) => setState(() {}),
-                  ),
-                  const SizedBox(height: 12),
-
-                  _FieldLabel('Per Hari'),
-                  const SizedBox(height: 6),
-                  _TarifField(
-                    controller: _hariController,
-                    onChanged: (_) => setState(() {}),
-                  ),
-                  const SizedBox(height: 12),
-
-                  _FieldLabel('Per Proyek'),
-                  const SizedBox(height: 6),
-                  _TarifField(
-                    controller: _proyekController,
-                    onChanged: (_) => setState(() {}),
-                  ),
-                  const SizedBox(height: 12),
-
-                  // ── Error tarif ──
-                  AnimatedCrossFade(
-                    duration: const Duration(milliseconds: 200),
-                    crossFadeState: _showTarifError && !_tarifValid
-                        ? CrossFadeState.showFirst
-                        : CrossFadeState.showSecond,
-                    firstChild: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFFFBEB),
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: const Color(0xFFFDE68A)),
-                      ),
-                      child: const Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Icon(
-                            Icons.warning_amber_rounded,
-                            size: 16,
-                            color: Color(0xFFD97706),
-                          ),
-                          SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              'Minimal satu tarif harus diisi (Jam, Hari, atau Proyek)',
-                              style: TextStyle(
+                    // Deskripsi + tombol AI
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            _FieldLabel('fields.service_description'.tr()),
+                            const SizedBox(width: 4),
+                            Text(
+                              '(${'general.optional'.tr()})',
+                              style: const TextStyle(
+                                fontStyle: FontStyle.italic,
                                 fontSize: 12,
-                                color: Color(0xFF92400E),
                               ),
                             ),
+                          ],
+                        ),
+
+                        // ← Tombol Generate AI
+                        GestureDetector(
+                          onTap: _isGenerating ? null : _generateDescription,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: _isGenerating
+                                  ? Colors.grey[100]
+                                  : kSecondary,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: _isGenerating
+                                    ? Colors.grey[300]!
+                                    : kPrimary.withOpacity(0.3),
+                              ),
+                            ),
+                            child: _isGenerating
+                                ? const SizedBox(
+                                    width: 14,
+                                    height: 14,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: kPrimary,
+                                    ),
+                                  )
+                                : Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(
+                                        Icons.auto_awesome,
+                                        size: 14,
+                                        color: kPrimary,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        'help_generate'.tr(),
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                          color: kPrimary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    secondChild: const SizedBox.shrink(),
-                  ),
-                  const SizedBox(height: 8),
-                ],
-              ),
-            ),
-          ),
+                    const SizedBox(height: 6),
+                    InputField(
+                      controller: _deskripsiController,
+                      hint: 'field_hints.service_desc_example'.tr(),
+                      minLines: 5, // ← minimum 5 baris
+                      maxLines: 999, // ← tidak dibatasi, bisa scroll
+                      maxLength: 500, // ← batas karakter
+                      keyboardType: TextInputType.multiline,
+                    ),
 
-          const SizedBox(height: 12),
-
-          // ── Simpan Button ──
-          SizedBox(
-            width: double.infinity,
-            height: 52,
-            child: ElevatedButton(
-              onPressed: _canSave ? _onSimpan : null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: kPrimary,
-                disabledBackgroundColor: const Color(0xFFD1D5DB),
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                    // Hint generate
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.info_outline,
+                          size: 12,
+                          color: Colors.grey[400],
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          'field_hints.service_name_info'.tr(),
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Colors.grey[400],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-                elevation: 0,
               ),
-              child: _isSaving
-                  ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
-                    )
-                  : const Text(
-                      'Simpan Layanan',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
             ),
-          ),
-        ],
+
+            const SizedBox(height: 12),
+
+            // Simpan button
+            SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: ElevatedButton(
+                onPressed: _canSave ? _onSimpan : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: kPrimary,
+                  disabledBackgroundColor: const Color(0xFFD1D5DB),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 0,
+                ),
+                child: _isSaving
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Text(
+                        'siap_bantu.save_services'.tr(),
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
+        ),
       ),
     );
   }
@@ -558,16 +639,6 @@ class _LayananCard extends StatelessWidget {
   final VoidCallback onMenuTap;
 
   const _LayananCard({required this.item, required this.onMenuTap});
-
-  String _formatHarga(int? value) {
-    if (value == null || value == 0) return '-';
-    if (value >= 1000) {
-      final k = value ~/ 1000;
-      final sisa = value % 1000;
-      return sisa == 0 ? 'Rp ${k}k' : 'Rp $value';
-    }
-    return 'Rp $value';
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -603,67 +674,14 @@ class _LayananCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 6),
-          Text(
-            item.deskripsi,
-            style: const TextStyle(fontSize: 13, color: Colors.grey),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              _HargaChip(label: 'Jam', value: _formatHarga(item.hargaJam)),
-              const SizedBox(width: 8),
-              _HargaChip(label: 'Hari', value: _formatHarga(item.hargaHari)),
-              const SizedBox(width: 8),
-              _HargaChip(
-                label: 'Proyek',
-                value: _formatHarga(item.hargaProyek),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────
-// HARGA CHIP
-// ─────────────────────────────────────────
-class _HargaChip extends StatelessWidget {
-  final String label;
-  final String value;
-
-  const _HargaChip({required this.label, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    final bool hasValue = value != '-';
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        decoration: BoxDecoration(
-          color: const Color(0xFFF3F4F6),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Column(
-          children: [
+          if (item.deskripsi != null && item.deskripsi!.isNotEmpty) ...[
+            const SizedBox(height: 6),
             Text(
-              label,
-              style: const TextStyle(fontSize: 11, color: Colors.grey),
-            ),
-            const SizedBox(height: 3),
-            Text(
-              value,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: hasValue ? kPrimary : Colors.grey,
-              ),
-              textAlign: TextAlign.center,
+              item.deskripsi!,
+              style: const TextStyle(fontSize: 13, color: Colors.grey),
             ),
           ],
-        ),
+        ],
       ),
     );
   }
@@ -681,60 +699,6 @@ class _FieldLabel extends StatelessWidget {
     return Text(
       text,
       style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
-    );
-  }
-}
-
-class _TarifField extends StatelessWidget {
-  final TextEditingController controller;
-  final void Function(String)? onChanged;
-
-  const _TarifField({required this.controller, this.onChanged});
-
-  @override
-  Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
-      keyboardType: TextInputType.number,
-      onChanged: onChanged,
-      decoration: InputDecoration(
-        hintText: '0',
-        hintStyle: const TextStyle(fontSize: 13, color: Colors.grey),
-        prefixIcon: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Rp',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.grey[700],
-                ),
-              ),
-              const SizedBox(width: 8),
-              Container(width: 1, height: 20, color: Colors.grey[300]),
-            ],
-          ),
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 14,
-          vertical: 14,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: kPrimary),
-        ),
-      ),
     );
   }
 }

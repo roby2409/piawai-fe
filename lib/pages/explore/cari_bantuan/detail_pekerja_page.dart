@@ -28,16 +28,8 @@ class PekerjaDetail {
 
 class LayananDetail {
   final String nama;
-  final String? hargaJam;
-  final String? hargaHari;
-  final String? hargaProyek;
 
-  const LayananDetail({
-    required this.nama,
-    this.hargaJam,
-    this.hargaHari,
-    this.hargaProyek,
-  });
+  const LayananDetail({required this.nama});
 }
 
 // ─────────────────────────────────────────
@@ -330,92 +322,8 @@ class _LayananCard extends StatelessWidget {
           ),
           const Divider(height: 1),
           const SizedBox(height: 16),
-
-          // Tarif rows
-          if (selected.hargaJam != null)
-            _TarifRow(
-              icon: Icons.access_time,
-              label: 'Tarif Per Jam',
-              harga: selected.hargaJam!,
-              isProyek: false,
-            ),
-          if (selected.hargaHari != null) ...[
-            const SizedBox(height: 12),
-            _TarifRow(
-              icon: Icons.calendar_today_outlined,
-              label: 'Tarif Per Hari',
-              harga: selected.hargaHari!,
-              isProyek: false,
-            ),
-          ],
-          if (selected.hargaProyek != null) ...[
-            const SizedBox(height: 12),
-            _TarifRow(
-              icon: Icons.build_outlined,
-              label: 'Tarif Proyek',
-              harga: selected.hargaProyek!,
-              isProyek: true,
-            ),
-          ],
         ],
       ),
-    );
-  }
-}
-
-class _TarifRow extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String harga;
-  final bool isProyek;
-
-  const _TarifRow({
-    required this.icon,
-    required this.label,
-    required this.harga,
-    required this.isProyek,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Icon(icon, size: 16, color: kPrimary),
-            const SizedBox(width: 6),
-            Text(
-              label,
-              style: const TextStyle(fontSize: 13, color: Colors.grey),
-            ),
-          ],
-        ),
-        const SizedBox(height: 4),
-        if (isProyek)
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Mulai dari',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-              ),
-              Text(
-                harga,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: kPrimary,
-                ),
-              ),
-            ],
-          )
-        else
-          Text(
-            harga,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-      ],
     );
   }
 }

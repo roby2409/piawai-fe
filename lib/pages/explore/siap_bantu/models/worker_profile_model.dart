@@ -84,4 +84,13 @@ class WorkerProfileModel {
     'age': age,
     'gender': gender,
   };
+
+  // Tambah getter di WorkerProfileModel
+  bool get isProfileComplete =>
+      fullName.isNotEmpty &&
+      gender != null &&
+      phoneWa != null &&
+      services.isNotEmpty &&
+      lat != null &&
+      lng != null;
 }
