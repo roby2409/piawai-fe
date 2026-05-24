@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:piawai/core/constants.dart';
 import 'package:piawai/core/app_colors.dart';
 import 'package:piawai/core/helper.dart';
 import 'package:piawai/pages/widgets/loading_detect_location.dart';
@@ -73,29 +72,6 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
       setState(() {
         _explore = explore;
         _isLoading = false;
-      });
-
-      // ← ganti addPostFrameCallback lama dengan ini
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) return;
-
-        final radiusM = (_activeFilter?.radiusKm ?? 5) * 1000;
-        final radiusDeg = radiusM / 111320;
-
-        final bounds = LatLngBounds.fromPoints([
-          LatLng(_myLocation!.latitude + radiusDeg, _myLocation!.longitude),
-          LatLng(_myLocation!.latitude - radiusDeg, _myLocation!.longitude),
-          LatLng(_myLocation!.latitude, _myLocation!.longitude + radiusDeg),
-          LatLng(_myLocation!.latitude, _myLocation!.longitude - radiusDeg),
-        ]);
-
-        // _mapController.fitCamera(
-        //   CameraFit.bounds(
-        //     bounds: bounds,
-        //     padding: const EdgeInsets.all(40),
-        //     minZoom: 12,
-        //   ),
-        // );
       });
     } catch (e) {
       if (!mounted) return; // ← add

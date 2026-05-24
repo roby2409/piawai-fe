@@ -97,9 +97,6 @@ class _SearchPageState extends State<SearchPage> {
     _fetchSuggestions(value);
   }
 
-  void _removeRecent(String value) => setState(() => _recents.remove(value));
-  void _clearAllRecents() => setState(() => _recents.clear());
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -323,51 +320,6 @@ class _HighlightedText extends StatelessWidget {
               style: const TextStyle(fontWeight: FontWeight.w700),
             ),
         ],
-      ),
-    );
-  }
-}
-
-class _RecentChip extends StatelessWidget {
-  final String label;
-  final VoidCallback onTap;
-  final VoidCallback onRemove;
-
-  const _RecentChip({
-    required this.label,
-    required this.onTap,
-    required this.onRemove,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.only(left: 12, right: 6, top: 7, bottom: 7),
-        decoration: BoxDecoration(
-          color: context.bgCard,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: context.divider),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 13,
-                color: context.black87,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(width: 6),
-            GestureDetector(
-              onTap: onRemove,
-              child: Icon(Icons.close, size: 14, color: context.primary),
-            ),
-          ],
-        ),
       ),
     );
   }

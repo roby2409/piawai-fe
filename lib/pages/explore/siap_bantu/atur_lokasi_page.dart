@@ -5,7 +5,6 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
-import 'package:piawai/core/constants.dart';
 import 'package:piawai/core/app_colors.dart';
 import 'package:piawai/pages/widgets/input_field.dart';
 import 'package:piawai/pages/widgets/map_component.dart';

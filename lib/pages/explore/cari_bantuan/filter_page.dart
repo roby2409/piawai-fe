@@ -1,12 +1,10 @@
 import 'dart:convert';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
-import 'package:piawai/core/constants.dart';
 import 'package:piawai/core/app_colors.dart';
 import 'package:piawai/pages/explore/siap_bantu/atur_lokasi_page.dart';
 import 'package:piawai/pages/widgets/loading_detect_location.dart';
