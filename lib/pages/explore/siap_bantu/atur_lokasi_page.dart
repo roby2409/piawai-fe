@@ -1,10 +1,13 @@
 import 'dart:convert';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:piawai/core/constants.dart';
+import 'package:piawai/core/app_colors.dart';
+import 'package:piawai/pages/widgets/input_field.dart';
 import 'package:piawai/pages/widgets/map_component.dart';
 
 class AturLokasiPage extends StatefulWidget {
@@ -190,17 +193,17 @@ class _AturLokasiPageState extends State<AturLokasiPage> {
                 }
               },
             ),
-            children: [buildTileLayer()],
+            children: [buildTileLayer(context)],
           ),
 
           // ── Center pin ──
-          const Positioned.fill(
+          Positioned.fill(
             child: IgnorePointer(
               child: Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.location_pin, color: kPrimary, size: 48),
+                    Icon(Icons.location_pin, color: context.primary, size: 48),
                     SizedBox(height: 24),
                   ],
                 ),
@@ -227,18 +230,23 @@ class _AturLokasiPageState extends State<AturLokasiPage> {
                         GestureDetector(
                           onTap: () => Navigator.pop(context),
                           child: Container(
-                            padding: const EdgeInsets.all(10),
+                            padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: context.bgCard,
                               borderRadius: BorderRadius.circular(12),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
+                                  color: context.black.withOpacity(0.1),
                                   blurRadius: 8,
                                 ),
                               ],
+                              border: Border.all(color: context.divider),
                             ),
-                            child: const Icon(Icons.arrow_back, size: 20),
+                            child: Icon(
+                              Icons.arrow_back,
+                              size: 20,
+                              color: context.primary,
+                            ),
                           ),
                         ),
                         const SizedBox(width: 10),
@@ -247,63 +255,18 @@ class _AturLokasiPageState extends State<AturLokasiPage> {
                         Expanded(
                           child: Container(
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: context.white,
                               borderRadius: BorderRadius.circular(12),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
+                                  color: context.black.withOpacity(0.1),
                                   blurRadius: 8,
                                 ),
                               ],
                             ),
-                            child: TextField(
+                            child: InputField(
                               controller: _searchController,
-                              focusNode: _searchFocus,
-                              style: const TextStyle(fontSize: 13),
-                              decoration: InputDecoration(
-                                hintText: 'Cari lokasi...',
-                                hintStyle: const TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.grey,
-                                ),
-                                prefixIcon: _isSearching
-                                    ? const Padding(
-                                        padding: EdgeInsets.all(12),
-                                        child: SizedBox(
-                                          width: 16,
-                                          height: 16,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                            color: kPrimary,
-                                          ),
-                                        ),
-                                      )
-                                    : const Icon(
-                                        Icons.search,
-                                        color: Colors.grey,
-                                        size: 20,
-                                      ),
-                                suffixIcon: _searchController.text.isNotEmpty
-                                    ? IconButton(
-                                        icon: const Icon(
-                                          Icons.close,
-                                          size: 18,
-                                          color: Colors.grey,
-                                        ),
-                                        onPressed: () {
-                                          _searchController.clear();
-                                          setState(() {
-                                            _showSuggestions = false;
-                                            _searchResults = [];
-                                          });
-                                        },
-                                      )
-                                    : null,
-                                border: InputBorder.none,
-                                contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 13,
-                                ),
-                              ),
+                              hint: 'field_hints.search_location'.tr(),
                               onChanged: (val) {
                                 setState(() {});
                                 Future.delayed(
@@ -326,11 +289,11 @@ class _AturLokasiPageState extends State<AturLokasiPage> {
                       Container(
                         margin: const EdgeInsets.only(top: 6, left: 46),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: context.bgCard,
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
+                              color: context.black.withOpacity(0.1),
                               blurRadius: 12,
                               offset: const Offset(0, 4),
                             ),
@@ -352,18 +315,18 @@ class _AturLokasiPageState extends State<AturLokasiPage> {
                                     ),
                                     child: Row(
                                       children: [
-                                        const Icon(
+                                        Icon(
                                           Icons.location_on_outlined,
-                                          color: Colors.grey,
+                                          color: context.grey,
                                           size: 18,
                                         ),
                                         const SizedBox(width: 10),
                                         Expanded(
                                           child: Text(
                                             label,
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontSize: 13,
-                                              color: Colors.black87,
+                                              color: context.black87,
                                             ),
                                             maxLines: 2,
                                             overflow: TextOverflow.ellipsis,
@@ -399,25 +362,25 @@ class _AturLokasiPageState extends State<AturLokasiPage> {
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: context.white,
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: context.black.withOpacity(0.1),
                       blurRadius: 8,
                     ),
                   ],
                 ),
                 child: _isLoadingLocation
-                    ? const SizedBox(
+                    ? SizedBox(
                         width: 22,
                         height: 22,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: kPrimary,
+                          color: context.primary,
                         ),
                       )
-                    : const Icon(Icons.my_location, color: kPrimary, size: 22),
+                    : Icon(Icons.my_location, color: context.primary, size: 22),
               ),
             ),
           ),
@@ -429,8 +392,8 @@ class _AturLokasiPageState extends State<AturLokasiPage> {
             right: 0,
             child: Container(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
-              decoration: const BoxDecoration(
-                color: Colors.white,
+              decoration: BoxDecoration(
+                color: context.bgContent,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
               ),
               child: Column(
@@ -439,7 +402,7 @@ class _AturLokasiPageState extends State<AturLokasiPage> {
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.location_on, color: kPrimary, size: 18),
+                      Icon(Icons.location_on, color: context.primary, size: 18),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
@@ -458,9 +421,12 @@ class _AturLokasiPageState extends State<AturLokasiPage> {
                     ],
                   ),
                   const SizedBox(height: 4),
-                  const Text(
+                  Text(
                     'Titik ini akan jadi pusat area layanan Anda',
-                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: context.textSecondary,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   SizedBox(
@@ -469,15 +435,15 @@ class _AturLokasiPageState extends State<AturLokasiPage> {
                     child: ElevatedButton(
                       onPressed: _confirmLocation,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: kPrimary,
-                        foregroundColor: Colors.white,
+                        backgroundColor: context.primary,
+                        foregroundColor: context.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                         elevation: 0,
                       ),
-                      child: const Text(
-                        'Konfirmasi Lokasi',
+                      child: Text(
+                        'confirm_location'.tr(),
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,

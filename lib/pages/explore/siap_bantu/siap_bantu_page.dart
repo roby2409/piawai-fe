@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:piawai/core/constants.dart';
+import 'package:piawai/core/app_colors.dart';
 import 'package:piawai/pages/explore/siap_bantu/models/worker_profile_model.dart';
 import 'package:piawai/services/worker_services.dart';
 import 'sections/area_section.dart';
@@ -89,9 +90,9 @@ class _SiapBantuPageState extends State<SiapBantuPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, color: Colors.red, size: 40),
+            Icon(Icons.alarm, size: 40),
             const SizedBox(height: 8),
-            Text(_errorMessage!, style: const TextStyle(color: Colors.red)),
+            Text(_errorMessage!, style: TextStyle(color: context.red)),
             const SizedBox(height: 12),
             ElevatedButton(onPressed: _loadAll, child: const Text('Coba Lagi')),
           ],
@@ -145,8 +146,8 @@ class _SiapBantuPageState extends State<SiapBantuPage> {
   Widget build(BuildContext context) {
     return ClipRRect(
       child: Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
+        decoration: BoxDecoration(
+          color: context.bgOuter,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(24),
             topRight: Radius.circular(24),
@@ -159,7 +160,7 @@ class _SiapBantuPageState extends State<SiapBantuPage> {
               alignment: Alignment.center,
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
-              decoration: BoxDecoration(color: kBgCard),
+              decoration: BoxDecoration(color: context.bgCard),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -170,7 +171,7 @@ class _SiapBantuPageState extends State<SiapBantuPage> {
                       Text(
                         'siap_bantu.ready_help_mode'.tr(),
                         style: TextStyle(
-                          color: kPrimary,
+                          color: context.primary,
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
                         ),
@@ -183,7 +184,7 @@ class _SiapBantuPageState extends State<SiapBantuPage> {
                     (_profile?.isProfileComplete ?? false)
                         ? 'siap_bantu.profil_already_complete'.tr()
                         : 'siap_bantu.profile_not_already'.tr(),
-                    style: TextStyle(color: Colors.black87, fontSize: 13),
+                    style: TextStyle(color: context.black87, fontSize: 13),
                   ),
                   SizedBox(height: 20),
                 ],
@@ -200,16 +201,16 @@ class _SiapBantuPageState extends State<SiapBantuPage> {
                   Container(
                     width: 72,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: context.bgContent,
                       border: Border(
                         right: BorderSide(
-                          color: Colors.grey.shade200, // ← garis tipis pemisah
+                          color: context.divider, // ← garis tipis pemisah
                           width: 1,
                         ),
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
+                          color: context.black.withOpacity(0.1),
                           blurRadius: 8,
                         ),
                       ],
@@ -228,14 +229,14 @@ class _SiapBantuPageState extends State<SiapBantuPage> {
                             height: 78,
                             decoration: BoxDecoration(
                               color: isActive
-                                  ? const Color(0xFFE0F7F5)
-                                  : Colors.transparent,
+                                  ? context.primary.withOpacity(0.1)
+                                  : context.transparent,
 
                               border: Border(
                                 left: BorderSide(
                                   color: isActive
-                                      ? kPrimary
-                                      : Colors.transparent,
+                                      ? context.primary
+                                      : context.transparent,
                                   width: 3,
                                 ),
                               ),
@@ -252,15 +253,17 @@ class _SiapBantuPageState extends State<SiapBantuPage> {
                                   item.icon,
                                   size: 22,
                                   color: isActive
-                                      ? kPrimary
-                                      : Color(0xff9E9E9E),
+                                      ? context.primary
+                                      : context.textSecondary,
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
                                   item.label,
                                   style: TextStyle(
                                     fontSize: 10,
-                                    color: isActive ? kPrimary : Colors.grey,
+                                    color: isActive
+                                        ? context.primary
+                                        : context.textSecondary,
                                     fontWeight: isActive
                                         ? FontWeight.w600
                                         : FontWeight.normal,
@@ -278,13 +281,13 @@ class _SiapBantuPageState extends State<SiapBantuPage> {
                   Expanded(
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: context.bgContent,
                         borderRadius: BorderRadius.only(
                           topRight: Radius.circular(24),
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
+                            color: context.black.withOpacity(0.1),
                             blurRadius: 8,
                           ),
                         ],

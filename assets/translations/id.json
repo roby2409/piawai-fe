@@ -32,6 +32,10 @@
   "the_app_need_location": "Aplikasi butuh akses lokasi untuk menampilkan pekerja di sekitar Anda.",
   "open_settings": "Buka Pengaturan",
   "allow_location_access": "Izinkan Akses Lokasi",
+  "search_location": "Cari Lokasi",
+  "confirm_location": "Konfirmasi Lokasi",
+  "look_profil": "Lihat Profil",
+  "email_contact_description": "Email yang digunakan untuk login dan keamanan akun Anda.",
   "general": {
     "loading": "Memuat...",
     "error": "Terjadi kesalahan. Silakan coba lagi.",
@@ -57,7 +61,13 @@
     "add": "Tambah",
     "hour": "Hour",
     "day": "Hari",
-    "project": "Proyek"
+    "project": "Proyek",
+    "worker_detail": "Detail Pekerja",
+    "retry": "Coba Lagi",
+    "services_offered": "LAYANAN YANG DITAWARKAN",
+    "service": "Layanan",
+    "radius": "Radius",
+    "whatsapp": "WhatsApp"
   },
   "fields": {
     "email": "Email",
@@ -100,7 +110,8 @@
     "register_success": "Registrasi berhasil! Silakan masuk",
     "register_account_success": "Selamat datang! Akun berhasil dibuat",
     "welcome_back": "Selamat datang kembali!",
-    "login_success": "Login berhasil!"
+    "login_success": "Login berhasil!",
+    "email_updated": "Email berhasil diupdate."
   },
   "validator": {
     "semua_fields_required": "Semua field wajib diisi",
@@ -119,16 +130,19 @@
     "username_invalid": "Username hanya boleh mengandung huruf, angka, dan underscore",
     "email_password_required": "Email dan password wajib diisi",
     "service_name_required": "Isi nama layanan dulu sebelum generate deskripsi",
-    "generate_ai_failed": "Gagal generate deskripsi, coba lagi"
+    "generate_ai_failed": "Gagal generate deskripsi, coba lagi",
+    "email_same": "Email sama dengan yang sekarang."
   },
   "cari_bantuan": {
     "title": "Cari Bantuan",
+    "search_worker_hint": "Cari nama atau jenis layanan...",
     "search_hint": "Cari topik bantuan...",
     "worker_found": "{} Pekerja ditemukan",
     "no_worker_found": "Tidak ada pekerja ditemukan",
     "no_result_found_search": "Tidak ada hasil ditemukan untuk \"{}\""
   },
   "siap_bantu": {
+    "title": "Siap Bantu",
     "ready_help_mode": "Mode Siap Bantu",
     "profil_already_complete": "Profilmu sudah lengkap! Pastikan status aktif agar pencari jasa bisa menemukanmu.",
     "profile_not_already": "Lengkapi profilmu agar lebih mudah ditemukan oleh pencari jasa di sekitarmu.",

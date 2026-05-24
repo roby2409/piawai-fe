@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:piawai/core/constants.dart';
+import 'package:piawai/core/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'explore/explore_page.dart';
 import 'settings/pengaturan_page.dart';
@@ -31,7 +32,7 @@ class _MainPageState extends State<MainPage> {
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.bgContent,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.06),
@@ -41,7 +42,7 @@ class _MainPageState extends State<MainPage> {
           ],
         ),
         child: BottomNavigationBar(
-          backgroundColor: Colors.white,
+          backgroundColor: context.bgContent,
           elevation: 0, // ← matiin shadow default, pakai shadow dari Container
           currentIndex: _currentIndex,
           onTap: (index) {
@@ -51,7 +52,7 @@ class _MainPageState extends State<MainPage> {
               _currentIndex = index;
             });
           },
-          selectedItemColor: kPrimary,
+          selectedItemColor: context.primary,
           unselectedItemColor: Colors.grey,
           selectedLabelStyle: const TextStyle(
             fontWeight: FontWeight.w600,

@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:piawai/core/constants.dart';
+import 'package:piawai/core/app_colors.dart';
 import 'package:piawai/pages/explore/siap_bantu/models/service_model.dart';
 import 'package:piawai/pages/widgets/input_field.dart';
 import 'package:piawai/pages/widgets/overlay_snackbar.dart';
@@ -88,12 +89,12 @@ class LayananSectionState extends State<LayananSection> {
               height: 4,
               margin: const EdgeInsets.only(top: 12, bottom: 8),
               decoration: BoxDecoration(
-                color: Colors.grey[300],
+                color: context.grey,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
             ListTile(
-              leading: const Icon(Icons.edit_outlined, color: kPrimary),
+              leading: Icon(Icons.edit_outlined, color: context.primary),
               title: Text('siap_bantu.edit_services'.tr()),
               onTap: () {
                 Navigator.pop(context);
@@ -113,7 +114,7 @@ class LayananSectionState extends State<LayananSection> {
               leading: const Icon(Icons.delete_outline, color: Colors.red),
               title: Text(
                 'siap_bantu.delete_services'.tr(),
-                style: const TextStyle(color: Colors.red),
+                style: TextStyle(color: context.red),
               ),
               onTap: () {
                 Navigator.pop(context);
@@ -140,13 +141,13 @@ class LayananSectionState extends State<LayananSection> {
             right: 16,
             child: Material(
               borderRadius: BorderRadius.circular(8),
-              color: Colors.red.shade700,
+              color: context.red,
               child: Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
                   vertical: 12,
                 ),
-                child: Text(msg, style: const TextStyle(color: Colors.white)),
+                child: Text(msg, style: TextStyle(color: context.white)),
               ),
             ),
           ),
@@ -187,8 +188,8 @@ class LayananSectionState extends State<LayananSection> {
                       ),
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: kPrimary,
-                      foregroundColor: Colors.white,
+                      backgroundColor: context.primary,
+                      foregroundColor: context.white,
                       elevation: 0,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16,
@@ -212,12 +213,12 @@ class LayananSectionState extends State<LayananSection> {
                         Icon(
                           Icons.work_off_outlined,
                           size: 48,
-                          color: Colors.grey[300],
+                          color: context.grey,
                         ),
                         const SizedBox(height: 12),
                         Text(
                           'siap_bantu.services_empty'.tr(),
-                          style: const TextStyle(color: Colors.grey),
+                          style: TextStyle(color: context.black87),
                         ),
                       ],
                     ),
@@ -236,9 +237,9 @@ class LayananSectionState extends State<LayananSection> {
         ),
 
         if (_isRefetching)
-          const Positioned.fill(
+          Positioned.fill(
             child: ColoredBox(
-              color: Colors.white60,
+              color: context.white60,
               child: Center(child: CircularProgressIndicator()),
             ),
           ),
@@ -259,7 +260,7 @@ void _showTambahLayananSheet(
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.transparent,
+    backgroundColor: context.transparent,
     builder: (_) => DraggableScrollableSheet(
       // ← wrap dengan ini
       initialChildSize: 0.75, // ← mulai dari 75% layar
@@ -422,8 +423,8 @@ class _TambahLayananSheetState extends State<_TambahLayananSheet> {
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
 
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      decoration: BoxDecoration(
+        color: context.bgContent,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       padding: EdgeInsets.fromLTRB(20, 0, 20, 20 + bottomInset),
@@ -440,7 +441,7 @@ class _TambahLayananSheetState extends State<_TambahLayananSheet> {
                 height: 4,
                 margin: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
-                  color: Colors.grey[300],
+                  color: context.grey,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -461,7 +462,7 @@ class _TambahLayananSheetState extends State<_TambahLayananSheet> {
                 ),
                 GestureDetector(
                   onTap: () => Navigator.pop(context),
-                  child: const Icon(Icons.close, size: 22, color: Colors.grey),
+                  child: const Icon(Icons.close, size: 22),
                 ),
               ],
             ),
@@ -513,31 +514,31 @@ class _TambahLayananSheetState extends State<_TambahLayananSheet> {
                             ),
                             decoration: BoxDecoration(
                               color: _isGenerating
-                                  ? Colors.grey[100]
-                                  : kSecondary,
+                                  ? context.grey
+                                  : context.secondary,
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
                                 color: _isGenerating
-                                    ? Colors.grey[300]!
-                                    : kPrimary.withOpacity(0.3),
+                                    ? context.grey
+                                    : context.primary.withOpacity(0.3),
                               ),
                             ),
                             child: _isGenerating
-                                ? const SizedBox(
+                                ? SizedBox(
                                     width: 14,
                                     height: 14,
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
-                                      color: kPrimary,
+                                      color: context.primary,
                                     ),
                                   )
                                 : Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      const Icon(
+                                      Icon(
                                         Icons.auto_awesome,
                                         size: 14,
-                                        color: kPrimary,
+                                        color: context.primary,
                                       ),
                                       const SizedBox(width: 4),
                                       Text(
@@ -545,7 +546,7 @@ class _TambahLayananSheetState extends State<_TambahLayananSheet> {
                                         style: TextStyle(
                                           fontSize: 12,
                                           fontWeight: FontWeight.w600,
-                                          color: kPrimary,
+                                          color: context.primary,
                                         ),
                                       ),
                                     ],
@@ -571,14 +572,14 @@ class _TambahLayananSheetState extends State<_TambahLayananSheet> {
                         Icon(
                           Icons.info_outline,
                           size: 12,
-                          color: Colors.grey[400],
+                          color: context.textSecondary,
                         ),
                         const SizedBox(width: 4),
                         Text(
                           'field_hints.service_name_info'.tr(),
                           style: TextStyle(
                             fontSize: 11,
-                            color: Colors.grey[400],
+                            color: context.textSecondary,
                           ),
                         ),
                       ],
@@ -597,28 +598,29 @@ class _TambahLayananSheetState extends State<_TambahLayananSheet> {
               child: ElevatedButton(
                 onPressed: _canSave ? _onSimpan : null,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: kPrimary,
+                  backgroundColor: context.primary,
                   disabledBackgroundColor: const Color(0xFFD1D5DB),
-                  foregroundColor: Colors.white,
+                  foregroundColor: context.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                   elevation: 0,
                 ),
                 child: _isSaving
-                    ? const SizedBox(
+                    ? SizedBox(
                         height: 20,
                         width: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: Colors.white,
+                          color: context.white,
                         ),
                       )
                     : Text(
                         'siap_bantu.save_services'.tr(),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
+                          color: context.white,
                         ),
                       ),
               ),
@@ -646,9 +648,9 @@ class _LayananCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.bgCard,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: kGrey),
+        border: Border.all(color: context.divider),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -667,9 +669,13 @@ class _LayananCard extends StatelessWidget {
               ),
               GestureDetector(
                 onTap: onMenuTap,
-                child: const Padding(
+                child: Padding(
                   padding: EdgeInsets.only(left: 8),
-                  child: Icon(Icons.more_vert, size: 20, color: Colors.grey),
+                  child: Icon(
+                    Icons.more_vert,
+                    size: 20,
+                    color: context.textSecondary,
+                  ),
                 ),
               ),
             ],
@@ -678,7 +684,7 @@ class _LayananCard extends StatelessWidget {
             const SizedBox(height: 6),
             Text(
               item.deskripsi!,
-              style: const TextStyle(fontSize: 13, color: Colors.grey),
+              style: TextStyle(color: context.textSecondary),
             ),
           ],
         ],

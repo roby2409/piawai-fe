@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:piawai/core/app_colors.dart';
 
 class LanguagePage extends StatefulWidget {
   const LanguagePage({super.key});
@@ -47,9 +48,9 @@ class _LanguagePageState extends State<LanguagePage> {
     final currentCode = context.locale.languageCode;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: context.bgOuter,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: context.bgContent,
         title: Text(
           'language.title'.tr(),
           style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
@@ -82,7 +83,7 @@ class _LanguagePageState extends State<LanguagePage> {
             // Language list
             Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: context.bgCard,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: ListView.separated(

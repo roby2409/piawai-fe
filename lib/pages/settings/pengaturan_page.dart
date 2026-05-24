@@ -1,12 +1,15 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:piawai/core/constants.dart';
+import 'package:piawai/core/app_colors.dart';
 import 'package:piawai/core/helper.dart';
 import 'package:piawai/pages/auth/auth_screen.dart';
 import 'package:piawai/pages/explore/siap_bantu/models/worker_profile_model.dart';
 import 'package:piawai/pages/settings/informasi_pribadi_page.dart';
 import 'package:piawai/pages/settings/kata_password_page.dart';
 import 'package:piawai/services/auth_services.dart';
+import 'package:piawai/services/theme_service.dart';
 import 'package:piawai/services/worker_services.dart';
 
 import 'language_page.dart';
@@ -60,14 +63,14 @@ class _PengaturanPageState extends State<PengaturanPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: context.bgOuter,
       appBar: AppBar(
-        backgroundColor: kWhite,
+        backgroundColor: context.bgContent,
         elevation: 0,
         title: Text(
           'settings.title'.tr(),
           style: TextStyle(
-            color: kPrimary,
+            color: context.primary,
             fontSize: 18,
             fontWeight: FontWeight.w700,
           ),
@@ -116,7 +119,7 @@ class _PengaturanPageState extends State<PengaturanPage> {
                   context,
                   MaterialPageRoute(
                     builder: (_) => InformasiPribadiPage(
-                      currentUsername: _profile!.username,
+                      currentEmail: _profile!.emailContact ?? "",
                     ),
                   ),
                 );
@@ -146,9 +149,6 @@ class _PengaturanPageState extends State<PengaturanPage> {
         const SizedBox(height: 8),
         _SettingsGroup(
           items: [
-            // State tambahan di _PengaturanPageState:
-
-            // Ganti SettingsItem Bahasa:
             _SettingsItem(
               icon: Icons.language,
               label: 'settings.language'.tr(),
@@ -160,6 +160,7 @@ class _PengaturanPageState extends State<PengaturanPage> {
                 );
               },
             ),
+            _ThemeSwitchItem(),
           ],
         ),
         const SizedBox(height: 24),
@@ -201,7 +202,7 @@ class _PengaturanPageState extends State<PengaturanPage> {
             final confirm = await showDialog<bool>(
               context: context,
               builder: (_) => AlertDialog(
-                backgroundColor: kBgCard,
+                backgroundColor: context.bgCard,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
@@ -255,12 +256,20 @@ class ProfileCard extends StatelessWidget {
   final WorkerProfileModel profile;
   const ProfileCard({super.key, required this.profile});
 
+  String get _initials {
+    final parts = profile.fullName.trim().split(' ');
+    if (parts.length >= 2) {
+      return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+    }
+    return parts[0][0].toUpperCase();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: kBgCard,
+        color: context.bgCard,
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
@@ -272,57 +281,73 @@ class ProfileCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          profile.avatarUrl != null
-              ? ClipOval(
-                  child: Image.network(
-                    width: 56,
-                    height: 56,
-                    imageUrl(profile.avatarUrl!),
-                    fit: BoxFit.cover,
-                    // Loading placeholder
-                    loadingBuilder: (_, child, progress) => progress == null
-                        ? child
-                        : const Center(
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          ),
-                    // Error fallback
-                    errorBuilder: (_, __, ___) => profilePlaceholder(),
-                  ),
-                )
-              : profilePlaceholder(),
+          // Initials Avatar
+          Container(
+            width: 52,
+            height: 52,
+            decoration: BoxDecoration(
+              color: context.primary.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: Text(
+                _initials,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: context.primary,
+                ),
+              ),
+            ),
+          ),
+
           const SizedBox(width: 14),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                profile.fullName,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
-              ),
-              SizedBox(height: 3),
-              Text(
-                profile.username,
-                style: TextStyle(fontSize: 13, color: Colors.grey),
-              ),
-            ],
+
+          // Info
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  profile.fullName,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: context.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '@${profile.username}',
+                  style: TextStyle(fontSize: 12, color: context.textSecondary),
+                ),
+                if (profile.emailContact != null) ...[
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.email_outlined,
+                        size: 12,
+                        color: context.textSecondary,
+                      ),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          profile.emailContact!,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: context.textSecondary,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ],
+            ),
           ),
         ],
-      ),
-    );
-  }
-
-  Container profilePlaceholder() {
-    return Container(
-      width: 56,
-      height: 56,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(color: kPrimary.withOpacity(0.3), width: 2),
-      ),
-      child: ClipOval(
-        child: Container(
-          color: kBgCard,
-          child: const Icon(Icons.person, size: 32, color: kPrimary),
-        ),
       ),
     );
   }
@@ -339,10 +364,10 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       label,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 14,
         fontWeight: FontWeight.w700,
-        color: kPrimary,
+        color: context.primary,
       ),
     );
   }
@@ -352,14 +377,14 @@ class _SectionLabel extends StatelessWidget {
 // SETTINGS GROUP
 // ─────────────────────────────────────────
 class _SettingsGroup extends StatelessWidget {
-  final List<_SettingsItem> items;
+  final List<Widget> items;
   const _SettingsGroup({required this.items});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: kBgCard,
+        color: context.bgCard,
         borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
@@ -373,7 +398,7 @@ class _SettingsGroup extends StatelessWidget {
                   height: 1,
                   indent: 6,
                   endIndent: 6,
-                  color: const Color(0xFFEEF0F0),
+                  color: context.divider,
                 ),
             ],
           );
@@ -412,29 +437,30 @@ class _SettingsItem extends StatelessWidget {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: kBgCard,
+                color: context.bgCard,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Icon(icon, size: 18, color: kPrimary),
+              child: Icon(icon, size: 18, color: context.primary),
             ),
             const SizedBox(width: 14),
             Expanded(
               child: Text(
                 label,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
+                  color: context.textPrimary,
                 ),
               ),
             ),
             if (trailing != null) ...[
               Text(
                 trailing!,
-                style: const TextStyle(fontSize: 13, color: Colors.grey),
+                style: TextStyle(fontSize: 13, color: context.textSecondary),
               ),
               const SizedBox(width: 4),
             ],
-            const Icon(Icons.chevron_right, size: 18, color: Colors.grey),
+            Icon(Icons.chevron_right, size: 18, color: context.textSecondary),
           ],
         ),
       ),
@@ -477,6 +503,68 @@ class _LogoutButton extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────
+// THEME SWITCH ITEM
+// ─────────────────────────────────────────
+class _ThemeSwitchItem extends StatelessWidget {
+  const _ThemeSwitchItem();
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<ThemeService>(
+      builder: (context, themeService, _) {
+        return InkWell(
+          onTap: () => themeService.toggleTheme(),
+          borderRadius: BorderRadius.circular(14),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+            child: Row(
+              children: [
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: context.bgCard,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    themeService.isDarkMode
+                        ? Icons.dark_mode
+                        : Icons.light_mode,
+                    size: 18,
+                    color: context.primary,
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Text(
+                    'Theme',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: context.textPrimary,
+                    ),
+                  ),
+                ),
+                Text(
+                  themeService.isDarkMode ? 'Dark' : 'Light',
+                  style: TextStyle(fontSize: 13, color: context.textSecondary),
+                ),
+                const SizedBox(width: 4),
+                Switch(
+                  value: themeService.isDarkMode,
+                  onChanged: (_) => themeService.toggleTheme(),
+                  activeColor: context.primary,
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

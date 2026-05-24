@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:piawai/core/constants.dart';
+import 'package:piawai/core/app_colors.dart';
 import 'package:piawai/pages/auth/reset_password_success_screen.dart';
 import 'package:piawai/pages/widgets/input_field.dart';
 import 'package:piawai/services/auth_services.dart';
@@ -69,17 +70,13 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            color: Colors.black87,
-            size: 20,
-          ),
+          icon: Icon(Icons.arrow_back_ios, color: context.black87, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'reset_password.title'.tr(),
-          style: const TextStyle(
-            color: Colors.black87,
+          style: TextStyle(
+            color: context.black87,
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
@@ -88,7 +85,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 14),
-            child: Icon(Icons.lock_outline, color: kPrimary, size: 22),
+            child: Icon(Icons.lock_outline, color: context.primary, size: 22),
           ),
         ],
       ),
@@ -124,7 +121,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                       Text(
                         'reset_password.illustration_title'.tr(),
                         style: TextStyle(
-                          color: kPrimary,
+                          color: context.primary,
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                         ),
@@ -146,8 +143,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 // Title
                 Text(
                   'reset_password.heading'.tr(),
-                  style: const TextStyle(
-                    color: Colors.black87,
+                  style: TextStyle(
+                    color: context.black87,
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
                   ),
@@ -234,7 +231,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   child: ElevatedButton(
                     onPressed: _isLoading ? null : _simpanPassword,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: kPrimary,
+                      backgroundColor: context.primary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -291,7 +288,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                             child: Text(
                               'reset_password.masuk'.tr(),
                               style: TextStyle(
-                                color: kPrimary,
+                                color: context.primary,
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -330,7 +327,7 @@ class _LockSuccessIllustration extends StatelessWidget {
               width: 80,
               height: 70,
               decoration: BoxDecoration(
-                color: kPrimary,
+                color: context.primary,
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
@@ -342,7 +339,7 @@ class _LockSuccessIllustration extends StatelessWidget {
               width: 50,
               height: 52,
               decoration: BoxDecoration(
-                border: Border.all(color: kPrimary, width: 10),
+                border: Border.all(color: context.primary, width: 10),
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(25),
                   topRight: Radius.circular(25),

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:piawai/core/constants.dart';
+import 'package:piawai/core/app_colors.dart';
 import 'package:piawai/pages/auth/reset_password_screen.dart';
 
 class VerificationOtpSuccessScreen extends StatefulWidget {
@@ -82,7 +83,7 @@ class _VerificationOtpSuccessScreenState
                       width: 110,
                       height: 110,
                       decoration: BoxDecoration(
-                        color: kPrimary.withOpacity(0.12),
+                        color: context.primary.withOpacity(0.12),
                         shape: BoxShape.circle,
                       ),
                       child: Center(
@@ -90,7 +91,7 @@ class _VerificationOtpSuccessScreenState
                           width: 76,
                           height: 76,
                           decoration: BoxDecoration(
-                            color: kPrimary,
+                            color: context.primary,
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
@@ -107,8 +108,8 @@ class _VerificationOtpSuccessScreenState
 
                   Text(
                     'verification_otp_success.heading'.tr(),
-                    style: const TextStyle(
-                      color: Colors.black87,
+                    style: TextStyle(
+                      color: context.black87,
                       fontSize: 22,
                       fontWeight: FontWeight.w700,
                     ),
@@ -183,7 +184,7 @@ class _DotsLoadingState extends State<_DotsLoading>
               width: 8,
               height: 8,
               decoration: BoxDecoration(
-                color: kPrimary.withOpacity(opacity),
+                color: context.primary.withOpacity(opacity),
                 shape: BoxShape.circle,
               ),
             );

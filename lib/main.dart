@@ -1,7 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:piawai/core/app_theme.dart';
 import 'package:piawai/services/auth_services.dart';
+import 'package:piawai/services/theme_service.dart';
 
 import 'core/constants.dart';
 import 'pages/auth/auth_screen.dart';
@@ -9,8 +11,9 @@ import 'pages/main_page.dart';
 import 'pages/onboarding/onboarding_screen.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized(); // ← wajib kalau ada async di main
+  WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
+  await ThemeService().init();
   runApp(
     EasyLocalization(
       supportedLocales: const [
@@ -21,7 +24,10 @@ void main() async {
       ],
       path: 'assets/translations',
       fallbackLocale: const Locale('en'),
-      child: const MyApp(),
+      child: ChangeNotifierProvider<ThemeService>(
+        create: (_) => ThemeService(),
+        child: const MyApp(),
+      ),
     ),
   );
 }
@@ -35,19 +41,22 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      scaffoldMessengerKey: scaffoldMessengerKey,
-      navigatorKey: navigatorKey, // ← tambah ini
-      debugShowCheckedModeBanner: false,
-      localizationsDelegates: context.localizationDelegates,
-      supportedLocales: context.supportedLocales,
-      locale: context.locale,
-      title: 'Piawai',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        textTheme: GoogleFonts.poppinsTextTheme(), // ← semua text pakai Poppins
-      ),
-      home: const _AuthGate(),
+    return Consumer<ThemeService>(
+      builder: (context, themeService, _) {
+        return MaterialApp(
+          scaffoldMessengerKey: scaffoldMessengerKey,
+          navigatorKey: navigatorKey,
+          debugShowCheckedModeBanner: false,
+          localizationsDelegates: context.localizationDelegates,
+          supportedLocales: context.supportedLocales,
+          locale: context.locale,
+          title: 'Piawai',
+          theme: AppTheme.lightTheme(),
+          darkTheme: AppTheme.darkTheme(),
+          themeMode: themeService.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+          home: const _AuthGate(),
+        );
+      },
     );
   }
 }

@@ -1,5 +1,7 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:piawai/core/constants.dart';
+import 'package:piawai/core/app_colors.dart';
 import 'cari_bantuan/map_page.dart';
 import 'siap_bantu/siap_bantu_page.dart';
 
@@ -32,7 +34,7 @@ class _ExplorePageState extends State<ExplorePage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: kPrimary, // background gelap
+      backgroundColor: context.bgOuter,
       body: SafeArea(
         child: Stack(
           children: [
@@ -44,19 +46,26 @@ class _ExplorePageState extends State<ExplorePage>
               margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: kSecondary,
+                color: context.bgContent,
                 borderRadius: BorderRadius.circular(30),
+                boxShadow: [
+                  BoxShadow(
+                    color: context.black.withOpacity(0.1),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
               child: TabBar(
                 controller: _tabController,
                 indicator: BoxDecoration(
-                  color: kPrimary,
+                  color: context.primary,
                   borderRadius: BorderRadius.circular(26),
                 ),
                 indicatorSize: TabBarIndicatorSize.tab,
-                dividerColor: Colors.transparent,
-                labelColor: Colors.white,
-                unselectedLabelColor: Color(0xFF04a5ba),
+                dividerColor: context.transparent,
+                labelColor: context.white,
+                unselectedLabelColor: context.textSecondary,
                 labelStyle: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
@@ -65,9 +74,9 @@ class _ExplorePageState extends State<ExplorePage>
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                 ),
-                tabs: const [
-                  Tab(text: 'Cari Bantuan'),
-                  Tab(text: 'Siap Bantu'),
+                tabs: [
+                  Tab(text: 'cari_bantuan.title'.tr()),
+                  Tab(text: 'siap_bantu.title'.tr()),
                 ],
               ),
             ),

@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:piawai/core/constants.dart';
+import 'package:piawai/core/app_colors.dart';
 import 'package:piawai/services/explore_services.dart';
 
 class SearchPage extends StatefulWidget {
@@ -103,130 +103,137 @@ class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.bgContent,
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ── Search bar ──
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.black87),
-                    onPressed: () => Navigator.of(context).pop(),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(
-                      minWidth: 36,
-                      minHeight: 36,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  Expanded(
-                    child: Container(
-                      height: 46,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF2F4F7),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: TextField(
-                        controller: _ctrl,
-                        focusNode: _focusNode,
-                        textInputAction: TextInputAction.search,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          color: Colors.black87,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        decoration: InputDecoration(
-                          hintText: 'cari_bantuan.search_hint'.tr(),
-                          hintStyle: TextStyle(
-                            color: Colors.black38,
-                            fontSize: 15,
-                          ),
-                          prefixIcon: Icon(
-                            Icons.search,
-                            color: kPrimary,
-                            size: 20,
-                          ),
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(vertical: 13),
-                        ),
-                        onChanged: _onQueryChanged,
-                        onSubmitted: _submit,
+        child: ColoredBox(
+          color: context.bgOuter,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ── Search bar ──
+              Container(
+                color: context.bgContent,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.arrow_back),
+                      onPressed: () => Navigator.of(context).pop(),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(
+                        minWidth: 36,
+                        minHeight: 36,
                       ),
                     ),
-                  ),
-                  if (_query.isNotEmpty) ...[
-                    const SizedBox(width: 8),
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _query = '';
-                          _suggestions = [];
-                        });
-                        _ctrl.clear();
-                        _focusNode.requestFocus();
-                        _fetchSuggestions('');
-                      },
+                    const SizedBox(width: 4),
+                    Expanded(
                       child: Container(
-                        width: 30,
-                        height: 30,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFFE5E7EB),
-                          shape: BoxShape.circle,
+                        height: 46,
+                        decoration: BoxDecoration(
+                          color: context.bgCard,
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Icon(
-                          Icons.close,
-                          size: 16,
-                          color: kPrimary,
+                        child: TextField(
+                          controller: _ctrl,
+                          focusNode: _focusNode,
+                          textInputAction: TextInputAction.search,
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: context.black87,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          decoration: InputDecoration(
+                            hintText: 'cari_bantuan.search_hint'.tr(),
+                            hintStyle: TextStyle(
+                              color: context.black38,
+                              fontSize: 15,
+                            ),
+                            prefixIcon: Icon(
+                              Icons.search,
+                              color: context.primary,
+                              size: 20,
+                            ),
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.symmetric(vertical: 13),
+                          ),
+                          onChanged: _onQueryChanged,
+                          onSubmitted: _submit,
                         ),
                       ),
                     ),
-                  ],
-                ],
-              ),
-            ),
-
-            // Loading bar tipis
-            if (_isLoadingSuggestions)
-              const LinearProgressIndicator(
-                minHeight: 2,
-                backgroundColor: Colors.transparent,
-                color: kPrimary,
-              )
-            else
-              const Divider(height: 1, color: Color(0xFFF0F0F0)),
-
-            // ── Content ──
-            Expanded(
-              child: ListView(
-                keyboardDismissBehavior:
-                    ScrollViewKeyboardDismissBehavior.onDrag,
-                children: [
-                  // Suggestions dari API
-                  if (_showSuggestions) ...[
-                    const SizedBox(height: 8),
-                    ..._suggestions.map(
-                      (s) => _SuggestionTile(
-                        query: _query,
-                        suggestion: s,
-                        onTap: () => _submit(s),
-                        onFill: () => _fillQuery(s),
+                    if (_query.isNotEmpty) ...[
+                      const SizedBox(width: 8),
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _query = '';
+                            _suggestions = [];
+                          });
+                          _ctrl.clear();
+                          _focusNode.requestFocus();
+                          _fetchSuggestions('');
+                        },
+                        child: Container(
+                          width: 30,
+                          height: 30,
+                          decoration: BoxDecoration(
+                            color: context.divider,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.close,
+                            size: 16,
+                            color: context.primary,
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
                   ],
-
-                  // Empty state
-                  if (!_showSuggestions &&
-                      _query.isNotEmpty &&
-                      !_isLoadingSuggestions)
-                    _EmptyState(query: _query),
-                ],
+                ),
               ),
-            ),
-          ],
+
+              // Loading bar tipis
+              if (_isLoadingSuggestions)
+                LinearProgressIndicator(
+                  minHeight: 2,
+                  backgroundColor: context.transparent,
+                  color: context.primary,
+                )
+              else
+                Divider(height: 1, color: context.divider),
+
+              // ── Content ──
+              Expanded(
+                child: ListView(
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
+                  children: [
+                    // Suggestions dari API
+                    if (_showSuggestions) ...[
+                      const SizedBox(height: 8),
+                      ..._suggestions.map(
+                        (s) => _SuggestionTile(
+                          query: _query,
+                          suggestion: s,
+                          onTap: () => _submit(s),
+                          onFill: () => _fillQuery(s),
+                        ),
+                      ),
+                    ],
+
+                    // Empty state
+                    if (!_showSuggestions &&
+                        _query.isNotEmpty &&
+                        !_isLoadingSuggestions)
+                      _EmptyState(query: _query),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -254,7 +261,7 @@ class _SuggestionTile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
         child: Row(
           children: [
-            const Icon(Icons.search, color: Colors.black38, size: 20),
+            Icon(Icons.search, size: 20),
             const SizedBox(width: 14),
             Expanded(
               child: _HighlightedText(full: suggestion, query: query),
@@ -264,11 +271,7 @@ class _SuggestionTile extends StatelessWidget {
               onTap: onFill,
               child: Padding(
                 padding: const EdgeInsets.only(left: 12),
-                child: Icon(
-                  Icons.north_west,
-                  size: 18,
-                  color: Colors.grey[400],
-                ),
+                child: Icon(Icons.north_west, size: 18, color: context.grey),
               ),
             ),
           ],
@@ -287,26 +290,20 @@ class _HighlightedText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (query.isEmpty)
-      return Text(
-        full,
-        style: const TextStyle(fontSize: 15, color: Colors.black87),
-      );
+      return Text(full, style: TextStyle(color: context.black87));
 
     final lowerFull = full.toLowerCase();
     final lowerQuery = query.toLowerCase();
     final matchStart = lowerFull.indexOf(lowerQuery);
 
     if (matchStart == -1)
-      return Text(
-        full,
-        style: const TextStyle(fontSize: 15, color: Colors.black87),
-      );
+      return Text(full, style: TextStyle(color: context.black87));
 
     final matchEnd = matchStart + query.length;
 
     return RichText(
       text: TextSpan(
-        style: const TextStyle(fontSize: 15, color: Colors.black87),
+        style: TextStyle(color: context.black87),
         children: [
           if (matchStart > 0)
             TextSpan(
@@ -315,8 +312,8 @@ class _HighlightedText extends StatelessWidget {
             ),
           TextSpan(
             text: full.substring(matchStart, matchEnd),
-            style: const TextStyle(
-              color: kPrimary,
+            style: TextStyle(
+              color: context.primary,
               fontWeight: FontWeight.w400,
             ),
           ),
@@ -349,25 +346,25 @@ class _RecentChip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.only(left: 12, right: 6, top: 7, bottom: 7),
         decoration: BoxDecoration(
-          color: const Color(0xFFF2F4F7),
+          color: context.bgCard,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: const Color(0xFFE5E7EB)),
+          border: Border.all(color: context.divider),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
-                color: Colors.black87,
+                color: context.black87,
                 fontWeight: FontWeight.w500,
               ),
             ),
             const SizedBox(width: 6),
             GestureDetector(
               onTap: onRemove,
-              child: const Icon(Icons.close, size: 14, color: kPrimary),
+              child: Icon(Icons.close, size: 14, color: context.primary),
             ),
           ],
         ),
@@ -386,14 +383,14 @@ class _EmptyState extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 60, horizontal: 32),
       child: Column(
         children: [
-          Icon(Icons.search_off_rounded, size: 52, color: kPrimary),
+          Icon(Icons.search_off_rounded, size: 52, color: context.primary),
           const SizedBox(height: 16),
           Text(
             'cari_bantuan.no_result_found_search'.tr(args: [query]),
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 15,
-              color: Colors.black45,
+              color: context.black45,
               fontWeight: FontWeight.w500,
             ),
           ),

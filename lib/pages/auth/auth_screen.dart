@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:piawai/core/constants.dart';
+import 'package:piawai/core/app_colors.dart';
 import 'package:piawai/pages/auth/forgot_password_screen.dart';
 import 'package:piawai/pages/main_page.dart';
 import 'package:piawai/pages/widgets/input_field.dart';
@@ -165,7 +166,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                 const SizedBox(height: 40),
 
                 // Logo
-                const Column(
+                Column(
                   children: [
                     Image(
                       height: 80,
@@ -177,7 +178,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                       'Piawai',
                       style: TextStyle(
                         fontSize: 28,
-                        color: kPrimary,
+                        color: context.primary,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -188,10 +189,10 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                 // Tabs
                 TabBar(
                   controller: _tabController,
-                  labelColor: kPrimary,
+                  labelColor: context.primary,
                   dividerColor: Colors.grey[300],
                   unselectedLabelColor: Colors.grey,
-                  indicatorColor: kPrimary,
+                  indicatorColor: context.primary,
                   tabs: [
                     Tab(text: 'general.masuk'.tr()),
                     Tab(text: 'general.daftar'.tr()),
@@ -258,7 +259,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                 _showLoginPassword
                     ? Icons.visibility_off_outlined
                     : Icons.visibility_outlined,
-                color: kPrimary,
+                color: context.primary,
                 size: 20,
               ),
               onPressed: () =>
@@ -285,7 +286,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
               },
               child: Text(
                 'lupa_password'.tr(),
-                style: TextStyle(color: kPrimary, fontSize: 12),
+                style: TextStyle(color: context.primary, fontSize: 12),
               ),
             ),
           ),
@@ -294,7 +295,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
           ElevatedButton(
             onPressed: _isLoading ? null : _handleLogin,
             style: ElevatedButton.styleFrom(
-              backgroundColor: kPrimary,
+              backgroundColor: context.primary,
               disabledBackgroundColor: const Color(0xFFD1D5DB),
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 15),
@@ -319,7 +320,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                     ),
                     TextSpan(
                       text: 'daftar_sekarang'.tr(),
-                      style: const TextStyle(color: kPrimary),
+                      style: TextStyle(color: context.primary),
                     ),
                   ],
                 ),
@@ -395,7 +396,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                 _showRegisterPassword
                     ? Icons.visibility_off_outlined
                     : Icons.visibility_outlined,
-                color: kPrimary,
+                color: context.primary,
                 size: 20,
               ),
               onPressed: () => setState(
@@ -425,7 +426,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                 _showConfirmRegisterPassword
                     ? Icons.visibility_off_outlined
                     : Icons.visibility_outlined,
-                color: kPrimary,
+                color: context.primary,
                 size: 20,
               ),
               onPressed: () => setState(
@@ -446,9 +447,9 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
           ElevatedButton(
             onPressed: _isLoading ? null : _handleRegister,
             style: ElevatedButton.styleFrom(
-              backgroundColor: kPrimary,
+              backgroundColor: context.primary,
               foregroundColor: Colors.white,
-              disabledBackgroundColor: kPrimary.withOpacity(0.5),
+              disabledBackgroundColor: context.primary.withOpacity(0.5),
               padding: const EdgeInsets.symmetric(vertical: 15),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -472,7 +473,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                     ),
                     TextSpan(
                       text: "masuk_sekarang".tr(),
-                      style: const TextStyle(color: kPrimary),
+                      style: TextStyle(color: context.primary),
                     ),
                   ],
                 ),
@@ -504,7 +505,7 @@ class _GoogleSignInButton extends StatelessWidget {
         foregroundColor: Colors.black,
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        side: const BorderSide(color: kPrimary),
+        side: BorderSide(color: context.primary),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,

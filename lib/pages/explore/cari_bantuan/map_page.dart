@@ -6,6 +6,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:piawai/core/constants.dart';
+import 'package:piawai/core/app_colors.dart';
 import 'package:piawai/core/helper.dart';
 import 'package:piawai/pages/widgets/loading_detect_location.dart';
 import 'package:piawai/pages/widgets/map_component.dart';
@@ -335,7 +336,7 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
     }
 
     if (_isLoadingLocation || _myLocation == null) {
-      return Scaffold(body: Center(child: loadingCurrentLocation()));
+      return Scaffold(body: Center(child: loadingCurrentLocation(context)));
     }
 
     if (_isLoading) {
@@ -348,9 +349,9 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, color: Colors.red, size: 40),
+            Icon(Icons.error_outline, size: 40),
             const SizedBox(height: 8),
-            Text(_errorMessage!, style: const TextStyle(color: Colors.red)),
+            Text(_errorMessage!, style: TextStyle(color: context.red)),
             const SizedBox(height: 12),
             ElevatedButton(onPressed: _loadAll, child: const Text('Coba Lagi')),
           ],
@@ -359,7 +360,7 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFFDEEAF7),
+      backgroundColor: context.bgOuter,
       body: Stack(
         children: [
           // ── Map ──
@@ -371,15 +372,15 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
               onTap: (_, __) => setState(() => _selectedWorker = null),
             ),
             children: [
-              buildTileLayer(),
+              buildTileLayer(context),
               CircleLayer(
                 circles: [
                   CircleMarker(
                     point: _myLocation!,
                     radius: (_activeFilter?.radiusKm ?? 5) * 1000, // km → meter
                     useRadiusInMeter: true, // ← wajib ini
-                    color: kPrimary.withOpacity(0.1),
-                    borderColor: kPrimary.withOpacity(0.4),
+                    color: context.primary.withOpacity(0.1),
+                    borderColor: context.primary.withOpacity(0.4),
                     borderStrokeWidth: 1.5,
                   ),
                 ],
@@ -499,21 +500,19 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                                 });
                               },
                               child: Container(
-                                padding: const EdgeInsets.symmetric(
+                                padding: EdgeInsets.symmetric(
                                   horizontal: 12,
                                   vertical: 6,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Colors.red.shade50,
+                                  color: context.white,
                                   borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(
-                                    color: Colors.red.shade200,
-                                  ),
+                                  border: Border.all(color: context.red),
                                 ),
                                 child: Text(
                                   'Hapus semua',
                                   style: TextStyle(
-                                    color: Colors.red.shade600,
+                                    color: context.red,
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -559,15 +558,15 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(
-                  color: kPrimary,
+                  color: context.primary,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
                   'cari_bantuan.worker_found'.tr(
                     args: ['${_explore?.total ?? 0}'],
                   ),
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: context.white,
                     fontWeight: FontWeight.w600,
                     fontSize: 13,
                   ),
@@ -615,12 +614,12 @@ class _FilterButton extends StatelessWidget {
             width: 46,
             height: 46,
             decoration: BoxDecoration(
-              color: hasActiveFilter ? kPrimary : Colors.white,
-              border: Border.all(color: kGrey),
+              color: hasActiveFilter ? context.primary : context.bgContent,
+              border: Border.all(color: context.divider),
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: context.black.withOpacity(0.1),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -628,7 +627,7 @@ class _FilterButton extends StatelessWidget {
             ),
             child: Icon(
               Icons.tune_rounded,
-              color: hasActiveFilter ? Colors.white : Colors.black87,
+              color: hasActiveFilter ? context.white : context.primary,
               size: 22,
             ),
           ),
@@ -640,8 +639,8 @@ class _FilterButton extends StatelessWidget {
               child: Container(
                 width: 12,
                 height: 12,
-                decoration: const BoxDecoration(
-                  color: Colors.red,
+                decoration: BoxDecoration(
+                  color: context.red,
                   shape: BoxShape.circle,
                 ),
               ),
@@ -665,19 +664,19 @@ class _ActiveFilterChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.only(left: 10, right: 6, top: 6, bottom: 6),
       decoration: BoxDecoration(
-        color: kWhite,
+        color: context.bgContent,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: kPrimary.withOpacity(0.3)),
+        border: Border.all(color: context.primary.withOpacity(0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(data.icon, size: 13, color: kPrimary),
+          Icon(data.icon, size: 13, color: context.primary),
           const SizedBox(width: 5),
           Text(
             data.label,
             style: TextStyle(
-              color: Colors.grey[900],
+              color: context.primary,
               fontSize: 12,
               fontWeight: FontWeight.w600,
             ),
@@ -685,7 +684,7 @@ class _ActiveFilterChip extends StatelessWidget {
           const SizedBox(width: 4),
           GestureDetector(
             onTap: data.onRemove,
-            child: const Icon(Icons.close, size: 14, color: kPrimary),
+            child: Icon(Icons.close, size: 14, color: context.primary),
           ),
         ],
       ),
@@ -712,12 +711,12 @@ class _SearchBar extends StatelessWidget {
       child: Container(
         height: 46,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.bgContent,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: kGrey),
+          border: Border.all(color: context.divider),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha(20),
+              color: context.black.withAlpha(20),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -727,13 +726,13 @@ class _SearchBar extends StatelessWidget {
           children: [
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 14),
-              child: Icon(Icons.search, color: Colors.grey[900], size: 20),
+              child: Icon(Icons.search, color: context.primary, size: 20),
             ),
             Expanded(
               child: Text(
-                hasQuery ? query : 'Cari Pekerja...',
+                hasQuery ? query : 'cari_bantuan.search_worker_hint'.tr(),
                 style: TextStyle(
-                  color: Colors.grey[900],
+                  color: context.black38,
                   fontSize: 15,
                   fontWeight: hasQuery ? FontWeight.w600 : FontWeight.normal,
                 ),
@@ -750,15 +749,11 @@ class _SearchBar extends StatelessWidget {
                   child: Container(
                     width: 20,
                     height: 20,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFE5E7EB),
+                    decoration: BoxDecoration(
+                      color: context.divider,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
-                      Icons.close,
-                      size: 13,
-                      color: Colors.black54,
-                    ),
+                    child: Icon(Icons.close, size: 13, color: context.black54),
                   ),
                 ),
               ),
@@ -792,11 +787,11 @@ class _WorkerPhotoMarker extends StatelessWidget {
           height: size,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: Colors.white,
-            border: Border.all(color: kPrimary, width: borderWidth),
+            color: context.bgContent,
+            border: Border.all(color: context.primary, width: borderWidth),
             boxShadow: [
               BoxShadow(
-                color: kPrimary.withAlpha(isSelected ? 150 : 70),
+                color: context.primary.withAlpha(isSelected ? 150 : 70),
                 blurRadius: isSelected ? 18 : 8,
                 spreadRadius: isSelected ? 2 : 0,
               ),
@@ -834,7 +829,7 @@ class _WorkerPhotoMarker extends StatelessWidget {
         // Teardrop point
         CustomPaint(
           size: const Size(12, 7),
-          painter: _TrianglePainter(color: kPrimary),
+          painter: _TrianglePainter(color: context.primary),
         ),
       ],
     );
@@ -908,26 +903,29 @@ class _MyLocationDotState extends State<_MyLocationDot>
               height: 46,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: kPrimary.withAlpha(40),
-                border: Border.all(color: kPrimary.withAlpha(100), width: 1),
+                color: context.primary.withAlpha(40),
+                border: Border.all(
+                  color: context.primary.withAlpha(100),
+                  width: 1,
+                ),
               ),
             ),
           ),
           Container(
             width: 22,
             height: 22,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: kPrimary,
+              color: context.primary,
               boxShadow: [
                 BoxShadow(
-                  color: Color(0x881565C0),
+                  color: context.primary.withAlpha(136),
                   blurRadius: 10,
                   spreadRadius: 2,
                 ),
               ],
             ),
-            child: const Icon(Icons.person, color: Colors.white, size: 13),
+            child: Icon(Icons.person, size: 13),
           ),
         ],
       ),
@@ -952,8 +950,8 @@ class _WorkerBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      decoration: BoxDecoration(
+        color: context.bgCard,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         boxShadow: [
           BoxShadow(
@@ -973,7 +971,7 @@ class _WorkerBottomSheet extends StatelessWidget {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.grey[300],
+                color: context.grey,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -989,7 +987,10 @@ class _WorkerBottomSheet extends StatelessWidget {
                   height: 64,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: kPrimary.withAlpha(60), width: 2),
+                    border: Border.all(
+                      color: context.primary.withAlpha(60),
+                      width: 2,
+                    ),
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(12),
@@ -1020,19 +1021,16 @@ class _WorkerBottomSheet extends StatelessWidget {
                     children: [
                       Text(
                         worker.fullName,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.w700,
                           fontSize: 17,
-                          color: Colors.black87,
+                          color: context.black87,
                         ),
                       ),
                       const SizedBox(height: 3),
                       Text(
                         worker.services.join(', '),
-                        style: const TextStyle(
-                          color: Colors.black54,
-                          fontSize: 13,
-                        ),
+                        style: TextStyle(color: context.black54, fontSize: 13),
                       ),
                       const SizedBox(height: 6),
                       Row(
@@ -1040,7 +1038,9 @@ class _WorkerBottomSheet extends StatelessWidget {
                           const Icon(Icons.star, color: Colors.amber, size: 15),
                           const SizedBox(width: 3),
                           Text(
-                            '${worker.distanceKm.toStringAsFixed(1)} km',
+                            'general.radius_display'.tr(
+                              args: ['${worker.distanceKm}'],
+                            ),
                             style: const TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
@@ -1048,10 +1048,10 @@ class _WorkerBottomSheet extends StatelessWidget {
                           ),
                           const SizedBox(width: 10),
                           Text(
-                            '${worker.age} thn',
-                            style: const TextStyle(
+                            'general.age_display'.tr(args: ['${worker.age}']),
+                            style: TextStyle(
                               fontSize: 12,
-                              color: kPrimary,
+                              color: context.primary,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -1063,7 +1063,7 @@ class _WorkerBottomSheet extends StatelessWidget {
                 // Close
                 GestureDetector(
                   onTap: onClose,
-                  child: Icon(Icons.close, color: Colors.grey[400], size: 22),
+                  child: Icon(Icons.close, color: context.grey, size: 22),
                 ),
               ],
             ),
@@ -1078,15 +1078,15 @@ class _WorkerBottomSheet extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: onViewProfile,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: kPrimary,
-                  foregroundColor: Colors.white,
+                  backgroundColor: context.primary,
+                  foregroundColor: context.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
                   elevation: 0,
                 ),
-                child: const Text(
-                  'Lihat Profil',
+                child: Text(
+                  'look_profil'.tr(),
                   style: TextStyle(
                     fontWeight: FontWeight.w700,
                     fontSize: 15,

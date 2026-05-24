@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:piawai/core/app_colors.dart';
 import 'package:piawai/pages/auth/verification_otp_success_screen.dart';
 import 'package:piawai/services/auth_services.dart';
 
@@ -132,17 +133,17 @@ class _VerificationOtpScreenState extends State<VerificationOtpScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(
+          icon:  Icon(
             Icons.arrow_back_ios,
-            color: Colors.black87,
+            color: context.black87,
             size: 20,
           ),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'verification_otp.title'.tr(),
-          style: const TextStyle(
-            color: Colors.black87,
+          style:  TextStyle(
+            color: context.black87,
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
@@ -197,8 +198,8 @@ class _VerificationOtpScreenState extends State<VerificationOtpScreen> {
               // Title
               Text(
                 'verification_otp.heading'.tr(),
-                style: const TextStyle(
-                  color: Colors.black87,
+                style:  TextStyle(
+                  color: context.black87,
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
                 ),
@@ -214,8 +215,8 @@ class _VerificationOtpScreenState extends State<VerificationOtpScreen> {
                   children: [
                     TextSpan(
                       text: widget.email,
-                      style: const TextStyle(
-                        color: Colors.black87,
+                      style:  TextStyle(
+                        color: context.black87,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -395,10 +396,10 @@ class _OtpBox extends StatelessWidget {
         maxLength: 1,
         enabled: enabled,
         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-        style: const TextStyle(
+        style:  TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.w700,
-          color: Colors.black87,
+          color: context.black87,
         ),
         onChanged: onChanged,
         decoration: InputDecoration(

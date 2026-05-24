@@ -1,15 +1,13 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:piawai/core/constants.dart';
+import 'package:piawai/core/app_colors.dart';
 import 'package:piawai/pages/widgets/input_field.dart';
-import 'package:piawai/services/user_services.dart';
+import 'package:piawai/services/worker_services.dart';
 
-// ─────────────────────────────────────────
-// INFORMASI PRIBADI PAGE — username only
-// ─────────────────────────────────────────
 class InformasiPribadiPage extends StatefulWidget {
-  final String currentUsername;
-  const InformasiPribadiPage({super.key, required this.currentUsername});
+  final String currentEmail;
+  const InformasiPribadiPage({super.key, required this.currentEmail});
 
   @override
   State<InformasiPribadiPage> createState() => _InformasiPribadiPageState();
@@ -17,36 +15,34 @@ class InformasiPribadiPage extends StatefulWidget {
 
 class _InformasiPribadiPageState extends State<InformasiPribadiPage> {
   final _formKey = GlobalKey<FormState>();
-  final _userService = UserService();
+  final _workerService = WorkerService();
 
-  late final TextEditingController _usernameCtrl;
+  late final TextEditingController _emailCtrl;
 
   bool _isSaving = false;
   String? _errorMessage;
   String? _successMessage;
-
   bool isUpdated = false;
 
   @override
   void initState() {
     super.initState();
-    _usernameCtrl = TextEditingController(text: widget.currentUsername);
+    _emailCtrl = TextEditingController(text: widget.currentEmail);
   }
 
   @override
   void dispose() {
-    _usernameCtrl.dispose();
+    _emailCtrl.dispose();
     super.dispose();
   }
 
-  bool get _usernameChanged =>
-      _usernameCtrl.text.trim() != widget.currentUsername;
+  bool get _emailChanged => _emailCtrl.text.trim() != widget.currentEmail;
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
 
-    if (!_usernameChanged) {
-      setState(() => _errorMessage = 'Username sama dengan yang sekarang.');
+    if (!_emailChanged) {
+      setState(() => _errorMessage = 'validator.email_same'.tr());
       return;
     }
 
@@ -57,10 +53,12 @@ class _InformasiPribadiPageState extends State<InformasiPribadiPage> {
     });
 
     try {
-      await _userService.updateUsername(_usernameCtrl.text.trim());
+      await _workerService.updateProfile({
+        'email_contact': _emailCtrl.text.trim(),
+      });
       if (mounted) {
         setState(() {
-          _successMessage = 'Username berhasil diupdate.';
+          _successMessage = 'success_messages.email_updated'.tr();
           _isSaving = false;
           isUpdated = true;
         });
@@ -78,20 +76,20 @@ class _InformasiPribadiPageState extends State<InformasiPribadiPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: context.bgOuter,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: context.bgContent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black87),
+          icon: Icon(Icons.arrow_back, color: context.primary),
           onPressed: () {
             if (mounted) Navigator.pop(context, isUpdated);
           },
         ),
-        title: const Text(
-          'Informasi Pribadi',
+        title: Text(
+          'settings.account_section.personal_info'.tr(),
           style: TextStyle(
-            color: Colors.black87,
+            color: context.black87,
             fontWeight: FontWeight.w700,
             fontSize: 16,
           ),
@@ -113,22 +111,22 @@ class _InformasiPribadiPageState extends State<InformasiPribadiPage> {
             ],
 
             _SectionCard(
-              title: 'Username',
-              subtitle: 'settings.account_settings.username_description'.tr(),
+              title: 'fields.email'.tr(),
+              subtitle: 'email_contact_description'.tr(),
               child: InputField(
-                controller: _usernameCtrl,
-                label: 'fields.username'.tr(),
-                hint: 'Masukkan username baru',
-                prefixIcon: Icons.alternate_email,
+                controller: _emailCtrl,
+                label: 'fields.email'.tr(),
+                hint: 'field_hints.email'.tr(),
+                prefixIcon: Icons.email_outlined,
+                keyboardType: TextInputType.emailAddress,
                 validator: (val) {
                   if (val == null || val.trim().isEmpty) {
-                    return 'validator.username_required'.tr();
+                    return 'validator.email_required'.tr();
                   }
-                  if (val.trim().length < 3) {
-                    return 'validator.username_min'.tr();
-                  }
-                  if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(val.trim())) {
-                    return 'validator.username_invalid'.tr();
+                  if (!RegExp(
+                    r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$',
+                  ).hasMatch(val.trim())) {
+                    return 'validator.email_invalid'.tr();
                   }
                   return null;
                 },
@@ -143,9 +141,9 @@ class _InformasiPribadiPageState extends State<InformasiPribadiPage> {
               child: ElevatedButton(
                 onPressed: _isSaving ? null : _save,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: kPrimary,
+                  backgroundColor: context.primary,
                   foregroundColor: Colors.white,
-                  disabledBackgroundColor: kPrimary.withOpacity(0.5),
+                  disabledBackgroundColor: context.primary.withOpacity(0.5),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
@@ -162,7 +160,7 @@ class _InformasiPribadiPageState extends State<InformasiPribadiPage> {
                       )
                     : Text(
                         'general.save_changes'.tr(),
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
                         ),
@@ -178,7 +176,7 @@ class _InformasiPribadiPageState extends State<InformasiPribadiPage> {
 }
 
 // ─────────────────────────────────────────
-// Shared sub-widgets
+// Shared sub-widgets (unchanged)
 // ─────────────────────────────────────────
 
 class _SectionCard extends StatelessWidget {
@@ -193,7 +191,7 @@ class _SectionCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.bgCard,
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
@@ -208,10 +206,10 @@ class _SectionCard extends StatelessWidget {
         children: [
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w700,
-              color: kPrimary,
+              color: context.primary,
             ),
           ),
           if (subtitle != null) ...[

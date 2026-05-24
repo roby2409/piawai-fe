@@ -4,6 +4,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:piawai/core/constants.dart';
+import 'package:piawai/core/app_colors.dart';
 import 'package:piawai/pages/explore/siap_bantu/models/worker_profile_model.dart';
 import 'package:piawai/services/worker_services.dart';
 
@@ -97,7 +98,7 @@ class TentangSectionState extends State<TentangSection> {
               const SizedBox(height: 4),
               Text(
                 'complete_about_me'.tr(),
-                style: TextStyle(fontSize: 13, color: Colors.grey),
+                style: TextStyle(fontSize: 13, color: context.textSecondary),
               ),
               const SizedBox(height: 20),
 
@@ -123,11 +124,8 @@ class TentangSectionState extends State<TentangSection> {
                     onChanged: (_) => setState(() {}),
                     decoration: InputDecoration(
                       hintText: 'field_hints.about_me_bio'.tr(),
-                      hintStyle: const TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey,
-                      ),
-                      contentPadding: const EdgeInsets.fromLTRB(12, 12, 12, 28),
+                      hintStyle: TextStyle(fontSize: 13, color: context.grey),
+                      contentPadding: const EdgeInsets.fromLTRB(12, 12, 12, 38),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
@@ -138,7 +136,7 @@ class TentangSectionState extends State<TentangSection> {
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: kPrimary),
+                        borderSide: BorderSide(color: context.primary),
                       ),
                     ),
                   ),
@@ -148,7 +146,7 @@ class TentangSectionState extends State<TentangSection> {
                     right: 12,
                     child: Text(
                       '${_bioController.text.length} / $_maxChars',
-                      style: const TextStyle(fontSize: 11, color: Colors.grey),
+                      style: TextStyle(color: context.textSecondary),
                     ),
                   ),
                 ],
@@ -166,7 +164,7 @@ class TentangSectionState extends State<TentangSection> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(Icons.info_outline, color: kPrimary, size: 18),
+                    Icon(Icons.info_outline, color: context.primary, size: 18),
                     SizedBox(width: 10),
                     Expanded(
                       child: Text(
@@ -190,21 +188,21 @@ class TentangSectionState extends State<TentangSection> {
                 child: ElevatedButton(
                   onPressed: _canSave ? _onSimpan : null,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: kPrimary,
+                    backgroundColor: context.primary,
                     disabledBackgroundColor: const Color(0xFFD1D5DB),
-                    foregroundColor: Colors.white,
+                    foregroundColor: context.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                     elevation: 0,
                   ),
                   child: _isSaving
-                      ? const SizedBox(
+                      ? SizedBox(
                           height: 20,
                           width: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: Colors.white,
+                            color: context.white,
                           ),
                         )
                       : Text(
@@ -220,9 +218,9 @@ class TentangSectionState extends State<TentangSection> {
           ),
         ),
         if (_isRefetching)
-          const Positioned.fill(
+          Positioned.fill(
             child: ColoredBox(
-              color: Colors.white60,
+              color: context.white60,
               child: Center(child: CircularProgressIndicator()),
             ),
           ),

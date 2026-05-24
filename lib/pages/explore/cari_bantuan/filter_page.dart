@@ -7,6 +7,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:piawai/core/constants.dart';
+import 'package:piawai/core/app_colors.dart';
 import 'package:piawai/pages/explore/siap_bantu/atur_lokasi_page.dart';
 import 'package:piawai/pages/widgets/loading_detect_location.dart';
 import 'package:piawai/pages/widgets/map_component.dart';
@@ -130,18 +131,18 @@ class _FilterPageState extends State<FilterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.bgOuter,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: context.bgContent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.black87),
+          icon: Icon(Icons.close),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
           'general.filter'.tr(),
           style: TextStyle(
-            color: Colors.black87,
+            color: context.black87,
             fontWeight: FontWeight.w600,
             fontSize: 17,
           ),
@@ -153,7 +154,7 @@ class _FilterPageState extends State<FilterPage> {
             child: Text(
               'general.reset'.tr(),
               style: TextStyle(
-                color: Colors.black54,
+                color: context.black54,
                 fontSize: 15,
                 fontWeight: FontWeight.w500,
               ),
@@ -185,9 +186,13 @@ class _FilterPageState extends State<FilterPage> {
                     children: [
                       _SectionLabel('fields.age_range'.tr()),
                       Text(
-                        '${_ageRange.start.round()} - ${_ageRange.end.round()} Tahun',
-                        style: const TextStyle(
-                          color: kPrimary,
+                        'general.age_display'.tr(
+                          args: [
+                            '${_ageRange.start.round()} - ${_ageRange.end.round()}',
+                          ],
+                        ),
+                        style: TextStyle(
+                          color: context.primary,
                           fontWeight: FontWeight.w700,
                           fontSize: 15,
                         ),
@@ -215,31 +220,27 @@ class _FilterPageState extends State<FilterPage> {
                         vertical: 13,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF5F7FA),
+                        color: context.bgCard,
                         borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: const Color(0xFFE0E7F0)),
+                        border: Border.all(color: context.divider),
                       ),
                       child: Row(
                         children: [
-                          const Icon(
-                            Icons.search,
-                            color: Colors.black38,
-                            size: 20,
-                          ),
+                          Icon(Icons.search, color: context.primary, size: 20),
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(
                               _locationLabel,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 14,
-                                color: Colors.black87,
+                                color: context.black87,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          const Icon(
+                          Icon(
                             Icons.chevron_right,
-                            color: Colors.black38,
+                            color: context.primary,
                             size: 18,
                           ),
                         ],
@@ -254,16 +255,16 @@ class _FilterPageState extends State<FilterPage> {
                         onTap: _getCurrentLocation,
                         child: Row(
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.my_location,
-                              color: kPrimary,
+                              color: context.primary,
                               size: 18,
                             ),
                             const SizedBox(width: 6),
                             Text(
                               'fields.use_current_location'.tr(),
-                              style: const TextStyle(
-                                color: kPrimary,
+                              style: TextStyle(
+                                color: context.primary,
                                 fontWeight: FontWeight.w600,
                                 fontSize: 14,
                               ),
@@ -289,7 +290,8 @@ class _FilterPageState extends State<FilterPage> {
                           });
                         },
                       ),
-                      if (_isLoadingCurrentLocation) loadingCurrentLocation(),
+                      if (_isLoadingCurrentLocation)
+                        loadingCurrentLocation(context),
                     ],
                   ),
 
@@ -304,8 +306,8 @@ class _FilterPageState extends State<FilterPage> {
                         'general.radius_display'.tr(
                           args: ['${_radius.round()}'],
                         ),
-                        style: const TextStyle(
-                          color: kPrimary,
+                        style: TextStyle(
+                          color: context.primary,
                           fontWeight: FontWeight.w700,
                           fontSize: 15,
                         ),
@@ -457,7 +459,7 @@ class _LocationSearchSheetState extends State<_LocationSearchSheet> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.grey[300],
+                color: context.grey,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -466,19 +468,19 @@ class _LocationSearchSheetState extends State<_LocationSearchSheet> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Container(
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF2F4F7),
+                  color: context.bgCard,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: TextField(
                   controller: _ctrl,
                   focusNode: _focus,
-                  style: const TextStyle(fontSize: 14, color: Colors.black87),
+                  style: TextStyle(color: context.black87),
                   decoration: InputDecoration(
                     hintText: 'field_hints.search_location'.tr(),
-                    hintStyle: TextStyle(color: Colors.black38, fontSize: 14),
+                    hintStyle: TextStyle(color: context.black38, fontSize: 14),
                     prefixIcon: Icon(
                       Icons.search,
-                      color: Colors.black45,
+                      color: context.black45,
                       size: 20,
                     ),
                     border: InputBorder.none,
@@ -498,14 +500,14 @@ class _LocationSearchSheetState extends State<_LocationSearchSheet> {
 
             Expanded(
               child: _isLoading
-                  ? const Center(
-                      child: CircularProgressIndicator(color: kPrimary),
+                  ? Center(
+                      child: CircularProgressIndicator(color: context.primary),
                     )
                   : _error != null
                   ? Center(
                       child: Text(
                         _error!,
-                        style: const TextStyle(color: Colors.grey),
+                        style: TextStyle(color: context.grey),
                       ),
                     )
                   : ListView(
@@ -517,12 +519,12 @@ class _LocationSearchSheetState extends State<_LocationSearchSheet> {
                             width: 36,
                             height: 36,
                             decoration: BoxDecoration(
-                              color: kPrimary.withOpacity(0.1),
+                              color: context.primary.withOpacity(0.1),
                               shape: BoxShape.circle,
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.my_location,
-                              color: kPrimary,
+                              color: context.primary,
                               size: 18,
                             ),
                           ),
@@ -551,7 +553,7 @@ class _LocationSearchSheetState extends State<_LocationSearchSheet> {
                             child: Center(
                               child: Text(
                                 'location_not_found'.tr(),
-                                style: TextStyle(color: Colors.grey),
+                                style: TextStyle(color: context.grey),
                               ),
                             ),
                           ),
@@ -565,12 +567,12 @@ class _LocationSearchSheetState extends State<_LocationSearchSheet> {
                                   width: 36,
                                   height: 36,
                                   decoration: BoxDecoration(
-                                    color: Colors.grey.withOpacity(0.1),
+                                    color: context.grey.withOpacity(0.1),
                                     shape: BoxShape.circle,
                                   ),
-                                  child: const Icon(
+                                  child: Icon(
                                     Icons.location_on_outlined,
-                                    color: Colors.black54,
+                                    color: context.black54,
                                     size: 18,
                                   ),
                                 ),
@@ -612,8 +614,8 @@ class _SectionLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Text(
     text,
-    style: const TextStyle(
-      color: Colors.black87,
+    style: TextStyle(
+      color: context.textPrimary,
       fontWeight: FontWeight.w600,
       fontSize: 15,
     ),
@@ -670,17 +672,17 @@ class _GenderChip extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? kPrimary : Colors.white,
+          color: isSelected ? context.primary : context.bgContent,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
-            color: isSelected ? kPrimary : const Color(0xFFD0D5DD),
+            color: isSelected ? context.primary : context.divider,
             width: 1.5,
           ),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: isSelected ? Colors.white : Colors.black87,
+            color: isSelected ? context.white : context.textPrimary,
             fontWeight: FontWeight.w600,
             fontSize: 14,
           ),
@@ -706,10 +708,10 @@ class _StyledRangeSlider extends StatelessWidget {
   Widget build(BuildContext context) {
     return SliderTheme(
       data: SliderTheme.of(context).copyWith(
-        activeTrackColor: kPrimary,
-        inactiveTrackColor: const Color(0xFFE0E7F0),
-        thumbColor: kPrimary,
-        overlayColor: kPrimary.withOpacity(0.12),
+        activeTrackColor: context.primary,
+        inactiveTrackColor: context.divider,
+        thumbColor: context.primary,
+        overlayColor: context.primary.withOpacity(0.12),
         trackHeight: 4,
         thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10),
       ),
@@ -745,10 +747,10 @@ class _StyledSlider extends StatelessWidget {
       children: [
         SliderTheme(
           data: SliderTheme.of(context).copyWith(
-            activeTrackColor: kPrimary,
-            inactiveTrackColor: const Color(0xFFE0E7F0),
-            thumbColor: kPrimary,
-            overlayColor: kPrimary.withOpacity(0.12),
+            activeTrackColor: context.primary,
+            inactiveTrackColor: context.divider,
+            thumbColor: context.primary,
+            overlayColor: context.primary.withOpacity(0.12),
             trackHeight: 4,
             thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10),
           ),
@@ -761,11 +763,11 @@ class _StyledSlider extends StatelessWidget {
             children: [
               Text(
                 minLabel,
-                style: const TextStyle(color: Colors.black45, fontSize: 12),
+                style: TextStyle(color: context.black45, fontSize: 12),
               ),
               Text(
                 maxLabel,
-                style: const TextStyle(color: Colors.black45, fontSize: 12),
+                style: TextStyle(color: context.black45, fontSize: 12),
               ),
             ],
           ),
@@ -830,15 +832,15 @@ class _MapPreviewState extends State<_MapPreview> {
                 },
               ),
               children: [
-                buildTileLayer(),
+                buildTileLayer(context),
                 CircleLayer(
                   circles: [
                     CircleMarker(
                       point: _markerPoint,
                       radius: widget.radiusKm * 1000,
                       useRadiusInMeter: true,
-                      color: kPrimary.withOpacity(0.12),
-                      borderColor: kPrimary.withOpacity(0.5),
+                      color: context.primary.withOpacity(0.12),
+                      borderColor: context.primary.withOpacity(0.5),
                       borderStrokeWidth: 1.5,
                     ),
                   ],
@@ -851,12 +853,12 @@ class _MapPreviewState extends State<_MapPreview> {
                       height: 24,
                       child: Container(
                         decoration: BoxDecoration(
-                          color: kPrimary,
+                          color: context.primary,
                           shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 2.5),
+                          border: Border.all(color: context.white, width: 2.5),
                           boxShadow: [
                             BoxShadow(
-                              color: kPrimary.withOpacity(0.3),
+                              color: context.primary.withOpacity(0.3),
                               blurRadius: 6,
                             ),
                           ],
@@ -877,11 +879,11 @@ class _MapPreviewState extends State<_MapPreview> {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: context.white,
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.12),
+                      color: context.black.withOpacity(0.12),
                       blurRadius: 6,
                       offset: const Offset(0, 2),
                     ),
@@ -890,18 +892,18 @@ class _MapPreviewState extends State<_MapPreview> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.touch_app_outlined,
                       size: 14,
-                      color: Colors.black54,
+                      color: context.black54,
                     ),
                     const SizedBox(width: 5),
                     Text(
                       'tap_map_for_move_point'.tr(),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
-                        color: Colors.black87,
+                        color: context.black87,
                       ),
                     ),
                   ],
@@ -922,7 +924,7 @@ class _ApplyButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white,
+      color: context.bgCard,
       padding: EdgeInsets.fromLTRB(
         20,
         12,
@@ -935,8 +937,8 @@ class _ApplyButton extends StatelessWidget {
         child: ElevatedButton(
           onPressed: onTap,
           style: ElevatedButton.styleFrom(
-            backgroundColor: kPrimary,
-            foregroundColor: Colors.white,
+            backgroundColor: context.primary,
+            foregroundColor: context.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(14),
             ),

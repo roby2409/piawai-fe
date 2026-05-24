@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:piawai/core/constants.dart';
+import 'package:piawai/core/app_colors.dart';
 
 class InputField extends StatelessWidget {
   final TextEditingController controller;
@@ -36,35 +37,35 @@ class InputField extends StatelessWidget {
     return TextFormField(
       controller: controller,
       maxLines: maxLines,
-      minLines: minLines, // ← tambah ini
+      minLines: minLines,
       maxLength: maxLength,
       onChanged: onChanged,
       obscureText: obscure,
       validator: validator,
       keyboardType: keyboardType,
-      style: const TextStyle(fontSize: 14, color: Colors.black87),
+      style: TextStyle(fontSize: 14, color: context.textPrimary),
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
-        hintStyle: TextStyle(color: Colors.grey[800], fontSize: 14),
-        labelStyle: TextStyle(color: Colors.grey[800], fontSize: 14),
+        hintStyle: TextStyle(color: context.textSecondary, fontSize: 14),
+        labelStyle: TextStyle(color: context.textSecondary, fontSize: 14),
         prefixIcon: prefixIcon != null
-            ? Icon(prefixIcon, color: kPrimary, size: 18)
+            ? Icon(prefixIcon, color: context.primary, size: 18)
             : null,
         suffixIcon: suffixIcon,
         filled: true,
-        fillColor: const Color(0xFFF8F9FA),
+        fillColor: context.bgCard,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+          borderSide: BorderSide(color: context.black87),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Colors.grey),
+          borderSide: BorderSide(color: context.divider),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: kPrimary, width: 1.5),
+          borderSide: BorderSide(color: context.primary, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:piawai/core/constants.dart';
+import 'package:piawai/core/app_colors.dart';
 import 'package:piawai/pages/widgets/input_field.dart';
 import 'package:piawai/services/user_services.dart';
 
@@ -105,20 +106,20 @@ class _KataPasswordPageState extends State<KataPasswordPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: context.bgOuter,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: context.bgContent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black87),
+          icon: Icon(Icons.arrow_back, color: context.primary),
           onPressed: () {
             if (mounted) Navigator.pop(context, isUpdated);
           },
         ),
-        title: const Text(
+        title: Text(
           'Kata Sandi & Keamanan',
           style: TextStyle(
-            color: Colors.black87,
+            color: context.black87,
             fontWeight: FontWeight.w700,
             fontSize: 16,
           ),
@@ -126,7 +127,7 @@ class _KataPasswordPageState extends State<KataPasswordPage> {
         centerTitle: true,
       ),
       body: _isLoadingMe
-          ? const Center(child: CircularProgressIndicator(color: kPrimary))
+          ? Center(child: CircularProgressIndicator(color: context.primary))
           : Form(
               key: _formKey,
               child: ListView(
@@ -254,9 +255,11 @@ class _KataPasswordPageState extends State<KataPasswordPage> {
                     child: ElevatedButton(
                       onPressed: _isSaving ? null : _save,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: kPrimary,
+                        backgroundColor: context.primary,
                         foregroundColor: Colors.white,
-                        disabledBackgroundColor: kPrimary.withOpacity(0.5),
+                        disabledBackgroundColor: context.primary.withOpacity(
+                          0.5,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
                         ),
@@ -304,7 +307,7 @@ class _SectionCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.bgCard,
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
@@ -319,10 +322,10 @@ class _SectionCard extends StatelessWidget {
         children: [
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w700,
-              color: kPrimary,
+              color: context.primary,
             ),
           ),
           if (subtitle != null) ...[

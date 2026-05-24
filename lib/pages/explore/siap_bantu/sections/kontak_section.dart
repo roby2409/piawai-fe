@@ -4,7 +4,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:piawai/core/constants.dart';
+import 'package:piawai/core/app_colors.dart';
 import 'package:piawai/pages/explore/siap_bantu/models/worker_profile_model.dart';
+import 'package:piawai/pages/widgets/input_field.dart';
 import 'package:piawai/services/worker_services.dart';
 
 class KontakSection extends StatefulWidget {
@@ -23,17 +25,13 @@ class KontakSection extends StatefulWidget {
 
 class KontakSectionState extends State<KontakSection> {
   final _phoneController = TextEditingController();
-  final _emailController = TextEditingController();
   final _igController = TextEditingController();
   bool _isRefetching = false;
   final _workerService = WorkerService();
 
   bool _isSaving = false;
 
-  bool get _canSave =>
-      _phoneController.text.trim().isNotEmpty &&
-      _emailController.text.trim().isNotEmpty &&
-      !_isSaving;
+  bool get _canSave => _phoneController.text.trim().isNotEmpty && !_isSaving;
 
   @override
   void initState() {
@@ -41,7 +39,6 @@ class KontakSectionState extends State<KontakSection> {
     if (widget.initialProfile != null) {
       final initialProfile = widget.initialProfile!;
       _phoneController.text = initialProfile.phoneWa ?? "";
-      _emailController.text = initialProfile.emailContact ?? "";
       _igController.text = initialProfile.instagram ?? "";
     }
   }
@@ -49,7 +46,6 @@ class KontakSectionState extends State<KontakSection> {
   @override
   void dispose() {
     _phoneController.dispose();
-    _emailController.dispose();
     _igController.dispose();
     super.dispose();
   }
@@ -61,7 +57,6 @@ class KontakSectionState extends State<KontakSection> {
       final raw = await _workerService.fetchProfile();
       setState(() {
         _phoneController.text = raw.phoneWa ?? "";
-        _emailController.text = raw.emailContact ?? "";
         _igController.text = raw.instagram ?? "";
         _isRefetching = false;
       });
@@ -81,7 +76,6 @@ class KontakSectionState extends State<KontakSection> {
 
     final payload = {
       'phone_wa': _phoneController.text.trim(),
-      'email_contact': _emailController.text.trim(),
       'instagram': _igController.text.trim(),
     };
 
@@ -113,7 +107,7 @@ class KontakSectionState extends State<KontakSection> {
               const SizedBox(height: 4),
               Text(
                 'siap_bantu.information_contact_desc'.tr(),
-                style: TextStyle(fontSize: 13, color: Colors.grey),
+                style: TextStyle(fontSize: 13, color: context.black87),
               ),
               const SizedBox(height: 20),
 
@@ -123,58 +117,10 @@ class KontakSectionState extends State<KontakSection> {
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 8),
-              TextField(
+              InputField(
                 controller: _phoneController,
                 keyboardType: TextInputType.phone,
-                decoration: InputDecoration(
-                  hintText: 'field_hints.phone_whatsapp'.tr(),
-                  hintStyle: const TextStyle(fontSize: 13, color: Colors.grey),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: kPrimary),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Email
-              Text(
-                "fields.email".tr(),
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                  hintText: 'contoh@email.com',
-                  hintStyle: const TextStyle(fontSize: 13, color: Colors.grey),
-                  prefixIcon: const Icon(
-                    Icons.mail_outline,
-                    color: Colors.grey,
-                    size: 20,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: kPrimary),
-                  ),
-                ),
+                hint: 'field_hints.phone_whatsapp'.tr(),
               ),
               const SizedBox(height: 16),
 
@@ -184,35 +130,9 @@ class KontakSectionState extends State<KontakSection> {
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 8),
-              TextField(
+              InputField(
                 controller: _igController,
-                decoration: InputDecoration(
-                  hintText: 'instagram_username'.tr(),
-                  hintStyle: const TextStyle(fontSize: 13, color: Colors.grey),
-                  prefixIcon: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Text(
-                      '@',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey[500],
-                      ),
-                    ),
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: kPrimary),
-                  ),
-                ),
+                hint: 'field_hints.instagram_username'.tr(),
               ),
               const SizedBox(height: 24),
 
@@ -220,16 +140,16 @@ class KontakSectionState extends State<KontakSection> {
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: kBgCard,
+                  color: context.bgCard,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: kPrimary, width: 1),
+                  border: Border.all(color: context.primary, width: 1),
                 ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.security_outlined,
-                      color: kPrimary,
+                      color: context.primary,
                       size: 20,
                     ),
                     const SizedBox(width: 10),
@@ -242,7 +162,7 @@ class KontakSectionState extends State<KontakSection> {
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
-                              color: Colors.grey[800],
+                              color: context.textSecondary,
                             ),
                           ),
                           SizedBox(height: 4),
@@ -250,7 +170,7 @@ class KontakSectionState extends State<KontakSection> {
                             'secure_tips_desc'.tr(),
                             style: TextStyle(
                               fontSize: 12,
-                              color: Colors.grey[700],
+                              color: context.textSecondary,
                             ),
                           ),
                         ],
@@ -268,21 +188,21 @@ class KontakSectionState extends State<KontakSection> {
                 child: ElevatedButton(
                   onPressed: _canSave ? _onSimpan : null,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: kPrimary,
+                    backgroundColor: context.primary,
                     disabledBackgroundColor: const Color(0xFFD1D5DB),
-                    foregroundColor: Colors.white,
+                    foregroundColor: context.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                     elevation: 0,
                   ),
                   child: _isSaving
-                      ? const SizedBox(
+                      ? SizedBox(
                           height: 20,
                           width: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: Colors.white,
+                            color: context.white,
                           ),
                         )
                       : Text(
@@ -298,9 +218,9 @@ class KontakSectionState extends State<KontakSection> {
           ),
         ),
         if (_isRefetching)
-          const Positioned.fill(
+          Positioned.fill(
             child: ColoredBox(
-              color: Colors.white60,
+              color: context.white60,
               child: Center(child: CircularProgressIndicator()),
             ),
           ),

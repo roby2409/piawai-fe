@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:piawai/core/constants.dart';
+import 'package:piawai/core/app_colors.dart';
 import 'package:piawai/pages/explore/siap_bantu/models/worker_profile_model.dart';
 import 'package:piawai/pages/widgets/overlay_snackbar.dart';
 import 'package:piawai/services/worker_services.dart';
@@ -72,9 +73,9 @@ class StatusSectionState extends State<StatusSection> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: context.bgContent,
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: kGrey),
+              border: Border.all(color: context.black87),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -95,7 +96,10 @@ class StatusSectionState extends State<StatusSection> {
                         _isAvailable
                             ? 'siap_bantu.status_ready_work_accept'.tr()
                             : 'siap_bantu.activate_to_start'.tr(),
-                        style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: context.textSecondary,
+                        ),
                       ),
                     ],
                   ),
@@ -108,10 +112,10 @@ class StatusSectionState extends State<StatusSection> {
                     onChanged: _isSaving
                         ? null
                         : (val) => setState(() => _isAvailable = val),
-                    activeColor: Colors.white,
-                    activeTrackColor: kPrimary,
-                    inactiveThumbColor: Colors.white,
-                    inactiveTrackColor: kGrey,
+                    activeColor: context.white,
+                    activeTrackColor: context.primary,
+                    inactiveThumbColor: context.white,
+                    inactiveTrackColor: context.divider,
                   ),
                 ),
               ],
@@ -125,11 +129,13 @@ class StatusSectionState extends State<StatusSection> {
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
               color: _isAvailable
-                  ? const Color(0xFFEFF6FF)
-                  : const Color(0xFFF3F4F6),
+                  ? context.primary.withOpacity(0.1)
+                  : context.bgCard,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: _isAvailable ? const Color(0xFFBFDBFE) : kGrey,
+                color: _isAvailable
+                    ? context.primary.withOpacity(0.3)
+                    : context.divider,
               ),
             ),
             child: Row(
@@ -138,7 +144,7 @@ class StatusSectionState extends State<StatusSection> {
                 Icon(
                   Icons.info_outline,
                   size: 20,
-                  color: _isAvailable ? kPrimary : Colors.grey,
+                  color: _isAvailable ? context.primary : context.grey,
                 ),
                 const SizedBox(width: 10),
                 Expanded(
@@ -148,9 +154,7 @@ class StatusSectionState extends State<StatusSection> {
                         : 'siap_bantu.status_is_not_active'.tr(),
                     style: TextStyle(
                       fontSize: 12,
-                      color: _isAvailable
-                          ? const Color(0xFF1e40af)
-                          : Colors.grey[500],
+                      color: _isAvailable ? context.primary : context.grey,
                     ),
                   ),
                 ),
@@ -166,21 +170,21 @@ class StatusSectionState extends State<StatusSection> {
             child: ElevatedButton(
               onPressed: _isSaving ? null : _saveStatus,
               style: ElevatedButton.styleFrom(
-                backgroundColor: kPrimary,
+                backgroundColor: context.primary,
                 disabledBackgroundColor: const Color(0xFFD1D5DB),
-                foregroundColor: Colors.white,
+                foregroundColor: context.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
                 elevation: 0,
               ),
               child: _isSaving
-                  ? const SizedBox(
+                  ? SizedBox(
                       height: 20,
                       width: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        color: Colors.white,
+                        color: context.white,
                       ),
                     )
                   : Text(

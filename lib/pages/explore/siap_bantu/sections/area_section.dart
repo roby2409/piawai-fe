@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart' show LatLng;
 import 'package:piawai/core/constants.dart';
+import 'package:piawai/core/app_colors.dart';
 import 'package:piawai/pages/explore/siap_bantu/atur_lokasi_page.dart';
 import 'package:piawai/pages/explore/siap_bantu/models/worker_profile_model.dart';
 import 'package:piawai/pages/widgets/map_component.dart';
@@ -123,11 +124,11 @@ class AreaSectionState extends State<AreaSection> {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: kPrimary,
+                        color: context.primary,
                       ),
                     ),
                     SizedBox(width: 2),
-                    Icon(Icons.chevron_right, size: 18, color: kPrimary),
+                    Icon(Icons.chevron_right, size: 18, color: context.primary),
                   ],
                 ),
               ),
@@ -136,7 +137,7 @@ class AreaSectionState extends State<AreaSection> {
           const SizedBox(height: 4),
           Text(
             'siap_bantu.define_scope_work'.tr(),
-            style: TextStyle(fontSize: 13, color: Colors.grey),
+            style: TextStyle(fontSize: 13, color: context.black87),
           ),
           const SizedBox(height: 16),
 
@@ -144,7 +145,7 @@ class AreaSectionState extends State<AreaSection> {
           Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: kGrey),
+              border: Border.all(color: context.bgOuter),
             ),
             clipBehavior: Clip.antiAlias,
             child: Column(
@@ -158,18 +159,18 @@ class AreaSectionState extends State<AreaSection> {
                     horizontal: 14,
                     vertical: 12,
                   ),
-                  color: Colors.white,
+                  color: context.bgCard,
                   child: Row(
                     children: [
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFEFF6FF),
+                          color: context.primary.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.my_location,
-                          color: kPrimary,
+                          color: context.primary,
                           size: 18,
                         ),
                       ),
@@ -190,9 +191,9 @@ class AreaSectionState extends State<AreaSection> {
                               _lat != null && _lng != null
                                   ? '${_lat!.toStringAsFixed(4)}, ${_lng!.toStringAsFixed(4)}'
                                   : 'siap_bantu.tap_set_location'.tr(),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 12,
-                                color: Colors.grey,
+                                color: context.textSecondary,
                               ),
                             ),
                           ],
@@ -216,10 +217,10 @@ class AreaSectionState extends State<AreaSection> {
               ),
               Text(
                 _radiusLabel,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: kPrimary,
+                  color: context.primary,
                 ),
               ),
             ],
@@ -227,9 +228,9 @@ class AreaSectionState extends State<AreaSection> {
           const SizedBox(height: 8),
           SliderTheme(
             data: SliderTheme.of(context).copyWith(
-              activeTrackColor: kPrimary,
-              inactiveTrackColor: kGrey,
-              thumbColor: kPrimary,
+              activeTrackColor: context.primary,
+              inactiveTrackColor: context.divider,
+              thumbColor: context.primary,
               thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 12),
               overlayShape: const RoundSliderOverlayShape(overlayRadius: 20),
               trackHeight: 4,
@@ -249,15 +250,15 @@ class AreaSectionState extends State<AreaSection> {
               children: [
                 Text(
                   'general.radius_display'.tr(args: ['1']),
-                  style: TextStyle(fontSize: 11, color: Colors.grey),
+                  style: TextStyle(fontSize: 11, color: context.textSecondary),
                 ),
                 Text(
                   'general.radius_display'.tr(args: ['25']),
-                  style: TextStyle(fontSize: 11, color: Colors.grey),
+                  style: TextStyle(fontSize: 11, color: context.textSecondary),
                 ),
                 Text(
                   'general.radius_display'.tr(args: ['50']),
-                  style: TextStyle(fontSize: 11, color: Colors.grey),
+                  style: TextStyle(fontSize: 11, color: context.textSecondary),
                 ),
               ],
             ),
@@ -268,19 +269,19 @@ class AreaSectionState extends State<AreaSection> {
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: const Color(0xFFEFF6FF),
+              color: context.primary.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFBFDBFE)),
+              border: Border.all(color: context.primary.withOpacity(0.3)),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.info_outline, color: kPrimary, size: 20),
+                Icon(Icons.info_outline, color: context.primary, size: 20),
                 SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     "siap_bantu.radius_range_desc".tr(),
-                    style: TextStyle(fontSize: 12, color: Color(0xFF1e40af)),
+                    style: TextStyle(fontSize: 12, color: context.primary),
                   ),
                 ),
               ],
@@ -295,21 +296,21 @@ class AreaSectionState extends State<AreaSection> {
             child: ElevatedButton(
               onPressed: _canSave ? _saveArea : null,
               style: ElevatedButton.styleFrom(
-                backgroundColor: kPrimary,
+                backgroundColor: context.primary,
                 disabledBackgroundColor: const Color(0xFFD1D5DB),
-                foregroundColor: Colors.white,
+                foregroundColor: context.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
                 elevation: 0,
               ),
               child: _isSaving
-                  ? const SizedBox(
+                  ? SizedBox(
                       height: 20,
                       width: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        color: Colors.white,
+                        color: context.white,
                       ),
                     )
                   : Text(
@@ -348,14 +349,14 @@ class _LocationSudahDiatur extends StatelessWidget {
           ),
         ),
         children: [
-          buildTileLayer(),
+          buildTileLayer(context),
           CircleLayer(
             circles: [
               CircleMarker(
                 point: LatLng(_lat!, _lng!),
                 radius: 40,
-                color: kPrimary.withOpacity(0.2),
-                borderColor: kPrimary.withOpacity(0.6),
+                color: context.primary.withOpacity(0.2),
+                borderColor: context.primary.withOpacity(0.6),
                 borderStrokeWidth: 2,
               ),
             ],
@@ -366,7 +367,11 @@ class _LocationSudahDiatur extends StatelessWidget {
                 point: LatLng(_lat!, _lng!),
                 width: 32,
                 height: 32,
-                child: const Icon(Icons.my_location, color: kPrimary, size: 28),
+                child: Icon(
+                  Icons.my_location,
+                  color: context.primary,
+                  size: 28,
+                ),
               ),
             ],
           ),
@@ -395,7 +400,9 @@ class _LokasiBelumDiatur extends StatelessWidget {
         children: [
           // ── Grid background ──
           Positioned.fill(
-            child: CustomPaint(painter: _MapPlaceholderPainter()),
+            child: CustomPaint(
+              painter: _MapPlaceholderPainter(color: context.bgCard),
+            ),
           ),
           // ── Center content ──
           Center(
@@ -404,14 +411,14 @@ class _LokasiBelumDiatur extends StatelessWidget {
               children: [
                 Icon(
                   Icons.location_off_outlined,
-                  color: Colors.white.withOpacity(0.5),
+                  color: context.white.withOpacity(0.5),
                   size: 36,
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'siap_bantu.location_not_set'.tr(),
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.5),
+                    color: context.white.withOpacity(0.5),
                     fontSize: 13,
                   ),
                 ),
@@ -419,7 +426,7 @@ class _LokasiBelumDiatur extends StatelessWidget {
                 Text(
                   'siap_bantu.tap_set_location'.tr(),
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.3),
+                    color: context.white.withOpacity(0.3),
                     fontSize: 11,
                   ),
                 ),
@@ -436,10 +443,14 @@ class _LokasiBelumDiatur extends StatelessWidget {
 // Map Placeholder Painter
 // ─────────────────────────────────────────
 class _MapPlaceholderPainter extends CustomPainter {
+  final Color color;
+
+  const _MapPlaceholderPainter({required this.color});
+
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withOpacity(0.08)
+      ..color = color.withOpacity(0.08)
       ..strokeWidth = 1
       ..style = PaintingStyle.stroke;
 
@@ -451,7 +462,7 @@ class _MapPlaceholderPainter extends CustomPainter {
     }
 
     final contourPaint = Paint()
-      ..color = Colors.white.withOpacity(0.15)
+      ..color = color.withOpacity(0.15)
       ..strokeWidth = 1.5
       ..style = PaintingStyle.stroke;
 

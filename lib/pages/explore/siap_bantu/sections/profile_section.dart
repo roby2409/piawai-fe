@@ -7,8 +7,10 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:piawai/core/constants.dart';
+import 'package:piawai/core/app_colors.dart';
 import 'package:piawai/core/helper.dart';
 import 'package:piawai/pages/explore/siap_bantu/models/worker_profile_model.dart';
+import 'package:piawai/pages/widgets/input_field.dart';
 import 'package:piawai/services/worker_services.dart';
 
 class ProfilSection extends StatefulWidget {
@@ -27,6 +29,8 @@ class ProfilSection extends StatefulWidget {
 
 class ProfilSectionState extends State<ProfilSection> {
   final _fullNameController = TextEditingController();
+  final _usernameController = TextEditingController();
+  final _ageController = TextEditingController();
   String? _jenisKelamin;
   Uint8List? _fotoBytes; // null = pakai
   bool _isRefetching = false;
@@ -38,6 +42,8 @@ class ProfilSectionState extends State<ProfilSection> {
     if (widget.initialProfile != null) {
       final initialProfile = widget.initialProfile!;
       _fullNameController.text = initialProfile.fullName;
+      _usernameController.text = initialProfile.username;
+      _ageController.text = initialProfile.age?.toString() ?? '';
       _jenisKelamin = initialProfile.gender;
     }
   }
@@ -46,12 +52,15 @@ class ProfilSectionState extends State<ProfilSection> {
 
   bool get _canSave =>
       _fullNameController.text.trim().isNotEmpty &&
+      _usernameController.text.trim().isNotEmpty &&
       _jenisKelamin != null &&
       !_isSaving;
 
   @override
   void dispose() {
     _fullNameController.dispose();
+    _usernameController.dispose();
+    _ageController.dispose();
     super.dispose();
   }
 
@@ -62,6 +71,7 @@ class ProfilSectionState extends State<ProfilSection> {
       final raw = await _workerService.fetchProfile();
       setState(() {
         _fullNameController.text = raw.fullName;
+        _usernameController.text = raw.username;
         _jenisKelamin = raw.gender;
         _fotoBytes = null; // ← reset setelah upload sukses
         _isRefetching = false;
@@ -83,15 +93,15 @@ class ProfilSectionState extends State<ProfilSection> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: const Icon(
+              leading: Icon(
                 Icons.photo_library_outlined,
-                color: kPrimary,
+                color: context.primary,
               ),
               title: const Text('Pilih dari Galeri'),
               onTap: () => Navigator.pop(context, ImageSource.gallery),
             ),
             ListTile(
-              leading: const Icon(Icons.camera_alt_outlined, color: kPrimary),
+              leading: Icon(Icons.camera_alt_outlined, color: context.primary),
               title: const Text('Ambil Foto'),
               onTap: () => Navigator.pop(context, ImageSource.camera),
             ),
@@ -116,6 +126,8 @@ class ProfilSectionState extends State<ProfilSection> {
 
     final payload = {
       'nama': _fullNameController.text.trim(),
+      'username': _usernameController.text.trim(),
+      'age': int.parse(_ageController.text),
       'gender': _jenisKelamin,
     };
 
@@ -150,7 +162,7 @@ class ProfilSectionState extends State<ProfilSection> {
               const SizedBox(height: 4),
               Text(
                 'siap_bantu.information_profile_desc'.tr(),
-                style: TextStyle(fontSize: 13, color: Colors.grey),
+                style: TextStyle(fontSize: 13, color: context.black87),
               ),
               const SizedBox(height: 20),
 
@@ -159,9 +171,9 @@ class ProfilSectionState extends State<ProfilSection> {
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(vertical: 24),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF8F9FA),
+                  color: context.bgCard,
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: kGrey),
+                  border: Border.all(color: context.divider),
                 ),
                 child: Column(
                   children: [
@@ -175,10 +187,13 @@ class ProfilSectionState extends State<ProfilSection> {
                             height: 96,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 3),
+                              border: Border.all(
+                                color: context.bgContent,
+                                width: 3,
+                              ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
+                                  color: context.black.withOpacity(0.1),
                                   blurRadius: 8,
                                   offset: const Offset(0, 2),
                                 ),
@@ -205,19 +220,19 @@ class ProfilSectionState extends State<ProfilSection> {
                                       // Error fallback
                                       errorBuilder: (_, __, ___) => Container(
                                         color: kGrey,
-                                        child: const Icon(
+                                        child: Icon(
                                           Icons.person,
                                           size: 52,
-                                          color: Colors.grey,
+                                          color: context.grey,
                                         ),
                                       ),
                                     )
                                   : Container(
                                       color: kGrey,
-                                      child: const Icon(
+                                      child: Icon(
                                         Icons.person,
                                         size: 52,
-                                        color: Colors.grey,
+                                        color: context.grey,
                                       ),
                                     ),
                             ),
@@ -227,14 +242,17 @@ class ProfilSectionState extends State<ProfilSection> {
                             width: 28,
                             height: 28,
                             decoration: BoxDecoration(
-                              color: kPrimary,
+                              color: context.primary,
                               shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 2),
+                              border: Border.all(
+                                color: context.white,
+                                width: 2,
+                              ),
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.camera_alt,
                               size: 14,
-                              color: Colors.white,
+                              color: context.white,
                             ),
                           ),
                         ],
@@ -248,7 +266,7 @@ class ProfilSectionState extends State<ProfilSection> {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: kPrimary,
+                          color: context.primary,
                         ),
                       ),
                     ),
@@ -263,30 +281,37 @@ class ProfilSectionState extends State<ProfilSection> {
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 8),
-              TextField(
+              InputField(
                 controller: _fullNameController,
-                decoration: InputDecoration(
-                  hintText: 'field_hints.full_name'.tr(),
-                  hintStyle: const TextStyle(fontSize: 13, color: Colors.grey),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: kPrimary),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 14,
-                  ),
-                ),
+                hint: 'field_hints.full_name'.tr(),
               ),
               const SizedBox(height: 20),
+
+              // Email
+              Text(
+                "fields.username".tr(),
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 8),
+              InputField(
+                controller: _usernameController,
+                keyboardType: TextInputType.text,
+                hint: 'field_hints.username'.tr(),
+                prefixIcon: Icons.alternate_email_outlined,
+              ),
+              const SizedBox(height: 16),
+
+              Text(
+                'fields.age_range'.tr(),
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 8),
+              InputField(
+                controller: _ageController,
+                keyboardType: TextInputType.number,
+                hint: 'general.age_display'.tr(args: ['25']),
+              ),
+              const SizedBox(height: 16),
 
               // ── Jenis Kelamin ──
               Text(
@@ -320,21 +345,21 @@ class ProfilSectionState extends State<ProfilSection> {
                 child: ElevatedButton(
                   onPressed: _canSave ? _onSimpan : null,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: kPrimary,
+                    backgroundColor: context.primary,
                     disabledBackgroundColor: const Color(0xFFD1D5DB),
-                    foregroundColor: Colors.white,
+                    foregroundColor: context.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                     elevation: 0,
                   ),
                   child: _isSaving
-                      ? const SizedBox(
+                      ? SizedBox(
                           height: 20,
                           width: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: Colors.white,
+                            color: context.white,
                           ),
                         )
                       : Text(
@@ -350,9 +375,9 @@ class ProfilSectionState extends State<ProfilSection> {
           ),
         ),
         if (_isRefetching)
-          const Positioned.fill(
+          Positioned.fill(
             child: ColoredBox(
-              color: Colors.white60,
+              color: context.white60,
               child: Center(child: CircularProgressIndicator()),
             ),
           ),
@@ -386,21 +411,28 @@ class _GenderButton extends StatelessWidget {
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(vertical: 14),
           decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFFEFF6FF) : Colors.white,
+            color: isSelected ? context.bgCard : context.bgOuter,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: isSelected ? kPrimary : kGrey, width: 1),
+            border: Border.all(
+              color: isSelected ? context.primary : context.divider,
+              width: 1,
+            ),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 20, color: isSelected ? kPrimary : Colors.grey),
+              Icon(
+                icon,
+                size: 20,
+                color: isSelected ? context.primary : context.black87,
+              ),
               const SizedBox(width: 6),
               Text(
                 label,
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: isSelected ? kPrimary : Colors.grey,
+                  color: isSelected ? context.primary : context.black87,
                 ),
               ),
             ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:piawai/core/constants.dart';
+import 'package:piawai/core/app_colors.dart';
 
 // ─────────────────────────────────────────
 // ONBOARDING SCREEN
@@ -83,12 +84,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 children: [
                   // Logo (hanya di page 1)
                   if (!isDark)
-                    const Text(
+                    Text(
                       'Piawai',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w800,
-                        color: kPrimary,
+                        color: context.primary,
                       ),
                     )
                   else
@@ -137,7 +138,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         height: 8,
                         decoration: BoxDecoration(
                           color: isActive
-                              ? kPrimary
+                              ? context.primary
                               : (isDark
                                     ? Colors.white30
                                     : Colors.grey.shade300),
@@ -155,7 +156,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     child: ElevatedButton(
                       onPressed: _next,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: kPrimary,
+                        backgroundColor: context.primary,
                         foregroundColor: Colors.white,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
@@ -260,8 +261,8 @@ class _OnboardingPageContent extends StatelessWidget {
                 if (data.highlightText != null)
                   TextSpan(
                     text: data.highlightText,
-                    style: const TextStyle(
-                      color: kPrimary,
+                    style: TextStyle(
+                      color: context.primary,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -317,7 +318,7 @@ class _Grid2x2Light extends StatelessWidget {
                   child: _PlaceholderBox(
                     color: const Color(0xFFDDE8FF),
                     icon: Icons.location_on_outlined,
-                    iconColor: kPrimary,
+                    iconColor: context.primary,
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -326,7 +327,7 @@ class _Grid2x2Light extends StatelessWidget {
                   child: _PlaceholderBox(
                     color: const Color(0xFFE8F0FE),
                     icon: Icons.person_outline,
-                    iconColor: kPrimary,
+                    iconColor: context.primary,
                     hasBottomLine: true,
                   ),
                 ),
@@ -378,7 +379,7 @@ class _Grid2x2Dark extends StatelessWidget {
               Expanded(
                 flex: 2,
                 child: _PlaceholderBox(
-                  color: kPrimary,
+                  color: context.primary,
                   icon: Icons.handshake_outlined,
                   iconColor: Colors.white,
                   borderRadius: 16,
@@ -409,7 +410,7 @@ class _Grid2x2Dark extends StatelessWidget {
               Expanded(
                 flex: 2,
                 child: _PlaceholderBox(
-                  color: kBgOuter,
+                  color: context.bgOuter,
                   icon: Icons.construction_outlined,
                   iconColor: Colors.white54,
                   borderRadius: 16,
@@ -439,8 +440,12 @@ class _HandshakeIllustration extends StatelessWidget {
             color: const Color(0xFFDDE8FF),
             borderRadius: BorderRadius.circular(20),
           ),
-          child: const Center(
-            child: Icon(Icons.people_outline, size: 100, color: kPrimary),
+          child: Center(
+            child: Icon(
+              Icons.people_outline,
+              size: 100,
+              color: context.primary,
+            ),
           ),
         ),
 
@@ -451,7 +456,7 @@ class _HandshakeIllustration extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: kPrimary,
+              color: context.primary,
               borderRadius: BorderRadius.circular(10),
             ),
             child: const Icon(
@@ -505,7 +510,7 @@ class _PlaceholderBox extends StatelessWidget {
               height: 4,
               width: 40,
               decoration: BoxDecoration(
-                color: kPrimary.withOpacity(0.4),
+                color: context.primary.withOpacity(0.4),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -534,14 +539,14 @@ class _Badge extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.verified_outlined, size: 14, color: kPrimary),
+          Icon(Icons.verified_outlined, size: 14, color: context.primary),
           const SizedBox(width: 4),
           Text(
             text,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: Colors.black87,
+              color: context.black87,
             ),
           ),
         ],

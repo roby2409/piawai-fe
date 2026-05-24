@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:piawai/core/constants.dart';
+import 'package:piawai/core/app_colors.dart';
 
 // ─────────────────────────────────────────
 // STATIC CONTENT PAGE
@@ -18,18 +19,18 @@ class StaticContentPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: context.bgOuter,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: context.bgContent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black87),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           title,
-          style: const TextStyle(
-            color: Colors.black87,
+          style: TextStyle(
+            color: context.black87,
             fontWeight: FontWeight.w700,
             fontSize: 16,
           ),
@@ -64,7 +65,7 @@ class _SectionCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.bgCard,
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
@@ -80,20 +81,20 @@ class _SectionCard extends StatelessWidget {
           if (section.title != null) ...[
             Text(
               section.title!,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
-                color: kPrimary,
+                color: context.primary,
               ),
             ),
             const SizedBox(height: 8),
           ],
           Text(
             section.body,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
-              color: Colors.black54,
-              height: 1.6,
+              fontWeight: FontWeight.w500,
+              color: context.textPrimary,
             ),
           ),
         ],

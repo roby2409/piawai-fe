@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:piawai/core/app_colors.dart';
 import 'package:piawai/services/auth_services.dart';
 
 import 'verification_otp_screen.dart';
@@ -66,17 +67,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            color: Colors.black87,
-            size: 20,
-          ),
+          icon: Icon(Icons.arrow_back_ios, color: context.black87, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'forgot_password.title'.tr(),
-          style: const TextStyle(
-            color: Colors.black87,
+          style: TextStyle(
+            color: context.black87,
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
@@ -124,8 +121,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               // Email Label
               Text(
                 'fields.email'.tr(),
-                style: const TextStyle(
-                  color: Colors.black87,
+                style: TextStyle(
+                  color: context.black87,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
