@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
+import 'package:piawai/core/auth_handler.dart';
 import 'package:piawai/core/constants.dart';
 import 'package:piawai/pages/explore/siap_bantu/models/worker_profile_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -19,6 +20,10 @@ class WorkerService {
   }
 
   dynamic _handleResponse(http.Response response) {
+    if (response.statusCode == 401) {
+      handleUnauthorized();
+      throw Exception('Unauthorized');
+    }
     final data = jsonDecode(response.body) as Map<String, dynamic>;
     if (response.statusCode == 200 || response.statusCode == 201) {
       return data['data']; // bisa null (misal delete), bisa Map, bisa List

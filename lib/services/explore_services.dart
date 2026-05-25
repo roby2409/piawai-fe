@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:piawai/core/auth_handler.dart';
 import 'package:piawai/core/constants.dart';
 import 'package:piawai/pages/explore/cari_bantuan/models/explore_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -18,6 +19,10 @@ class ExploreService {
   }
 
   dynamic _handleResponse(http.Response response) {
+    if (response.statusCode == 401) {
+      handleUnauthorized();
+      throw Exception('Unauthorized');
+    }
     final data = jsonDecode(response.body) as Map<String, dynamic>;
     if (response.statusCode == 200 || response.statusCode == 201) {
       return data['data']; // bisa null (misal delete), bisa Map, bisa List

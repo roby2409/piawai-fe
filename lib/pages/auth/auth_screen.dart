@@ -17,12 +17,13 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
   late TabController _tabController;
 
   // Controllers
-  final _emailOrRegisterController = TextEditingController();
+  final _emailOrUsernameController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _usernameController = TextEditingController();
+
+  final _fullNameRegController = TextEditingController();
+  final _usernameRegController = TextEditingController();
   final _emailRegController = TextEditingController();
   final _passwordRegController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
 
   // Services
   final _authService = AuthService();
@@ -30,7 +31,6 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
   bool _isLoading = false;
   bool _showLoginPassword = false;
   bool _showRegisterPassword = false;
-  bool _showConfirmRegisterPassword = false;
 
   @override
   void initState() {
@@ -41,12 +41,12 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
   @override
   void dispose() {
     _tabController.dispose();
-    _emailOrRegisterController.dispose();
+    _emailOrUsernameController.dispose();
     _passwordController.dispose();
-    _usernameController.dispose();
+    _fullNameRegController.dispose();
+    _usernameRegController.dispose();
     _emailRegController.dispose();
     _passwordRegController.dispose();
-    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -82,7 +82,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
   // ─── Email Login ──────────────────────────────────────────────────────────
 
   Future<void> _handleLogin() async {
-    final email = _emailOrRegisterController.text.trim();
+    final email = _emailOrUsernameController.text.trim();
     final password = _passwordController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
@@ -111,24 +111,22 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
   // ─── Email Register ───────────────────────────────────────────────────────
 
   Future<void> _handleRegister() async {
-    final username = _usernameController.text.trim();
+    final fullName = _fullNameRegController.text.trim();
+    final username = _usernameRegController.text.trim();
     final email = _emailRegController.text.trim();
     final password = _passwordRegController.text.trim();
-    final confirmPassword = _confirmPasswordController.text.trim();
 
-    if (username.isEmpty || email.isEmpty || password.isEmpty) {
+    if (fullName.isEmpty ||
+        username.isEmpty ||
+        email.isEmpty ||
+        password.isEmpty) {
       _showSnackbar('validator.semua_fields_required'.tr());
-      return;
-    }
-
-    if (password != confirmPassword) {
-      _showSnackbar('validator.password_not_match'.tr());
       return;
     }
 
     setState(() => _isLoading = true);
     try {
-      await _authService.register(username, email, password);
+      await _authService.register(fullName, username, email, password);
       if (!mounted) return;
 
       _showSnackbar('success_messages.register_success'.tr(), isError: false);
@@ -240,7 +238,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
 
           InputField(
             label: 'fields.email_or_username'.tr(),
-            controller: _emailOrRegisterController,
+            controller: _emailOrUsernameController,
             keyboardType: TextInputType.emailAddress,
             hint: 'field_hints.email'.tr(),
             prefixIcon: Icons.email,
@@ -367,11 +365,20 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
           const SizedBox(height: 20),
 
           InputField(
+            label: 'fields.full_name'.tr(),
+            controller: _fullNameRegController,
+            keyboardType: TextInputType.text,
+            hint: 'field_hints.full_name'.tr(),
+            prefixIcon: Icons.person_outline,
+          ),
+          const SizedBox(height: 20),
+
+          InputField(
             label: 'fields.username'.tr(),
-            controller: _usernameController,
+            controller: _usernameRegController,
             keyboardType: TextInputType.text,
             hint: 'field_hints.username_example'.tr(),
-            prefixIcon: Icons.person,
+            prefixIcon: Icons.alternate_email_outlined,
           ),
           const SizedBox(height: 20),
 
@@ -380,7 +387,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
             controller: _emailRegController,
             keyboardType: TextInputType.emailAddress,
             hint: 'field_hints.email'.tr(),
-            prefixIcon: Icons.email,
+            prefixIcon: Icons.email_outlined,
           ),
           const SizedBox(height: 20),
 
@@ -409,35 +416,6 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
               if (val.length < 6) {
                 return 'validator.password_min'.tr();
               }
-              return null;
-            },
-          ),
-          const SizedBox(height: 20),
-
-          InputField(
-            controller: _confirmPasswordController,
-            label: 'fields.confirm_password'.tr(),
-            hint: 'field_hints.confirm_password'.tr(),
-            prefixIcon: Icons.lock_outline,
-            obscure: !_showConfirmRegisterPassword,
-            suffixIcon: IconButton(
-              icon: Icon(
-                _showConfirmRegisterPassword
-                    ? Icons.visibility_off_outlined
-                    : Icons.visibility_outlined,
-                color: context.primary,
-                size: 20,
-              ),
-              onPressed: () => setState(
-                () => _showConfirmRegisterPassword =
-                    !_showConfirmRegisterPassword,
-              ),
-            ),
-            validator: (val) {
-              if (val == null || val.isEmpty)
-                return 'validator.confirm_password_required'.tr();
-              if (val != _confirmPasswordController.text)
-                return 'validator.password_not_match'.tr();
               return null;
             },
           ),

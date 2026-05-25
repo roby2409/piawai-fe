@@ -29,7 +29,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       title: 'Buka Jasa Sekarang',
       subtitle:
           'Pasang jasa Anda dengan mudah. Kami menitikberatkan kemudahan bagi siapapun untuk mencari dan menawarkan talenta.',
-      badgeText: 'Talenta Terverifikasi',
+      badgeText: null,
       highlightText: null,
       layout: _OnboardingLayout.grid2x2Dark,
       isDark: true,

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
+import 'package:piawai/core/auth_handler.dart';
 import 'package:piawai/core/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -38,6 +39,7 @@ class AuthService {
   // ── Email Register ───────────────────────────────────────────────────────
 
   Future<Map<String, dynamic>> register(
+    String fullName,
     String username,
     String email,
     String password,
@@ -46,6 +48,7 @@ class AuthService {
       Uri.parse('$baseUrl/auth/register'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
+        'full_name': fullName,
         'username': username,
         'email': email,
         'password': password,
@@ -142,6 +145,9 @@ class AuthService {
         'password_confirmation': passwordConfirmation,
       }),
     );
+    if (response.statusCode == 401) {
+      handleUnauthorized();
+    }
     final data = jsonDecode(response.body);
     if (response.statusCode != 200) {
       throw Exception(data['message'] ?? 'Gagal reset password');

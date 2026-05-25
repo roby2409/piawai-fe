@@ -371,20 +371,14 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                   ),
                   ...(_explore?.workers ?? []).map(
                     (worker) => Marker(
-                      point: LatLng(
-                        double.parse(worker.lat ?? '0'),
-                        double.parse(worker.lng ?? '0'),
-                      ),
+                      point: LatLng(worker.lat ?? 0, worker.lng ?? 0),
                       width: 70,
                       height: 80,
                       child: GestureDetector(
                         onTap: () {
                           setState(() => _selectedWorker = worker);
                           _mapController.move(
-                            LatLng(
-                              double.parse(worker.lat ?? '0'),
-                              double.parse(worker.lng ?? '0'),
-                            ),
+                            LatLng(worker.lat ?? 0, worker.lng ?? 0),
                             15.5,
                           );
                         },

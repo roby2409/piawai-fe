@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:piawai/core/auth_handler.dart';
 import 'package:piawai/core/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -14,6 +15,10 @@ class ConfigService {
   }
 
   dynamic _handleResponse(http.Response response) {
+    if (response.statusCode == 401) {
+      handleUnauthorized();
+      throw Exception('Unauthorized');
+    }
     final data = jsonDecode(response.body) as Map<String, dynamic>;
     if (response.statusCode == 200 || response.statusCode == 201) {
       return data;

@@ -15,8 +15,8 @@ class WorkerExploreModel {
   String? gender;
   String? areaLabel;
   bool? isAvailable;
-  String? lat;
-  String? lng;
+  double? lat;
+  double? lng;
   List<String> services;
   double distanceKm;
 
