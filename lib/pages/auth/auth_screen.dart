@@ -17,7 +17,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
   late TabController _tabController;
 
   // Controllers
-  final _emailController = TextEditingController();
+  final _emailOrRegisterController = TextEditingController();
   final _passwordController = TextEditingController();
   final _usernameController = TextEditingController();
   final _emailRegController = TextEditingController();
@@ -41,7 +41,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
   @override
   void dispose() {
     _tabController.dispose();
-    _emailController.dispose();
+    _emailOrRegisterController.dispose();
     _passwordController.dispose();
     _usernameController.dispose();
     _emailRegController.dispose();
@@ -82,7 +82,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
   // ─── Email Login ──────────────────────────────────────────────────────────
 
   Future<void> _handleLogin() async {
-    final email = _emailController.text.trim();
+    final email = _emailOrRegisterController.text.trim();
     final password = _passwordController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
@@ -240,7 +240,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
 
           InputField(
             label: 'fields.email_or_username'.tr(),
-            controller: _emailController,
+            controller: _emailOrRegisterController,
             keyboardType: TextInputType.emailAddress,
             hint: 'field_hints.email'.tr(),
             prefixIcon: Icons.email,
@@ -379,13 +379,13 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
             label: 'fields.email'.tr(),
             controller: _emailRegController,
             keyboardType: TextInputType.emailAddress,
-            hint: 'field_hints.email_example'.tr(),
+            hint: 'field_hints.email'.tr(),
             prefixIcon: Icons.email,
           ),
           const SizedBox(height: 20),
 
           InputField(
-            controller: _passwordController,
+            controller: _passwordRegController,
             label: 'fields.password'.tr(),
             hint: 'field_hints.password'.tr(),
             prefixIcon: Icons.lock_outline,

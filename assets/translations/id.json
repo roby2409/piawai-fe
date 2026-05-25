@@ -36,6 +36,7 @@
   "confirm_location": "Konfirmasi Lokasi",
   "look_profil": "Lihat Profil",
   "email_contact_description": "Email yang digunakan untuk login dan keamanan akun Anda.",
+  "app_version": "Versi {} ({})",
   "general": {
     "loading": "Memuat...",
     "error": "Terjadi kesalahan. Silakan coba lagi.",
@@ -144,7 +145,8 @@
   "siap_bantu": {
     "title": "Siap Bantu",
     "ready_help_mode": "Mode Siap Bantu",
-    "profil_already_complete": "Profilmu sudah lengkap! Pastikan status aktif agar pencari jasa bisa menemukanmu.",
+    "profil_already_complete": "Profilmu sudah lengkap dan aktif! Pencari jasa kini bisa menemukanmu.",
+    "profile_complete_not_active": "Profilmu sudah lengkap! Aktifkan status agar pencari jasa bisa menemukanmu.",
     "profile_not_already": "Lengkapi profilmu agar lebih mudah ditemukan oleh pencari jasa di sekitarmu.",
     "information_profile": "Informasi Profil",
     "information_profile_desc": "Tampilkan wajahmu! Profil yang lengkap membuat pencari jasa lebih percaya dan nyaman menghubungimu.",
@@ -157,7 +159,7 @@
     "edit_services": "Edit Layanan",
     "delete_services": "Hapus Layanan",
     "area_services": "Area Layanan",
-    "setting_services": "Atur Layanan",
+    "set_location": "Atur Lokasi",
     "define_scope_work": "Tentukan jangkauan kerja Anda",
     "location_not_set": "Lokasi belum diatur",
     "tap_set_location": "Tap \"Atur Lokasi\" untuk menentukan titik",

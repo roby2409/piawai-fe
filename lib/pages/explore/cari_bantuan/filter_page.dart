@@ -95,6 +95,7 @@ class _FilterPageState extends State<FilterPage> {
         builder: (_) => AturLokasiPage(
           initialLat: _currentLocation.latitude,
           initialLng: _currentLocation.longitude,
+          radius: _radius,
         ),
       ),
     );
@@ -236,10 +237,21 @@ class _FilterPageState extends State<FilterPage> {
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          Icon(
-                            Icons.chevron_right,
-                            color: context.primary,
-                            size: 18,
+                          Row(
+                            children: [
+                              Text(
+                                "siap_bantu.set_location".tr(),
+                                style: TextStyle(
+                                  color: context.primary,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              Icon(
+                                Icons.chevron_right,
+                                color: context.primary,
+                                size: 18,
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -866,47 +878,6 @@ class _MapPreviewState extends State<_MapPreview> {
                   ],
                 ),
               ],
-            ),
-            // ── Hint label ──
-            Positioned(
-              bottom: 10,
-              left: 10,
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: context.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: context.black.withOpacity(0.12),
-                      blurRadius: 6,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.touch_app_outlined,
-                      size: 14,
-                      color: context.black54,
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      'tap_map_for_move_point'.tr(),
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: context.black87,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
             ),
           ],
         ),

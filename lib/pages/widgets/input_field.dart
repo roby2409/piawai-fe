@@ -14,6 +14,13 @@ class InputField extends StatelessWidget {
   final int? minLines; // ← tambah ini
   final int? maxLength; // ← tambah ini
   final void Function(String)? onChanged;
+  final Widget? Function(
+    BuildContext, {
+    required int currentLength,
+    required bool isFocused,
+    int? maxLength,
+  })?
+  buildCounter;
 
   const InputField({
     super.key,
@@ -29,6 +36,7 @@ class InputField extends StatelessWidget {
     this.minLines, // ← tambah ini
     this.maxLength,
     this.onChanged,
+    this.buildCounter,
   });
 
   @override
@@ -43,6 +51,7 @@ class InputField extends StatelessWidget {
       validator: validator,
       keyboardType: keyboardType,
       style: TextStyle(fontSize: 14, color: context.textPrimary),
+      buildCounter: buildCounter,
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,

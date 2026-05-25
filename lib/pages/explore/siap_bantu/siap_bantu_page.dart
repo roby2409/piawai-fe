@@ -180,9 +180,11 @@ class _SiapBantuPageState extends State<SiapBantuPage> {
                   SizedBox(height: 4),
                   Text(
                     textAlign: TextAlign.center,
-                    (_profile?.isProfileComplete ?? false)
-                        ? 'siap_bantu.profil_already_complete'.tr()
-                        : 'siap_bantu.profile_not_already'.tr(),
+                    !(_profile?.isProfileComplete ?? false)
+                        ? 'siap_bantu.profile_not_already'.tr()
+                        : !(_profile?.isAvailable ?? false)
+                        ? 'siap_bantu.profile_complete_not_active'.tr()
+                        : 'siap_bantu.profil_already_complete'.tr(),
                     style: TextStyle(color: context.black87, fontSize: 13),
                   ),
                   SizedBox(height: 20),
@@ -248,12 +250,37 @@ class _SiapBantuPageState extends State<SiapBantuPage> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(
-                                  item.icon,
-                                  size: 22,
-                                  color: isActive
-                                      ? context.primary
-                                      : context.textSecondary,
+                                Stack(
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                    Icon(
+                                      item.icon,
+                                      size: 22,
+                                      color: isActive
+                                          ? context.primary
+                                          : context.textSecondary,
+                                    ),
+                                    if (index == 4) // hanya di Status
+                                      Positioned(
+                                        top: -2,
+                                        right: -4,
+                                        child: Container(
+                                          width: 8,
+                                          height: 8,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color:
+                                                !(_profile?.isProfileComplete ??
+                                                    false)
+                                                ? Colors.red
+                                                : !(_profile?.isAvailable ??
+                                                      false)
+                                                ? Colors.orange
+                                                : Colors.green,
+                                          ),
+                                        ),
+                                      ),
+                                  ],
                                 ),
                                 const SizedBox(height: 4),
                                 Text(

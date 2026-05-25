@@ -36,6 +36,7 @@
   "confirm_location": "Confirm Location",
   "look_profil": "View Profile",
   "email_contact_description": "Email used for login and securing your account.",
+  "app_version": "Version {} ({})",
   "general": {
     "loading": "Loading...",
     "error": "An error occurred. Please try again.",
@@ -145,7 +146,8 @@
   "siap_bantu": {
     "title": "Ready to Help",
     "ready_help_mode": "Ready to Help Mode",
-    "profil_already_complete": "Your profile is complete! Make sure your status is active so service seekers can find you.",
+    "profil_already_complete": "Your profile is complete and active! Service seekers can now find you.",
+    "profile_complete_not_active": "Your profile is complete! Activate your status so service seekers can find you.",
     "profile_not_already": "Complete your profile to be more easily found by service seekers near you.",
     "information_profile": "Profile Information",
     "information_profile_desc": "Show your face! A complete profile makes service seekers more trusting and comfortable contacting you.",
@@ -158,7 +160,7 @@
     "edit_services": "Edit Service",
     "delete_services": "Delete Service",
     "area_services": "Service Area",
-    "setting_services": "Manage Services",
+    "set_location": "Set Location",
     "define_scope_work": "Define your work coverage area",
     "location_not_set": "Location not set",
     "tap_set_location": "Tap \"Set Location\" to set a point",

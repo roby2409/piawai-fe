@@ -5,6 +5,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:piawai/core/app_colors.dart';
 import 'package:piawai/pages/explore/siap_bantu/models/worker_profile_model.dart';
+import 'package:piawai/pages/widgets/input_field.dart';
 import 'package:piawai/services/worker_services.dart';
 
 class TentangSection extends StatefulWidget {
@@ -109,8 +110,9 @@ class TentangSectionState extends State<TentangSection> {
               const SizedBox(height: 8),
               Stack(
                 children: [
-                  TextField(
+                  InputField(
                     controller: _bioController,
+                    hint: 'field_hints.about_me_bio'.tr(),
                     maxLines: 6,
                     maxLength: _maxChars,
                     buildCounter:
@@ -121,23 +123,6 @@ class TentangSectionState extends State<TentangSection> {
                           maxLength,
                         }) => null, // hide default counter
                     onChanged: (_) => setState(() {}),
-                    decoration: InputDecoration(
-                      hintText: 'field_hints.about_me_bio'.tr(),
-                      hintStyle: TextStyle(fontSize: 13, color: context.grey),
-                      contentPadding: const EdgeInsets.fromLTRB(12, 12, 12, 38),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: context.primary),
-                      ),
-                    ),
                   ),
                   // Character counter bottom-right
                   Positioned(
@@ -179,7 +164,6 @@ class TentangSectionState extends State<TentangSection> {
               ),
               const SizedBox(height: 24),
 
-              // Save button
               // Save button
               SizedBox(
                 width: double.infinity,

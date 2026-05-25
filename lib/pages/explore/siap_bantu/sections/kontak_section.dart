@@ -40,6 +40,10 @@ class KontakSectionState extends State<KontakSection> {
       _phoneController.text = initialProfile.phoneWa ?? "";
       _igController.text = initialProfile.instagram ?? "";
     }
+
+    _phoneController.addListener(() {
+      setState(() {});
+    });
   }
 
   @override

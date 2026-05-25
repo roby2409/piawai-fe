@@ -12,6 +12,7 @@ import 'package:piawai/services/worker_services.dart';
 
 import 'language_page.dart';
 import 'bantuan_page.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 // ─────────────────────────────────────────
 // PENGATURAN PAGE
@@ -30,11 +31,18 @@ class _PengaturanPageState extends State<PengaturanPage> {
   WorkerProfileModel? _profile;
   bool _isLoading = true;
   String? _errorMessage;
+  String _version = '';
 
   @override
   void initState() {
     super.initState();
     _loadAll();
+    _loadVersion();
+  }
+
+  Future<void> _loadVersion() async {
+    final info = await PackageInfo.fromPlatform();
+    setState(() => _version = info.version);
   }
 
   Future<void> _loadAll() async {
@@ -235,10 +243,10 @@ class _PengaturanPageState extends State<PengaturanPage> {
         ),
         const SizedBox(height: 16),
 
-        const Center(
+        Center(
           child: Text(
-            'Versi 2.4.1 (2024)',
-            style: TextStyle(fontSize: 12, color: Colors.grey),
+            'app_version'.tr(args: [_version, '${DateTime.now().year}']),
+            style: const TextStyle(fontSize: 12, color: Colors.grey),
           ),
         ),
         const SizedBox(height: 24),
@@ -255,7 +263,7 @@ class ProfileCard extends StatelessWidget {
   const ProfileCard({super.key, required this.profile});
 
   String get _initials {
-    final parts = profile.fullName.trim().split(' ');
+    final parts = profile.username.trim().split(' ');
     if (parts.length >= 2) {
       return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
     }
@@ -307,7 +315,7 @@ class ProfileCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  profile.fullName,
+                  profile.fullName ?? "",
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,

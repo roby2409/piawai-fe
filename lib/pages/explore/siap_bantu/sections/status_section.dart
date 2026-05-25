@@ -30,6 +30,9 @@ class StatusSectionState extends State<StatusSection> {
     _isAvailable = widget.initialProfile?.isAvailable ?? false;
   }
 
+  bool get _isProfileComplete =>
+      widget.initialProfile?.isProfileComplete ?? false;
+
   Future<void> _saveStatus() async {
     setState(() => _isSaving = true);
     try {
@@ -74,7 +77,7 @@ class StatusSectionState extends State<StatusSection> {
             decoration: BoxDecoration(
               color: context.bgContent,
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: context.black87),
+              border: Border.all(color: context.divider),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -108,8 +111,8 @@ class StatusSectionState extends State<StatusSection> {
                   scale: 0.9,
                   child: Switch(
                     value: _isAvailable,
-                    onChanged: _isSaving
-                        ? null
+                    onChanged: (_isSaving || !_isProfileComplete)
+                        ? null // ← disable kalau belum complete atau lagi saving
                         : (val) => setState(() => _isAvailable = val),
                     activeColor: context.white,
                     activeTrackColor: context.primary,
@@ -122,6 +125,34 @@ class StatusSectionState extends State<StatusSection> {
           ),
           const SizedBox(height: 16),
 
+          if (!_isProfileComplete) ...[
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: Colors.red.withOpacity(0.08),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.red.withOpacity(0.3)),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    Icons.warning_amber_outlined,
+                    size: 20,
+                    color: Colors.red,
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      'siap_bantu.profile_not_already'.tr(),
+                      style: TextStyle(fontSize: 12, color: Colors.red),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
           // ── Info Box ──
           AnimatedContainer(
             duration: const Duration(milliseconds: 300),
@@ -143,7 +174,7 @@ class StatusSectionState extends State<StatusSection> {
                 Icon(
                   Icons.info_outline,
                   size: 20,
-                  color: _isAvailable ? context.primary : context.grey,
+                  color: _isAvailable ? context.primary : context.textSecondary,
                 ),
                 const SizedBox(width: 10),
                 Expanded(
@@ -153,7 +184,9 @@ class StatusSectionState extends State<StatusSection> {
                         : 'siap_bantu.status_is_not_active'.tr(),
                     style: TextStyle(
                       fontSize: 12,
-                      color: _isAvailable ? context.primary : context.grey,
+                      color: _isAvailable
+                          ? context.primary
+                          : context.textSecondary,
                     ),
                   ),
                 ),

@@ -90,48 +90,9 @@ class AreaSectionState extends State<AreaSection> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // ── Title Row ──
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'siap_bantu.area_services'.tr(),
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              GestureDetector(
-                onTap: () async {
-                  final result = await Navigator.push<Map<String, dynamic>>(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) =>
-                          AturLokasiPage(initialLat: _lat, initialLng: _lng),
-                    ),
-                  );
-
-                  // ← terima data balik dari AturLokasiPage
-                  if (result != null) {
-                    setState(() {
-                      _lat = result['lat'];
-                      _lng = result['lng'];
-                      _areaLabel = result['area_label'];
-                    });
-                  }
-                },
-                child: Row(
-                  children: [
-                    Text(
-                      "siap_bantu.setting_services".tr(),
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: context.primary,
-                      ),
-                    ),
-                    SizedBox(width: 2),
-                    Icon(Icons.chevron_right, size: 18, color: context.primary),
-                  ],
-                ),
-              ),
-            ],
+          Text(
+            'siap_bantu.area_services'.tr(),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 4),
           Text(
@@ -141,67 +102,100 @@ class AreaSectionState extends State<AreaSection> {
           const SizedBox(height: 16),
 
           // ── Map Card ──
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: context.bgOuter),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: Column(
-              children: [
-                _lat != null && _lng != null
-                    ? _LocationSudahDiatur(lat: _lat, lng: _lng)
-                    : _LokasiBelumDiatur(),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 12,
-                  ),
-                  color: context.bgCard,
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: context.primary.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(
-                          Icons.my_location,
-                          color: context.primary,
-                          size: 18,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              _areaLabel ?? 'siap_bantu.location_not_set'.tr(),
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              _lat != null && _lng != null
-                                  ? '${_lat!.toStringAsFixed(4)}, ${_lng!.toStringAsFixed(4)}'
-                                  : 'siap_bantu.tap_set_location'.tr(),
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: context.textSecondary,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+          GestureDetector(
+            onTap: () async {
+              final result = await Navigator.push<Map<String, dynamic>>(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => AturLokasiPage(
+                    initialLat: _lat,
+                    initialLng: _lng,
+                    radius: _radius,
                   ),
                 ),
-              ],
+              );
+
+              // ← terima data balik dari AturLokasiPage
+              if (result != null) {
+                setState(() {
+                  _lat = result['lat'];
+                  _lng = result['lng'];
+                  _areaLabel = result['area_label'];
+                });
+              }
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: context.bgOuter),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: Column(
+                children: [
+                  _lat != null && _lng != null
+                      ? _LocationSudahDiatur(
+                          lat: _lat,
+                          lng: _lng,
+                          currentRadius: _radius.toInt(),
+                        )
+                      : _LokasiBelumDiatur(),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 12,
+                    ),
+                    color: context.bgCard,
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: context.primary.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            Icons.my_location,
+                            color: context.primary,
+                            size: 18,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _areaLabel ??
+                                    'siap_bantu.location_not_set'.tr(),
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                _lat != null && _lng != null
+                                    ? '${_lat!.toStringAsFixed(4)}, ${_lng!.toStringAsFixed(4)}'
+                                    : 'siap_bantu.tap_set_location'.tr(),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: context.textSecondary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Icon(
+                          Icons.zoom_out_map,
+                          size: 16,
+                          color: context.primary,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 24),
@@ -328,53 +322,63 @@ class AreaSectionState extends State<AreaSection> {
 }
 
 class _LocationSudahDiatur extends StatelessWidget {
-  const _LocationSudahDiatur({required double? lat, required double? lng})
-    : _lat = lat,
-      _lng = lng;
+  const _LocationSudahDiatur({
+    required double? lat,
+    required double? lng,
+    required int currentRadius,
+  }) : _lat = lat,
+       _lng = lng,
+       _currentRadius = currentRadius;
 
   final double? _lat;
   final double? _lng;
+  final int _currentRadius;
+
+  double get radius => _currentRadius.toDouble();
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: 160, // ← wajib ada
-      child: FlutterMap(
-        options: MapOptions(
-          initialCenter: LatLng(_lat!, _lng!),
-          initialZoom: 13,
-          interactionOptions: const InteractionOptions(
-            flags: InteractiveFlag.none,
+      child: AbsorbPointer(
+        child: FlutterMap(
+          options: MapOptions(
+            initialCenter: LatLng(_lat!, _lng!),
+            initialZoom: 13,
+            interactionOptions: const InteractionOptions(
+              flags: InteractiveFlag.none,
+            ),
           ),
-        ),
-        children: [
-          buildTileLayer(context),
-          CircleLayer(
-            circles: [
-              CircleMarker(
-                point: LatLng(_lat!, _lng!),
-                radius: 40,
-                color: context.primary.withOpacity(0.2),
-                borderColor: context.primary.withOpacity(0.6),
-                borderStrokeWidth: 2,
-              ),
-            ],
-          ),
-          MarkerLayer(
-            markers: [
-              Marker(
-                point: LatLng(_lat!, _lng!),
-                width: 32,
-                height: 32,
-                child: Icon(
-                  Icons.my_location,
-                  color: context.primary,
-                  size: 28,
+          children: [
+            buildTileLayer(context),
+            CircleLayer(
+              circles: [
+                CircleMarker(
+                  point: LatLng(_lat!, _lng!),
+                  radius: radius * 1000,
+                  useRadiusInMeter: true,
+                  color: context.primary.withOpacity(0.1),
+                  borderColor: context.primary.withOpacity(0.4),
+                  borderStrokeWidth: 1.5,
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+            MarkerLayer(
+              markers: [
+                Marker(
+                  point: LatLng(_lat!, _lng!),
+                  width: 32,
+                  height: 32,
+                  child: Icon(
+                    Icons.my_location,
+                    color: context.primary,
+                    size: 28,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
