@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:piawai/core/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:piawai/core/app_colors.dart';
 import 'package:piawai/pages/auth/auth_screen.dart';
@@ -9,7 +10,7 @@ import 'package:piawai/pages/settings/kata_password_page.dart';
 import 'package:piawai/services/auth_services.dart';
 import 'package:piawai/services/theme_service.dart';
 import 'package:piawai/services/worker_services.dart';
-
+import 'package:url_launcher/url_launcher.dart';
 import 'language_page.dart';
 import 'bantuan_page.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -186,10 +187,15 @@ class _PengaturanPageState extends State<PengaturanPage> {
             _SettingsItem(
               icon: Icons.privacy_tip_outlined,
               label: 'settings.help_section.privacy_policy'.tr(),
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const KebijakanPrivasiPage()),
-              ),
+              onTap: () async {
+                final Uri url = Uri.parse('$baseUrl/privacy-policy');
+                if (!await launchUrl(
+                  url,
+                  mode: LaunchMode.externalApplication,
+                )) {
+                  debugPrint('Could not launch $url');
+                }
+              },
             ),
             _SettingsItem(
               icon: Icons.description_outlined,
