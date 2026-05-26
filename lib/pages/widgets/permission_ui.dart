@@ -4,6 +4,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:piawai/core/app_colors.dart';
 import 'package:piawai/core/constants.dart';
 
 class PermissionUI extends StatelessWidget {
@@ -19,7 +20,7 @@ class PermissionUI extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.bgOuter,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(32),

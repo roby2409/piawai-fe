@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:piawai/core/app_colors.dart';
 import 'package:piawai/services/explore_services.dart';
 
@@ -18,6 +19,11 @@ class _SearchPageState extends State<SearchPage> {
   late final TextEditingController _ctrl;
   late final FocusNode _focusNode;
   final _exploreService = ExploreService();
+
+  BannerAd? _bannerAd;
+  bool _isLoaded = false;
+
+  final adUnitId = 'ca-app-pub-3940256099942544/6300978111';
 
   Timer? _debounce;
 
@@ -40,6 +46,28 @@ class _SearchPageState extends State<SearchPage> {
     );
     // Load popular suggestions saat pertama buka
     _fetchSuggestions('');
+    _loadAd();
+  }
+
+  void _loadAd() {
+    _bannerAd?.dispose();
+    _bannerAd = null;
+    _isLoaded = false;
+
+    _bannerAd = BannerAd(
+      adUnitId: adUnitId,
+      request: const AdRequest(),
+      size: AdSize.banner,
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          if (mounted) setState(() => _isLoaded = true);
+        },
+        onAdFailedToLoad: (ad, err) {
+          ad.dispose();
+          _bannerAd = null;
+        },
+      ),
+    )..load();
   }
 
   @override
@@ -47,6 +75,8 @@ class _SearchPageState extends State<SearchPage> {
     _debounce?.cancel();
     _ctrl.dispose();
     _focusNode.dispose();
+    _bannerAd?.dispose();
+    _bannerAd = null;
     super.dispose();
   }
 
@@ -229,6 +259,18 @@ class _SearchPageState extends State<SearchPage> {
                   ],
                 ),
               ),
+              if (_isLoaded && _bannerAd != null)
+                SizedBox(
+                  width: double.infinity,
+                  height: _bannerAd!.size.height.toDouble(),
+                  child: Center(
+                    child: SizedBox(
+                      width: _bannerAd!.size.width.toDouble(),
+                      height: _bannerAd!.size.height.toDouble(),
+                      child: AdWidget(ad: _bannerAd!),
+                    ),
+                  ),
+                ),
             ],
           ),
         ),

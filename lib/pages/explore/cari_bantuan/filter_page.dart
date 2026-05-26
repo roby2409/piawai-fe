@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:piawai/core/app_colors.dart';
@@ -50,6 +51,11 @@ class _FilterPageState extends State<FilterPage> {
 
   final MapController _previewMapController = MapController();
 
+  BannerAd? _bannerAd;
+  bool _isLoaded = false;
+
+  final adUnitId = 'ca-app-pub-3940256099942544/6300978111';
+
   @override
   void initState() {
     super.initState();
@@ -59,6 +65,35 @@ class _FilterPageState extends State<FilterPage> {
     _radius = init?.radiusKm ?? 15;
     _currentLocation = init?.locationLatLng ?? widget.myLocation;
     _locationLabel = init?.location ?? 'my_location'.tr();
+    _loadAd();
+  }
+
+  void _loadAd() {
+    _bannerAd?.dispose();
+    _bannerAd = null;
+    _isLoaded = false;
+
+    _bannerAd = BannerAd(
+      adUnitId: adUnitId,
+      request: const AdRequest(),
+      size: AdSize.banner,
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          if (mounted) setState(() => _isLoaded = true);
+        },
+        onAdFailedToLoad: (ad, err) {
+          ad.dispose();
+          _bannerAd = null;
+        },
+      ),
+    )..load();
+  }
+
+  @override
+  void dispose() {
+    _bannerAd?.dispose();
+    _bannerAd = null;
+    super.dispose();
   }
 
   void _reset() async {
@@ -341,6 +376,18 @@ class _FilterPageState extends State<FilterPage> {
               ),
             ),
           ),
+          if (_isLoaded && _bannerAd != null)
+            SizedBox(
+              width: double.infinity,
+              height: _bannerAd!.size.height.toDouble(),
+              child: Center(
+                child: SizedBox(
+                  width: _bannerAd!.size.width.toDouble(),
+                  height: _bannerAd!.size.height.toDouble(),
+                  child: AdWidget(ad: _bannerAd!),
+                ),
+              ),
+            ),
           _ApplyButton(onTap: _apply),
         ],
       ),
