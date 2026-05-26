@@ -4,6 +4,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:piawai/core/app_colors.dart';
+import 'package:piawai/core/snackbar_helper.dart';
 import 'package:piawai/pages/explore/siap_bantu/models/worker_profile_model.dart';
 import 'package:piawai/pages/widgets/input_field.dart';
 import 'package:piawai/services/worker_services.dart';
@@ -59,8 +60,9 @@ class TentangSectionState extends State<TentangSection> {
       widget.onDataChanged?.call();
     } catch (e) {
       setState(() => _isRefetching = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('general.fetch_failed'.tr(args: ['$e']))),
+      SnackBarHelper.showErrorSnackBar(
+        context,
+        'general.fetch_failed'.tr(args: ['$e']),
       );
     }
   }

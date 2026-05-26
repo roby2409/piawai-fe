@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:piawai/core/app_colors.dart';
+import 'package:piawai/core/snackbar_helper.dart';
 import 'package:piawai/pages/auth/forgot_password_screen.dart';
 import 'package:piawai/pages/main_page.dart';
 import 'package:piawai/pages/widgets/input_field.dart';
@@ -60,11 +61,12 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
 
       final isNewUser = data['is_new_user'] == true;
 
-      _showSnackbar(
+      SnackBarHelper.showSuccessSnackBar(
+        context,
         isNewUser
             ? 'success_messages.register_account_success'.tr()
             : 'success_messages.welcome_back'.tr(),
-        isError: false,
+        floating: true,
       );
 
       // TODO: Navigate ke halaman utama
@@ -73,7 +75,11 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
         MaterialPageRoute(builder: (_) => MainPage()),
       );
     } catch (e) {
-      _showSnackbar(e.toString().replaceFirst('Exception: ', ''));
+      SnackBarHelper.showErrorSnackBar(
+        context,
+        e.toString().replaceFirst('Exception: ', ''),
+        floating: true,
+      );
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -86,7 +92,12 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
     final password = _passwordController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
-      _showSnackbar('email_password_required'.tr());
+      SnackBarHelper.showSnackBar(
+        context,
+        'validator.email_password_required'.tr(),
+        backgroundColor: Colors.orange,
+        floating: true,
+      );
       return;
     }
 
@@ -95,14 +106,22 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
       await _authService.login(email, password);
       if (!mounted) return;
 
-      _showSnackbar('success_messages.login_success'.tr(), isError: false);
+      SnackBarHelper.showSuccessSnackBar(
+        context,
+        'success_messages.login_success'.tr(),
+        floating: true,
+      );
       // TODO: Navigate ke halaman utama
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => MainPage()),
       );
     } catch (e) {
-      _showSnackbar(e.toString().replaceFirst('Exception: ', ''));
+      SnackBarHelper.showErrorSnackBar(
+        context,
+        e.toString().replaceFirst('Exception: ', ''),
+        floating: true,
+      );
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -120,7 +139,12 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
         username.isEmpty ||
         email.isEmpty ||
         password.isEmpty) {
-      _showSnackbar('validator.semua_fields_required'.tr());
+      SnackBarHelper.showSnackBar(
+        context,
+        'validator.semua_fields_required'.tr(),
+        backgroundColor: Colors.orange,
+        floating: true,
+      );
       return;
     }
 
@@ -129,24 +153,21 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
       await _authService.register(fullName, username, email, password);
       if (!mounted) return;
 
-      _showSnackbar('success_messages.register_success'.tr(), isError: false);
+      SnackBarHelper.showSuccessSnackBar(
+        context,
+        'success_messages.register_success'.tr(),
+        floating: true,
+      );
       _tabController.animateTo(0); // Switch ke tab login
     } catch (e) {
-      _showSnackbar(e.toString().replaceFirst('Exception: ', ''));
+      SnackBarHelper.showErrorSnackBar(
+        context,
+        e.toString().replaceFirst('Exception: ', ''),
+        floating: true,
+      );
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
-  }
-
-  void _showSnackbar(String message, {bool isError = true}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: isError ? Colors.red : Colors.green,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
-    );
   }
 
   // ─── Build ─────────────────────────────────────────────────────────────────
@@ -227,7 +248,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
       padding: const EdgeInsets.all(20),
       child: ListView(
         children: [
-          const SizedBox(height: 40),
+          const SizedBox(height: 20),
 
           // Google Sign In Button
           _GoogleSignInButton(
@@ -369,7 +390,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
       padding: const EdgeInsets.all(20),
       child: ListView(
         children: [
-          const SizedBox(height: 40),
+          const SizedBox(height: 20),
 
           // Google Sign Up Button
           _GoogleSignInButton(

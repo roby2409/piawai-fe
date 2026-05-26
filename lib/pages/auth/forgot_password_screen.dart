@@ -1,6 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:piawai/core/app_colors.dart';
+import 'package:piawai/core/snackbar_helper.dart';
+import 'package:piawai/pages/widgets/input_field.dart';
 import 'package:piawai/services/auth_services.dart';
 
 import 'verification_otp_screen.dart';
@@ -48,12 +50,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       );
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.toString().replaceAll('Exception: ', '')),
-          backgroundColor: Colors.redAccent,
-        ),
-      );
+      SnackBarHelper.showErrorSnackBar(context, e.toString());
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -62,12 +59,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: context.bgOuter,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: context.bgContent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: context.black87, size: 20),
+          icon: Icon(Icons.arrow_back_ios, color: context.primary, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -81,11 +78,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(
-              Icons.mail_outline,
-              color: Color(0xFF4DD9C0),
-              size: 22,
-            ),
+            icon: Icon(Icons.mail_outline, color: context.primary, size: 22),
             onPressed: () {},
           ),
         ],
@@ -99,17 +92,21 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               const SizedBox(height: 48),
 
               // Illustration
-              Center(child: _EnvelopeLockIcon()),
-
-              const SizedBox(height: 36),
+              Center(
+                child: Image(
+                  image: AssetImage("assets/images/forgot_password.png"),
+                  width: 250,
+                  height: 250,
+                ),
+              ),
 
               // Description Text
               Center(
                 child: Text(
                   'forgot_password.description'.tr(),
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Colors.black54,
+                  style: TextStyle(
+                    color: context.textSecondary,
                     fontSize: 14,
                     height: 1.6,
                   ),
@@ -118,57 +115,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
               const SizedBox(height: 32),
 
-              // Email Label
-              Text(
-                'fields.email'.tr(),
-                style: TextStyle(
-                  color: context.black87,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-
-              const SizedBox(height: 8),
-
               // Email TextField
-              TextField(
+              InputField(
                 controller: _emailController,
+                hint: 'field_hints.email'.tr(),
                 keyboardType: TextInputType.emailAddress,
-                enabled: !_isLoading,
-                style: const TextStyle(fontSize: 14, color: Colors.black87),
-                decoration: InputDecoration(
-                  hintText: 'field_hints.email'.tr(),
-                  hintStyle: const TextStyle(
-                    color: Colors.black38,
-                    fontSize: 14,
-                  ),
-                  prefixIcon: const Icon(
-                    Icons.mail_outline,
-                    color: Colors.black38,
-                    size: 20,
-                  ),
-                  filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: const EdgeInsets.symmetric(
-                    vertical: 14,
-                    horizontal: 16,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(
-                      color: Color(0xFF4DD9C0),
-                      width: 1.5,
-                    ),
-                  ),
-                ),
               ),
 
               const SizedBox(height: 20),
@@ -182,12 +133,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       ? _kirimKode
                       : null,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF4DD9C0),
-                    disabledBackgroundColor: const Color(0xFFB0EDE5),
+                    backgroundColor: context.primary,
+                    disabledBackgroundColor: const Color(0xFFD1D5DB),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 15),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    elevation: 0,
                   ),
                   child: _isLoading
                       ? const SizedBox(
@@ -226,7 +178,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               Center(
                 child: Text(
                   'forgot_password.button_hint'.tr(),
-                  style: const TextStyle(color: Colors.black38, fontSize: 12),
+                  style: TextStyle(color: context.textSecondary, fontSize: 12),
                 ),
               ),
 
@@ -237,7 +189,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 child: RichText(
                   text: TextSpan(
                     text: 'forgot_password.ingat_password'.tr(),
-                    style: const TextStyle(color: Colors.black54, fontSize: 13),
+                    style: TextStyle(
+                      color: context.textSecondary,
+                      fontSize: 14,
+                    ),
                     children: [
                       WidgetSpan(
                         child: GestureDetector(
@@ -264,76 +219,4 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       ),
     );
   }
-}
-
-/// Custom envelope with lock illustration
-class _EnvelopeLockIcon extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 110,
-      height: 110,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          // Envelope body
-          Positioned(
-            bottom: 0,
-            child: Container(
-              width: 100,
-              height: 72,
-              decoration: BoxDecoration(
-                color: const Color(0xFF4DD9C0),
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-          ),
-          // Envelope flap (triangle)
-          Positioned(
-            bottom: 36,
-            child: CustomPaint(
-              size: const Size(100, 40),
-              painter: _EnvelopeFlapPainter(),
-            ),
-          ),
-          // Lock icon circle background
-          Positioned(
-            top: 0,
-            right: 4,
-            child: Container(
-              width: 34,
-              height: 34,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-              ),
-              child: const Center(
-                child: Icon(Icons.lock, color: Color(0xFF4DD9C0), size: 18),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _EnvelopeFlapPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color(0xFF3BCFB8)
-      ..style = PaintingStyle.fill;
-
-    final path = Path()
-      ..moveTo(0, 0)
-      ..lineTo(size.width / 2, size.height)
-      ..lineTo(size.width, 0)
-      ..close();
-
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

@@ -65,7 +65,7 @@ class _VerificationOtpSuccessScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: context.bgContent,
       body: SafeArea(
         child: Center(
           child: FadeTransition(
@@ -119,10 +119,11 @@ class _VerificationOtpSuccessScreenState
                   Text(
                     'verification_otp_success.description'.tr(),
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: Colors.black45,
+                    style: TextStyle(
+                      color: context.textSecondary,
                       fontSize: 13,
                       height: 1.6,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
 

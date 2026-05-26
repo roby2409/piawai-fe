@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:piawai/core/app_colors.dart';
+import 'package:piawai/core/snackbar_helper.dart';
 import 'package:piawai/pages/auth/verification_otp_success_screen.dart';
 import 'package:piawai/services/auth_services.dart';
 
@@ -73,12 +74,7 @@ class _VerificationOtpScreenState extends State<VerificationOtpScreen> {
       _focusNodes[0].requestFocus();
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.toString().replaceAll('Exception: ', '')),
-          backgroundColor: Colors.redAccent,
-        ),
-      );
+      SnackBarHelper.showErrorSnackBar(context, e.toString());
     }
   }
 
@@ -96,12 +92,7 @@ class _VerificationOtpScreenState extends State<VerificationOtpScreen> {
       );
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.toString().replaceAll('Exception: ', '')),
-          backgroundColor: Colors.redAccent,
-        ),
-      );
+      SnackBarHelper.showErrorSnackBar(context, e.toString());
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -128,21 +119,17 @@ class _VerificationOtpScreenState extends State<VerificationOtpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: context.bgOuter,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: context.bgContent,
         elevation: 0,
         leading: IconButton(
-          icon:  Icon(
-            Icons.arrow_back_ios,
-            color: context.black87,
-            size: 20,
-          ),
+          icon: Icon(Icons.arrow_back_ios, color: context.black87, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'verification_otp.title'.tr(),
-          style:  TextStyle(
+          style: TextStyle(
             color: context.black87,
             fontSize: 16,
             fontWeight: FontWeight.w600,
@@ -176,29 +163,18 @@ class _VerificationOtpScreenState extends State<VerificationOtpScreen> {
               const SizedBox(height: 24),
 
               // Illustration Card
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 28),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.04),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+              Center(
+                child: Image(
+                  image: AssetImage("assets/images/verification_otp.png"),
+                  width: 250,
+                  height: 250,
                 ),
-                child: Center(child: _EmailIllustration()),
               ),
-
-              const SizedBox(height: 28),
 
               // Title
               Text(
                 'verification_otp.heading'.tr(),
-                style:  TextStyle(
+                style: TextStyle(
                   color: context.black87,
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
@@ -211,12 +187,16 @@ class _VerificationOtpScreenState extends State<VerificationOtpScreen> {
               RichText(
                 text: TextSpan(
                   text: 'verification_otp.description'.tr(),
-                  style: const TextStyle(color: Colors.black54, fontSize: 13),
+                  style: TextStyle(
+                    color: context.black87,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
                   children: [
                     TextSpan(
                       text: widget.email,
-                      style:  TextStyle(
-                        color: context.black87,
+                      style: TextStyle(
+                        color: context.primary,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -253,18 +233,15 @@ class _VerificationOtpScreenState extends State<VerificationOtpScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.access_time_rounded,
                       size: 16,
-                      color: Colors.black45,
+                      color: context.black45,
                     ),
                     const SizedBox(width: 6),
                     Text(
                       'verification_otp.resend_countdown'.tr(),
-                      style: const TextStyle(
-                        color: Colors.black54,
-                        fontSize: 13,
-                      ),
+                      style: TextStyle(color: context.black87, fontSize: 13),
                     ),
                     Text(
                       _timerText,
@@ -291,12 +268,13 @@ class _VerificationOtpScreenState extends State<VerificationOtpScreen> {
                       ? _verifyOtp
                       : null,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF4DD9C0),
-                    disabledBackgroundColor: const Color(0xFFCDD3DA),
+                    backgroundColor: context.primary,
+                    disabledBackgroundColor: const Color(0xFFD1D5DB),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 15),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    elevation: 0,
                   ),
                   child: _isLoading
                       ? const SizedBox(
@@ -340,7 +318,7 @@ class _VerificationOtpScreenState extends State<VerificationOtpScreen> {
                 child: RichText(
                   text: TextSpan(
                     text: 'verification_otp.ingat_password'.tr(),
-                    style: const TextStyle(color: Colors.black54, fontSize: 13),
+                    style: TextStyle(color: context.black54, fontSize: 13),
                     children: [
                       WidgetSpan(
                         child: GestureDetector(
@@ -396,7 +374,7 @@ class _OtpBox extends StatelessWidget {
         maxLength: 1,
         enabled: enabled,
         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-        style:  TextStyle(
+        style: TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.w700,
           color: context.black87,
@@ -405,7 +383,7 @@ class _OtpBox extends StatelessWidget {
         decoration: InputDecoration(
           counterText: '',
           filled: true,
-          fillColor: Colors.white,
+          fillColor: context.bgCard,
           contentPadding: EdgeInsets.zero,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),

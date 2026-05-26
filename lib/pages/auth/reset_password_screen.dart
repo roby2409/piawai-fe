@@ -1,6 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:piawai/core/app_colors.dart';
+import 'package:piawai/core/snackbar_helper.dart';
+import 'package:piawai/pages/auth/auth_screen.dart';
 import 'package:piawai/pages/auth/reset_password_success_screen.dart';
 import 'package:piawai/pages/widgets/input_field.dart';
 import 'package:piawai/services/auth_services.dart';
@@ -50,12 +52,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       );
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.toString().replaceFirst('Exception: ', '')),
-          backgroundColor: Colors.redAccent,
-        ),
-      );
+      SnackBarHelper.showErrorSnackBar(context, e.toString());
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -64,12 +61,12 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: context.bgOuter,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: context.bgContent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: context.black87, size: 20),
+          icon: Icon(Icons.arrow_back_ios, color: context.primary, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -98,46 +95,14 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
               children: [
                 const SizedBox(height: 24),
 
-                // Illustration Card
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 28),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      _LockSuccessIllustration(),
-                      const SizedBox(height: 12),
-                      Text(
-                        'reset_password.illustration_title'.tr(),
-                        style: TextStyle(
-                          color: context.primary,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'reset_password.illustration_subtitle'.tr(),
-                        style: const TextStyle(
-                          color: Colors.black45,
-                          fontSize: 11,
-                        ),
-                      ),
-                    ],
+                // Illustration
+                Center(
+                  child: Image(
+                    image: AssetImage("assets/images/reset_password.png"),
+                    width: 250,
+                    height: 250,
                   ),
                 ),
-
-                const SizedBox(height: 28),
 
                 // Title
                 Text(
@@ -153,8 +118,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
                 Text(
                   'reset_password.description'.tr(),
-                  style: const TextStyle(
-                    color: Colors.black54,
+                  style: TextStyle(
+                    color: context.textSecondary,
                     fontSize: 13,
                     height: 1.5,
                   ),
@@ -274,15 +239,32 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   child: RichText(
                     text: TextSpan(
                       text: 'reset_password.ingat_password'.tr(),
-                      style: const TextStyle(
-                        color: Colors.black54,
+                      style: TextStyle(
+                        color: context.textSecondary,
                         fontSize: 13,
                       ),
                       children: [
                         WidgetSpan(
                           child: GestureDetector(
                             onTap: () {
-                              // TODO: Navigate to login
+                              Navigator.pushAndRemoveUntil(
+                                context,
+                                PageRouteBuilder(
+                                  pageBuilder: (_, __, ___) =>
+                                      const AuthScreen(),
+                                  transitionsBuilder:
+                                      (_, animation, __, child) {
+                                        return FadeTransition(
+                                          opacity: animation,
+                                          child: child,
+                                        );
+                                      },
+                                  transitionDuration: const Duration(
+                                    milliseconds: 400,
+                                  ),
+                                ),
+                                (route) => false,
+                              );
                             },
                             child: Text(
                               'reset_password.masuk'.tr(),

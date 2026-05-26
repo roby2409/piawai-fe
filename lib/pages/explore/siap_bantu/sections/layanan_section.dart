@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:piawai/core/app_colors.dart';
+import 'package:piawai/core/snackbar_helper.dart';
 import 'package:piawai/pages/explore/siap_bantu/models/service_model.dart';
 import 'package:piawai/pages/widgets/input_field.dart';
 import 'package:piawai/pages/widgets/overlay_snackbar.dart';
@@ -48,8 +49,9 @@ class LayananSectionState extends State<LayananSection> {
     } catch (e) {
       setState(() => _isRefetching = false);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('general.fetch_failed'.tr(args: ['$e']))),
+        SnackBarHelper.showErrorSnackBar(
+          context,
+          'general.fetch_failed'.tr(args: ['$e']),
         );
       }
     }
@@ -60,14 +62,16 @@ class LayananSectionState extends State<LayananSection> {
       await _workerService.deleteService(id);
       await _refetch();
       if (mounted) {
-        ScaffoldMessenger.of(
+        SnackBarHelper.showSuccessSnackBar(
           context,
-        ).showSnackBar(SnackBar(content: Text('service_success_deleted'.tr())));
+          'service_success_deleted'.tr(),
+        );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('general.delete_failed'.tr(args: ['$e']))),
+        SnackBarHelper.showErrorSnackBar(
+          context,
+          'general.delete_failed'.tr(args: ['$e']),
         );
       }
     }
@@ -102,8 +106,9 @@ class LayananSectionState extends State<LayananSection> {
                   existing: _items[index],
                   onSuccess: () => _refetch(),
                   onError: (msg) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('general.failed'.tr(args: [msg]))),
+                    SnackBarHelper.showErrorSnackBar(
+                      context,
+                      'general.failed'.tr(args: [msg]),
                     );
                   },
                 );

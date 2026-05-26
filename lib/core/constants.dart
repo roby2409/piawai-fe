@@ -1,8 +1,8 @@
 // lib/core/constants.dart
 import 'package:flutter/material.dart';
 
-// const String baseUrl = 'http://192.168.18.63/apigoogle';
-const String baseUrl = 'https://radarapp.jokifigma.cloud';
+const String baseUrl = 'http://192.168.18.63/apigoogle';
+// const String baseUrl = 'https://radarapp.jokifigma.cloud';
 
 // Light Theme Colors
 const Color kPrimary = Color(0xFF04A5BA);
