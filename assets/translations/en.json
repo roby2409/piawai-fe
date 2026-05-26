@@ -247,5 +247,16 @@
   "reset_password_success": {
     "heading": "Password Successfully Changed!",
     "description": "Your new password is now active.\nPlease sign in with your new password."
+  },
+  "onboarding": {
+    "next": "Next",
+    "start": "Get Started",
+    "skip": "Skip",
+    "slide_1_title": "Find People Who Can Help",
+    "slide_1_desc": "Find people with specific skills around you without complicated portfolios or ratings. Instantly connect through WhatsApp.",
+    "slide_2_title": "Ready to Help Mode",
+    "slide_2_desc": "Activate Ready to Help mode so others can instantly discover your skills and services.",
+    "slide_3_title": "Fast, Simple, Instant",
+    "slide_3_desc": "No complicated process. No layered chats. Piawai helps people connect and solve needs faster."
   }
 }

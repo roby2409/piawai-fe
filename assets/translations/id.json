@@ -246,5 +246,16 @@
   "reset_password_success": {
     "heading": "Password Berhasil Diubah!",
     "description": "Password baru kamu sudah aktif.\nSilakan masuk dengan password baru."
+  },
+  "onboarding": {
+    "next": "Lanjut",
+    "start": "Mulai",
+    "skip": "Lewati",
+    "slide_1_title": "Temukan Orang yang Bisa Bantu",
+    "slide_1_desc": "Cari orang dengan skill tertentu di sekitarmu tanpa ribet portfolio atau rating. Langsung terhubung cepat lewat WhatsApp.",
+    "slide_2_title": "Mode Siap Bantu",
+    "slide_2_desc": "Aktifkan mode Siap Bantu agar orang lain dapat menemukan skill dan layanan yang kamu tawarkan secara instan.",
+    "slide_3_title": "Cepat, Simple, Langsung",
+    "slide_3_desc": "Tanpa proses rumit. Tanpa chat berlapis. Piawai membantu orang saling terhubung dan menyelesaikan kebutuhan lebih cepat."
   }
 }

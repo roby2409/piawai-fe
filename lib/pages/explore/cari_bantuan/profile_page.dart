@@ -192,7 +192,14 @@ class _ProfilePageState extends State<ProfilePage> {
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    const Icon(Icons.star, color: Color(0xFFFFC107), size: 16),
+                    if (profile.gender != null)
+                      Icon(
+                        profile.gender == 'Wanita' ? Icons.female : Icons.male,
+                        color: profile.gender == 'Wanita'
+                            ? const Color(0xFFFF4081)
+                            : const Color(0xFFFFC107),
+                        size: 16,
+                      ),
                     const SizedBox(width: 4),
                     Text(
                       [

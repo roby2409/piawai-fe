@@ -41,6 +41,7 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
 
   // ── Filter state ──
   FilterResult? _activeFilter;
+  bool _showList = false;
 
   String _searchQuery = '';
   bool _isLoading = true;
@@ -522,25 +523,70 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
             Positioned(
               bottom: 24,
               right: 16,
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: context.primary,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  'cari_bantuan.worker_found'.tr(
-                    args: ['${_explore?.total ?? 0}'],
+              child: GestureDetector(
+                onTap: () => setState(() => _showList = true),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 8,
                   ),
-                  style: TextStyle(
-                    color: context.white,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 13,
+                  decoration: BoxDecoration(
+                    color: context.primary,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: context.primary.withOpacity(0.4),
+                        blurRadius: 8,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'cari_bantuan.worker_found'.tr(
+                          args: ['${_explore?.total ?? 0}'],
+                        ),
+                        style: TextStyle(
+                          color: context.white,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Icon(Icons.list_rounded, color: context.white, size: 16),
+                    ],
                   ),
                 ),
+              ),
+            ),
+
+          if (_showList)
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: () => setState(() => _showList = false),
+                child: Container(color: Colors.black.withOpacity(0.3)),
+              ),
+            ),
+          if (_showList)
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: _WorkerListSheet(
+                workers: _explore?.workers ?? [],
+                onClose: () => setState(() => _showList = false),
+                onTap: (worker) {
+                  setState(() {
+                    _showList = false;
+                    _selectedWorker = worker;
+                  });
+                  _mapController.move(
+                    LatLng(worker.lat ?? 0, worker.lng ?? 0),
+                    15.5,
+                  );
+                },
               ),
             ),
         ],
@@ -1067,6 +1113,164 @@ class _WorkerBottomSheet extends StatelessWidget {
             ),
           ),
           SizedBox(height: MediaQuery.of(context).padding.bottom),
+        ],
+      ),
+    );
+  }
+}
+
+class _WorkerListSheet extends StatelessWidget {
+  final List<WorkerExploreModel> workers;
+  final VoidCallback onClose;
+  final ValueChanged<WorkerExploreModel> onTap;
+
+  const _WorkerListSheet({
+    required this.workers,
+    required this.onClose,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.6,
+      ),
+      decoration: BoxDecoration(
+        color: context.bgCard,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0x22000000),
+            blurRadius: 20,
+            offset: const Offset(0, -4),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Drag handle
+          Padding(
+            padding: const EdgeInsets.only(top: 10, bottom: 6),
+            child: Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: context.grey,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+
+          // Header
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              children: [
+                Text(
+                  '${workers.length} Worker ditemukan',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16,
+                    color: context.black87,
+                  ),
+                ),
+                const Spacer(),
+                GestureDetector(
+                  onTap: onClose,
+                  child: Icon(Icons.close, color: context.grey, size: 22),
+                ),
+              ],
+            ),
+          ),
+
+          const Divider(height: 1),
+
+          // List
+          Flexible(
+            child: ListView.separated(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).padding.bottom + 16,
+                top: 8,
+              ),
+              itemCount: workers.length,
+              separatorBuilder: (_, __) => const Divider(height: 1),
+              itemBuilder: (_, i) {
+                final worker = workers[i];
+                return ListTile(
+                  onTap: () => onTap(worker),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 6,
+                  ),
+                  leading: Container(
+                    width: 52,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: context.primary.withAlpha(60),
+                        width: 2,
+                      ),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: worker.avatarUrl != null
+                          ? Image.network(
+                              imageUrl(worker.avatarUrl!),
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => const Center(
+                                child: Text(
+                                  '👨',
+                                  style: TextStyle(fontSize: 22),
+                                ),
+                              ),
+                            )
+                          : const Center(
+                              child: Text('👨', style: TextStyle(fontSize: 22)),
+                            ),
+                    ),
+                  ),
+                  title: Text(
+                    worker.fullName,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 15,
+                    ),
+                  ),
+                  subtitle: Text(
+                    worker.services.join(', '),
+                    style: TextStyle(color: context.black54, fontSize: 12),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  trailing: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        '${worker.distanceKm} km',
+                        style: TextStyle(
+                          color: context.primary,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Icon(
+                        worker.gender == 'Wanita' ? Icons.female : Icons.male,
+                        color: worker.gender == 'Wanita'
+                            ? const Color(0xFFFF4081)
+                            : const Color(0xFFFFC107),
+                        size: 16,
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
         ],
       ),
     );
