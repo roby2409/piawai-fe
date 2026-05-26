@@ -18,14 +18,13 @@ TileLayer buildTileLayer(BuildContext context) {
       }
 
       // Filter matrix untuk mengubah gaya terang OSM menjadi estetika gelap (Dark Sci-Fi/Minimalis)
-      return ColorFiltered(
-        colorFilter: const ColorFilter.matrix([
-          -0.9, 0.0, 0.0, 0.0, 230.0, // Invert & sedikit kurangi kontras merah
-          0.0, -0.9, 0.0, 0.0, 230.0, // Invert & sedikit kurangi kontras hijau
-          0.0, 0.0, -0.8, 0.0, 240.0, // Invert biru dengan tone sedikit berbeda
-          0.0, 0.0, 0.0, 1.0, 0.0, // Alpha tetap normal
-        ]),
-        child: tileWidget,
+      return Stack(
+        children: [
+          tileWidget, // tile asli OSM tetap utuh
+          Container(
+            color: Colors.black.withOpacity(0.2), // overlay gelap
+          ),
+        ],
       );
     },
   );

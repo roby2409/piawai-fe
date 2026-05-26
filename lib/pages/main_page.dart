@@ -13,7 +13,6 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   int _currentIndex = 0;
-  int _historyRefreshKey = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -23,9 +22,7 @@ class _MainPageState extends State<MainPage> {
       IndexedStack(
         index: _currentIndex,
         children: [
-          ExplorePage(
-            key: ValueKey('history_${locale.languageCode}_$_historyRefreshKey'),
-          ),
+          ExplorePage(),
           PengaturanPage(key: ValueKey(locale.languageCode)),
         ],
       ),
@@ -46,8 +43,6 @@ class _MainPageState extends State<MainPage> {
           currentIndex: _currentIndex,
           onTap: (index) {
             setState(() {
-              if (index == 1)
-                _historyRefreshKey++; // ← increment tiap buka history
               _currentIndex = index;
             });
           },

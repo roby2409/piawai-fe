@@ -75,7 +75,9 @@ class _AuthGateState extends State<_AuthGate> {
   @override
   void initState() {
     super.initState();
-    _checkSession();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkSession();
+    });
   }
 
   // Di _AuthGate, update bagian onboarding:
@@ -89,14 +91,15 @@ class _AuthGateState extends State<_AuthGate> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => OnboardingScreen(
-            onFinish: () async {
-              await auth.setOnboardingDone();
-              // ← JANGAN pakai context dari sini, pakai navigatorKey
-              navigatorKey.currentState?.pushReplacement(
-                MaterialPageRoute(builder: (_) => const AuthScreen()),
-              );
-            },
+          builder: (_) => Consumer<ThemeService>(
+            builder: (context, themeService, _) => OnboardingScreen(
+              onFinish: () async {
+                await auth.setOnboardingDone();
+                navigatorKey.currentState?.pushReplacement(
+                  MaterialPageRoute(builder: (_) => const AuthScreen()),
+                );
+              },
+            ),
           ),
         ),
       );

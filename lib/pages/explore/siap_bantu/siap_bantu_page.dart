@@ -17,7 +17,11 @@ class SiapBantuPage extends StatefulWidget {
   State<SiapBantuPage> createState() => _SiapBantuPageState();
 }
 
-class _SiapBantuPageState extends State<SiapBantuPage> {
+class _SiapBantuPageState extends State<SiapBantuPage>
+    with AutomaticKeepAliveClientMixin {
+  // 2. Wajib return true supaya Flutter menjaga halaman ini tetap hidup di memori
+  @override
+  bool get wantKeepAlive => true;
   int _selectedIndex = 0;
   final _workerService = WorkerService();
 
@@ -143,6 +147,7 @@ class _SiapBantuPageState extends State<SiapBantuPage> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return ClipRRect(
       child: Container(
         decoration: BoxDecoration(

@@ -37,6 +37,7 @@ class _ExplorePageState extends State<ExplorePage>
       body: SafeArea(
         child: Stack(
           children: [
+            // PENTING: Tambahkan PageStorageKey di bawah ini!
             TabBarView(
               controller: _tabController,
               children: [MapPage(), SiapBantuPage()],

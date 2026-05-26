@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:piawai/core/app_colors.dart';
 
 class OnboardingModel {
   final String title;
@@ -12,24 +13,6 @@ class OnboardingModel {
     required this.image,
   });
 }
-
-final onboardingData = [
-  OnboardingModel(
-    title: 'onboarding.slide_1_title'.tr(),
-    description: 'onboarding.slide_1_desc'.tr(),
-    image: 'assets/images/onboarding_1.png',
-  ),
-  OnboardingModel(
-    title: 'onboarding.slide_2_title'.tr(),
-    description: 'onboarding.slide_2_desc'.tr(),
-    image: 'assets/images/onboarding_2.png',
-  ),
-  OnboardingModel(
-    title: 'onboarding.slide_3_title'.tr(),
-    description: 'onboarding.slide_3_desc'.tr(),
-    image: 'assets/images/onboarding_3.png',
-  ),
-];
 
 class OnboardingScreen extends StatefulWidget {
   final VoidCallback onFinish;
@@ -44,9 +27,28 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   int currentIndex = 0;
 
+  List<OnboardingModel> get _onboardingData => [
+    OnboardingModel(
+      title: 'onboarding.slide_1_title'.tr(),
+      description: 'onboarding.slide_1_desc'.tr(),
+      image: 'assets/images/onboarding_1.png',
+    ),
+    OnboardingModel(
+      title: 'onboarding.slide_2_title'.tr(),
+      description: 'onboarding.slide_2_desc'.tr(),
+      image: 'assets/images/onboarding_2.png',
+    ),
+    OnboardingModel(
+      title: 'onboarding.slide_3_title'.tr(),
+      description: 'onboarding.slide_3_desc'.tr(),
+      image: 'assets/images/onboarding_3.png',
+    ),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: context.bgCard,
       body: SafeArea(
         child: Column(
           children: [
@@ -54,21 +56,24 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               alignment: Alignment.centerRight,
               child: TextButton(
                 onPressed: () {},
-                child: Text('onboarding.skip'.tr()),
+                child: Text(
+                  'onboarding.skip'.tr(),
+                  style: TextStyle(color: context.primary),
+                ),
               ),
             ),
 
             Expanded(
               child: PageView.builder(
                 controller: controller,
-                itemCount: onboardingData.length,
+                itemCount: _onboardingData.length,
                 onPageChanged: (index) {
                   setState(() {
                     currentIndex = index;
                   });
                 },
                 itemBuilder: (context, index) {
-                  final item = onboardingData[index];
+                  final item = _onboardingData[index];
 
                   return Padding(
                     padding: const EdgeInsets.all(24),
@@ -82,9 +87,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         Text(
                           item.title,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
+                            color: context.black87,
                           ),
                         ),
 
@@ -95,7 +101,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 16,
-                            color: Colors.grey.shade600,
+                            color: context.textSecondary,
                             height: 1.5,
                           ),
                         ),
@@ -111,14 +117,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(
-                onboardingData.length,
+                _onboardingData.length,
                 (index) => AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
                   margin: const EdgeInsets.symmetric(horizontal: 4),
                   height: 8,
                   width: currentIndex == index ? 28 : 8,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF04A5BA),
+                    color: context.primary,
                     borderRadius: BorderRadius.circular(100),
                   ),
                 ),
@@ -132,7 +138,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 height: 54,
                 child: ElevatedButton(
                   onPressed: () {
-                    if (currentIndex == onboardingData.length - 1) {
+                    if (currentIndex == _onboardingData.length - 1) {
                       widget.onFinish();
                     } else {
                       controller.nextPage(
@@ -142,7 +148,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     }
                   },
                   child: Text(
-                    currentIndex == onboardingData.length - 1
+                    currentIndex == _onboardingData.length - 1
                         ? 'onboarding.start'.tr()
                         : 'onboarding.next'.tr(),
                   ),

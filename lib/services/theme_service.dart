@@ -15,7 +15,17 @@ class ThemeService extends ChangeNotifier {
 
   Future<void> init() async {
     final prefs = await SharedPreferences.getInstance();
-    _isDarkMode = prefs.getBool('isDarkMode') ?? false;
+
+    // Kalau belum pernah set di app, ikut system
+    final savedTheme = prefs.getBool('isDarkMode');
+    if (savedTheme == null) {
+      final brightness =
+          WidgetsBinding.instance.platformDispatcher.platformBrightness;
+      _isDarkMode = brightness == Brightness.dark;
+    } else {
+      _isDarkMode = savedTheme;
+    }
+
     notifyListeners();
   }
 

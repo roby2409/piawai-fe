@@ -154,64 +154,67 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.bgOuter,
       body: SafeArea(
-        child: Stack(
-          children: [
-            Column(
-              children: [
-                const SizedBox(height: 40),
+        child: ColoredBox(
+          color: context.bgOuter,
+          child: Stack(
+            children: [
+              Column(
+                children: [
+                  const SizedBox(height: 40),
 
-                // Logo
-                Column(
-                  children: [
-                    Image(
-                      height: 80,
-                      width: 80,
-                      image: AssetImage("assets/icons/logo.png"),
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      'Piawai',
-                      style: TextStyle(
-                        fontSize: 28,
-                        color: context.primary,
-                        fontWeight: FontWeight.bold,
+                  // Logo
+                  Column(
+                    children: [
+                      Image(
+                        height: 100,
+                        width: 100,
+                        image: AssetImage("assets/icons/logoapp.png"),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-
-                // Tabs
-                TabBar(
-                  controller: _tabController,
-                  labelColor: context.primary,
-                  dividerColor: Colors.grey[300],
-                  unselectedLabelColor: Colors.grey,
-                  indicatorColor: context.primary,
-                  tabs: [
-                    Tab(text: 'general.masuk'.tr()),
-                    Tab(text: 'general.daftar'.tr()),
-                  ],
-                ),
-
-                Expanded(
-                  child: TabBarView(
-                    controller: _tabController,
-                    children: [_buildLoginTab(), _buildRegisterTab()],
+                      SizedBox(height: 8),
+                      Text(
+                        'Piawai',
+                        style: TextStyle(
+                          fontSize: 28,
+                          color: context.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
+                  const SizedBox(height: 20),
 
-            // Loading overlay
-            if (_isLoading)
-              Container(
-                color: Colors.black26,
-                child: const Center(child: CircularProgressIndicator()),
+                  // Tabs
+                  TabBar(
+                    controller: _tabController,
+                    labelColor: context.primary,
+                    dividerColor: context.grey,
+                    unselectedLabelColor: context.textSecondary,
+                    indicatorColor: context.primary,
+                    tabs: [
+                      Tab(text: 'general.masuk'.tr()),
+                      Tab(text: 'general.daftar'.tr()),
+                    ],
+                  ),
+
+                  Expanded(
+                    child: TabBarView(
+                      controller: _tabController,
+                      children: [_buildLoginTab(), _buildRegisterTab()],
+                    ),
+                  ),
+                ],
               ),
-          ],
+
+              // Loading overlay
+              if (_isLoading)
+                Container(
+                  color: Colors.black26,
+                  child: const Center(child: CircularProgressIndicator()),
+                ),
+            ],
+          ),
         ),
       ),
     );
@@ -224,7 +227,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
       padding: const EdgeInsets.all(20),
       child: ListView(
         children: [
-          const SizedBox(height: 20),
+          const SizedBox(height: 40),
 
           // Google Sign In Button
           _GoogleSignInButton(
@@ -283,7 +286,11 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
               },
               child: Text(
                 'lupa_password'.tr(),
-                style: TextStyle(color: context.primary, fontSize: 12),
+                style: TextStyle(
+                  color: context.primary,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ),
@@ -300,7 +307,14 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: Text('general.masuk'.tr(), style: TextStyle(fontSize: 14)),
+            child: Text(
+              'general.masuk'.tr(),
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: context.white,
+              ),
+            ),
           ),
           const SizedBox(height: 20),
 
@@ -313,11 +327,14 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                   children: [
                     TextSpan(
                       text: 'belum_punya_akun'.tr(),
-                      style: const TextStyle(color: Colors.grey),
+                      style: TextStyle(color: context.textSecondary),
                     ),
                     TextSpan(
                       text: 'daftar_sekarang'.tr(),
-                      style: TextStyle(color: context.primary),
+                      style: TextStyle(
+                        color: context.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ],
                 ),
@@ -332,15 +349,15 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
   Widget orDivider() {
     return Row(
       children: [
-        Expanded(child: Divider(color: Colors.grey[300], thickness: 1.5)),
+        Expanded(child: Divider(color: context.grey, thickness: 1.5)),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Text(
             'general.or'.tr(),
-            style: TextStyle(color: Colors.grey, fontSize: 14),
+            style: TextStyle(color: context.black87, fontSize: 14),
           ),
         ),
-        Expanded(child: Divider(color: Colors.grey[300], thickness: 1.5)),
+        Expanded(child: Divider(color: context.grey, thickness: 1.5)),
       ],
     );
   }
@@ -352,7 +369,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
       padding: const EdgeInsets.all(20),
       child: ListView(
         children: [
-          const SizedBox(height: 20),
+          const SizedBox(height: 40),
 
           // Google Sign Up Button
           _GoogleSignInButton(
@@ -432,7 +449,14 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: Text('general.daftar'.tr()),
+            child: Text(
+              'general.daftar'.tr(),
+              style: TextStyle(
+                fontSize: 14,
+                color: context.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
 
           const SizedBox(height: 20),
@@ -446,11 +470,14 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                   children: [
                     TextSpan(
                       text: "sudah_punya_akun".tr(),
-                      style: const TextStyle(color: Colors.grey),
+                      style: TextStyle(color: context.textSecondary),
                     ),
                     TextSpan(
                       text: "masuk_sekarang".tr(),
-                      style: TextStyle(color: context.primary),
+                      style: TextStyle(
+                        color: context.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ],
                 ),
@@ -477,9 +504,9 @@ class _GoogleSignInButton extends StatelessWidget {
     return OutlinedButton(
       onPressed: onPressed,
       style: OutlinedButton.styleFrom(
-        backgroundColor: Colors.grey[50],
+        backgroundColor: context.bgOuter,
         disabledBackgroundColor: const Color(0xFFD1D5DB),
-        foregroundColor: Colors.black,
+        foregroundColor: context.textPrimary,
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         side: BorderSide(color: context.primary),
@@ -494,7 +521,7 @@ class _GoogleSignInButton extends StatelessWidget {
             image: AssetImage("assets/icons/google-logo.png"),
           ),
           const SizedBox(width: 12),
-          Text(text, style: const TextStyle(color: Colors.black, fontSize: 14)),
+          Text(text, style: TextStyle(color: context.black87, fontSize: 14)),
         ],
       ),
     );

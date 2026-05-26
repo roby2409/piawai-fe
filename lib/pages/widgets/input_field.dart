@@ -56,7 +56,7 @@ class InputField extends StatelessWidget {
         labelText: label,
         hintText: hint,
         hintStyle: TextStyle(color: context.textSecondary, fontSize: 14),
-        labelStyle: TextStyle(color: context.textSecondary, fontSize: 14),
+        labelStyle: TextStyle(color: context.black87, fontSize: 14),
         prefixIcon: prefixIcon != null
             ? Icon(prefixIcon, color: context.primary, size: 18)
             : null,
