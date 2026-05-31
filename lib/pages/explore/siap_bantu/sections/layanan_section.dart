@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
@@ -8,6 +10,7 @@ import 'package:piawai/pages/widgets/input_field.dart';
 import 'package:piawai/pages/widgets/overlay_snackbar.dart';
 import 'package:piawai/services/config_services.dart';
 import 'package:piawai/services/worker_services.dart';
+import 'package:speech_to_text/speech_to_text.dart';
 
 // ─────────────────────────────────────────
 // LAYANAN SECTION
@@ -266,21 +269,23 @@ void _showTambahLayananSheet(
     isScrollControlled: true,
     backgroundColor: context.transparent,
     builder: (_) => DraggableScrollableSheet(
-      // ← wrap dengan ini
-      initialChildSize: 0.75, // ← mulai dari 75% layar
-      minChildSize: 0.5, // ← minimum 50%
-      maxChildSize: 0.8, // ← bisa full screen
+      initialChildSize: 0.75,
+      minChildSize: 0.5,
+      maxChildSize: 0.9,
       expand: false,
       builder: (_, scrollController) => _TambahLayananSheet(
         existing: existing,
         onSuccess: onSuccess,
         onError: onError,
-        scrollController: scrollController, // ← pass scroll controller
+        scrollController: scrollController,
       ),
     ),
   );
 }
 
+// ─────────────────────────────────────────
+// SHEET WIDGET
+// ─────────────────────────────────────────
 class _TambahLayananSheet extends StatefulWidget {
   final ServiceModel? existing;
   final VoidCallback? onSuccess;
@@ -291,113 +296,202 @@ class _TambahLayananSheet extends StatefulWidget {
     this.existing,
     this.onSuccess,
     this.onError,
-    this.scrollController, // ← tambah ini
+    this.scrollController,
   });
 
   @override
   State<_TambahLayananSheet> createState() => _TambahLayananSheetState();
 }
 
-class _TambahLayananSheetState extends State<_TambahLayananSheet> {
+enum _SheetMode { voice, form }
+
+enum _RecordState { idle, recording, processing }
+
+class _TambahLayananSheetState extends State<_TambahLayananSheet>
+    with SingleTickerProviderStateMixin {
+  // Controllers
   final _namaController = TextEditingController();
   final _deskripsiController = TextEditingController();
   final _workerService = WorkerService();
-
-  bool _isSaving = false;
-  bool _isGenerating = false; // ← state loading Gemini
-
   final _configService = ConfigService();
-  String kGeminiApiKey = "";
+  final _speechToText = SpeechToText(); // package: speech_to_text
 
-  Future<void> _loadConfigServices() async {
-    final result = await _configService.getConfigKeys();
-    setState(() {
-      kGeminiApiKey = result["gemini_api_key"];
-    });
-  }
+  // State
+  _SheetMode _mode = _SheetMode.voice;
+  _RecordState _recordState = _RecordState.idle;
+  bool _isSaving = false;
+  bool _aiFilledForm = false; // badge ✨ AI
+  String _spokenWords = '';
+  String kGeminiApiKey = '';
+
+  // Animation
+  late AnimationController _pulseController;
+  late Animation<double> _pulseAnim;
 
   @override
   void initState() {
     super.initState();
+
+    // Kalau edit existing → langsung form mode
     if (widget.existing != null) {
-      final e = widget.existing!;
-      _namaController.text = e.nama;
-      _deskripsiController.text = e.deskripsi ?? "";
+      _mode = _SheetMode.form;
+      _namaController.text = widget.existing!.nama;
+      _deskripsiController.text = widget.existing!.deskripsi ?? '';
     }
 
-    _loadConfigServices();
+    _loadConfig();
+    _initSpeech();
+
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    )..repeat(reverse: true);
+
+    _pulseAnim = Tween<double>(begin: 1.0, end: 1.3).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
+  }
+
+  Future<void> _loadConfig() async {
+    final result = await _configService.getConfigKeys();
+    setState(() => kGeminiApiKey = result["gemini_api_key"]);
+  }
+
+  Future<void> _initSpeech() async {
+    await _speechToText.initialize();
   }
 
   @override
   void dispose() {
     _namaController.dispose();
     _deskripsiController.dispose();
+    _pulseController.dispose();
+    _speechToText.stop();
     super.dispose();
   }
 
   bool get _canSave => _namaController.text.trim().isNotEmpty && !_isSaving;
 
-  // ── Generate deskripsi dengan Gemini ──────────────────────────────────
-  Future<void> _generateDescription() async {
-    final nama = _namaController.text.trim();
-    if (nama.isEmpty) {
-      showOverlaySnackbar(
-        context,
-        'validator.service_name_required'.tr(),
-        isError: true,
-      );
+  // ── Toggle record ──────────────────────────────────────────────────────
+  Future<void> _toggleRecord() async {
+    if (_recordState == _RecordState.recording) {
+      await _stopRecord();
+    } else {
+      await _startRecord();
+    }
+  }
+
+  Future<void> _startRecord() async {
+    final available = await _speechToText.initialize(
+      onError: (e) => _handleSpeechError(e.errorMsg),
+    );
+    if (!available) {
+      showOverlaySnackbar(context, 'Mikrofon tidak tersedia', isError: true);
       return;
     }
-    print("gemini apikey ${kGeminiApiKey}");
 
-    setState(() => _isGenerating = true);
+    setState(() {
+      _recordState = _RecordState.recording;
+      _spokenWords = '';
+    });
+
+    _speechToText.listen(
+      onResult: (result) {
+        setState(() => _spokenWords = result.recognizedWords);
+        // Auto stop saat user berhenti bicara (finalResult)
+        if (result.finalResult && _spokenWords.isNotEmpty) {
+          _stopRecord();
+        }
+      },
+      localeId: 'id_ID', // Bahasa Indonesia
+      listenMode: ListenMode.dictation,
+    );
+  }
+
+  Future<void> _stopRecord() async {
+    await _speechToText.stop();
+    if (_spokenWords.trim().isEmpty) {
+      setState(() => _recordState = _RecordState.idle);
+      if (mounted) {
+        showOverlaySnackbar(
+          context,
+          'siap_bantu.voice_empty'
+              .tr(), // "Tidak ada suara terdeteksi, coba lagi"
+          isError: true,
+        );
+      }
+      return;
+    }
+    await _processWithGemini(_spokenWords);
+  }
+
+  void _handleSpeechError(String msg) {
+    setState(() => _recordState = _RecordState.idle);
+    showOverlaySnackbar(context, 'Error: $msg', isError: true);
+  }
+
+  // ── 1x Gemini call: extract nama + generate deskripsi ─────────────────
+  Future<void> _processWithGemini(String spokenText) async {
+    setState(() => _recordState = _RecordState.processing);
 
     try {
       final model = GenerativeModel(
-        model: 'gemini-3-flash-preview',
+        model: 'gemini-2.0-flash',
         apiKey: kGeminiApiKey,
       );
 
       final prompt =
           '''
-          Buatkan deskripsi untuk layanan jasa bernama "$nama" dalam bahasa Indonesia.
+Dari teks berikut, ekstrak informasi layanan jasa dan kembalikan HANYA JSON tanpa markdown.
 
-          Ketentuan:
-          - Maksimal 500 karakter
-          - 2-3 kalimat
-          - Jelaskan jenis pekerjaan yang dilakukan
-          - Sertakan estimasi harga dengan kalimat "harga bisa nego"
-          - Tone santai dan meyakinkan
-          - Langsung ke poin, tanpa pembuka seperti "Berikut deskripsinya:"
-          - Jangan pakai tanda kutip atau simbol berlebihan
+Teks: "$spokenText"
 
-          Contoh output yang benar:
-          Menerima jasa instalasi listrik rumah dan gedung komersial. Pengerjaan rapi, aman, dan bergaransi. Mulai dari Rp 150.000, harga bisa nego.
+Ketentuan deskripsi:
+- Maksimal 500 karakter
+- 2-3 kalimat
+- Jelaskan jenis pekerjaan yang dilakukan
+- Sertakan estimasi harga dengan kalimat "harga bisa nego"
+- Tone santai dan meyakinkan
 
-          Contoh output yang benar:
-          Layanan cuci dan setrika baju panggilan ke rumah, minimal 3 kg. Cepat, wangi, dan terlipat rapi. Mulai Rp 7.000/kg, harga bisa nego.
-          ''';
+Format JSON yang dikembalikan (tanpa backtick, tanpa penjelasan):
+{"nama":"...", "deskripsi":"..."}
+''';
 
-      final content = [Content.text(prompt)];
-      final response = await model.generateContent(content);
-      final text = response.text?.trim() ?? '';
+      final response = await model.generateContent([Content.text(prompt)]);
+      final raw = response.text?.trim() ?? '';
 
-      if (text.isNotEmpty) {
-        setState(() => _deskripsiController.text = text);
-      }
+      // Bersihkan kalau ada backtick
+      final cleaned = raw
+          .replaceAll('```json', '')
+          .replaceAll('```', '')
+          .trim();
+
+      final json = jsonDecode(cleaned) as Map<String, dynamic>;
+      final nama = json['nama']?.toString().trim() ?? '';
+      final deskripsi = json['deskripsi']?.toString().trim() ?? '';
+
+      if (nama.isEmpty) throw Exception('Nama layanan tidak terdeteksi');
+
+      setState(() {
+        _namaController.text = nama;
+        _deskripsiController.text = deskripsi;
+        _aiFilledForm = true;
+        _recordState = _RecordState.idle;
+        _mode = _SheetMode.form; // ← auto switch ke form
+      });
     } catch (e) {
+      setState(() => _recordState = _RecordState.idle);
       if (mounted) {
         showOverlaySnackbar(
           context,
-          'Gagal generate deskripsi, coba lagi',
+          'Gagal memproses, coba lagi',
           isError: true,
         );
       }
-    } finally {
-      setState(() => _isGenerating = false);
     }
   }
 
+  // ── Simpan ─────────────────────────────────────────────────────────────
   Future<void> _onSimpan() async {
     if (!_canSave) return;
 
@@ -422,6 +516,7 @@ class _TambahLayananSheetState extends State<_TambahLayananSheet> {
     }
   }
 
+  // ── BUILD ──────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
@@ -429,7 +524,7 @@ class _TambahLayananSheetState extends State<_TambahLayananSheet> {
     return Container(
       decoration: BoxDecoration(
         color: context.bgContent,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       padding: EdgeInsets.fromLTRB(20, 0, 20, 20 + bottomInset),
       child: SingleChildScrollView(
@@ -470,168 +565,349 @@ class _TambahLayananSheetState extends State<_TambahLayananSheet> {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
 
-            ConstrainedBox(
-              constraints: BoxConstraints(
-                maxHeight: MediaQuery.of(context).size.height * 0.65,
-              ),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Nama layanan
-                    _FieldLabel('fields.service_name'.tr()),
-                    const SizedBox(height: 6),
-                    InputField(
-                      controller: _namaController,
-                      hint: 'field_hints.service_name_example'.tr(),
-                      onChanged: (_) => setState(() {}),
-                    ),
-                    const SizedBox(height: 16),
+            // Toggle — sembunyikan kalau edit existing
+            if (widget.existing == null) _buildToggle(),
+            if (widget.existing == null) const SizedBox(height: 20),
 
-                    // Deskripsi + tombol AI
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            _FieldLabel('fields.service_description'.tr()),
-                            const SizedBox(width: 4),
-                            Text(
-                              '(${'general.optional'.tr()})',
-                              style: const TextStyle(
-                                fontStyle: FontStyle.italic,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        // ← Tombol Generate AI
-                        GestureDetector(
-                          onTap: _isGenerating ? null : _generateDescription,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: _isGenerating
-                                  ? context.grey
-                                  : context.secondary,
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                color: _isGenerating
-                                    ? context.grey
-                                    : context.primary.withOpacity(0.3),
-                              ),
-                            ),
-                            child: _isGenerating
-                                ? SizedBox(
-                                    width: 14,
-                                    height: 14,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: context.primary,
-                                    ),
-                                  )
-                                : Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(
-                                        Icons.auto_awesome,
-                                        size: 14,
-                                        color: context.primary,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        'help_generate'.tr(),
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w600,
-                                          color: context.primary,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-                    InputField(
-                      controller: _deskripsiController,
-                      hint: 'field_hints.service_desc_example'.tr(),
-                      minLines: 5, // ← minimum 5 baris
-                      maxLines: 999, // ← tidak dibatasi, bisa scroll
-                      maxLength: 500, // ← batas karakter
-                      keyboardType: TextInputType.multiline,
-                    ),
-
-                    // Hint generate
-                    const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.info_outline,
-                          size: 12,
-                          color: context.textSecondary,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          'field_hints.service_name_info'.tr(),
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: context.textSecondary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+            // Content
+            Center(
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                child: _mode == _SheetMode.voice
+                    ? _buildVoiceMode()
+                    : _buildFormMode(),
               ),
             ),
-
-            const SizedBox(height: 12),
-
-            // Simpan button
-            SizedBox(
-              width: double.infinity,
-              height: 52,
-              child: ElevatedButton(
-                onPressed: _canSave ? _onSimpan : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: context.primary,
-                  disabledBackgroundColor: const Color(0xFFD1D5DB),
-                  foregroundColor: context.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 0,
-                ),
-                child: _isSaving
-                    ? SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: context.white,
-                        ),
-                      )
-                    : Text(
-                        'siap_bantu.save_services'.tr(),
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: context.white,
-                        ),
-                      ),
-              ),
-            ),
-            const SizedBox(height: 12),
           ],
         ),
+      ),
+    );
+  }
+
+  // ── Toggle ─────────────────────────────────────────────────────────────
+  Widget _buildToggle() {
+    return Container(
+      decoration: BoxDecoration(
+        color: context.grey.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      padding: const EdgeInsets.all(4),
+      child: Row(
+        children: [
+          _ToggleBtn(
+            label: '🎤  ${'general.voice'.tr()}',
+            isActive: _mode == _SheetMode.voice,
+            onTap: () => setState(() => _mode = _SheetMode.voice),
+          ),
+          _ToggleBtn(
+            label: '📝  ${'general.form'.tr()}',
+            isActive: _mode == _SheetMode.form,
+            onTap: () => setState(() => _mode = _SheetMode.form),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ── Voice Mode ─────────────────────────────────────────────────────────
+  Widget _buildVoiceMode() {
+    return SizedBox(
+      key: const ValueKey('voice'),
+      child: Column(
+        children: [
+          Text(
+            'siap_bantu.voice_hint'
+                .tr(), // "Ceritakan layanan yang ingin kamu tambahkan"
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 14, color: context.textSecondary),
+          ),
+          const SizedBox(height: 32),
+
+          // Mic button + ripple
+          SizedBox(
+            width: 120,
+            height: 120,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                if (_recordState == _RecordState.recording)
+                  ...[1.0, 1.4, 1.8].map(
+                    (scale) => AnimatedBuilder(
+                      animation: _pulseAnim,
+                      builder: (_, __) => Transform.scale(
+                        scale: scale * (_pulseAnim.value * 0.15 + 0.85),
+                        child: Container(
+                          width: 72,
+                          height: 72,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.red.withOpacity(0.08),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                GestureDetector(
+                  onTap: _recordState == _RecordState.processing
+                      ? null
+                      : _toggleRecord,
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    width: 72,
+                    height: 72,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: _recordState == _RecordState.recording
+                          ? Colors.red
+                          : context.primary,
+                      boxShadow: [
+                        BoxShadow(
+                          color:
+                              (_recordState == _RecordState.recording
+                                      ? Colors.red
+                                      : context.primary)
+                                  .withOpacity(0.35),
+                          blurRadius: 16,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: _recordState == _RecordState.processing
+                        ? const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.5,
+                              color: Colors.white,
+                            ),
+                          )
+                        : Icon(
+                            _recordState == _RecordState.recording
+                                ? Icons.stop_rounded
+                                : Icons.mic_rounded,
+                            color: Colors.white,
+                            size: 30,
+                          ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          // Status text
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 200),
+            child: Text(
+              key: ValueKey(_recordState),
+              _recordState == _RecordState.idle
+                  ? 'siap_bantu.tap_to_record'.tr()
+                  : _recordState == _RecordState.recording
+                  ? 'siap_bantu.recording'.tr()
+                  : 'siap_bantu.processing'.tr(),
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: _recordState != _RecordState.idle
+                    ? FontWeight.w600
+                    : FontWeight.normal,
+                color: _recordState == _RecordState.recording
+                    ? Colors.red
+                    : _recordState == _RecordState.processing
+                    ? context.primary
+                    : context.textSecondary,
+              ),
+            ),
+          ),
+
+          // Live transcript preview
+          if (_spokenWords.isNotEmpty && _recordState == _RecordState.recording)
+            Container(
+              margin: const EdgeInsets.only(top: 16),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: context.grey.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                _spokenWords,
+                style: TextStyle(fontSize: 13, color: context.textSecondary),
+                textAlign: TextAlign.center,
+              ),
+            ),
+
+          const SizedBox(height: 32),
+        ],
+      ),
+    );
+  }
+
+  // ── Form Mode ──────────────────────────────────────────────────────────
+  Widget _buildFormMode() {
+    return SizedBox(
+      key: const ValueKey('form'),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Nama
+          Row(
+            children: [
+              _FieldLabel('fields.service_name'.tr()),
+              if (_aiFilledForm) ...[const SizedBox(width: 6), _AiBadge()],
+            ],
+          ),
+          const SizedBox(height: 6),
+          InputField(
+            controller: _namaController,
+            hint: 'field_hints.service_name_example'.tr(),
+            onChanged: (_) => setState(() {}),
+          ),
+          const SizedBox(height: 16),
+
+          // Deskripsi
+          Row(
+            children: [
+              _FieldLabel('fields.service_description'.tr()),
+              const SizedBox(width: 4),
+              Text(
+                '(${'general.optional'.tr()})',
+                style: const TextStyle(
+                  fontStyle: FontStyle.italic,
+                  fontSize: 12,
+                ),
+              ),
+              if (_aiFilledForm) ...[const SizedBox(width: 6), _AiBadge()],
+            ],
+          ),
+          const SizedBox(height: 6),
+          InputField(
+            controller: _deskripsiController,
+            hint: 'field_hints.service_desc_example'.tr(),
+            minLines: 5,
+            maxLines: 999,
+            maxLength: 500,
+            keyboardType: TextInputType.multiline,
+          ),
+
+          const SizedBox(height: 20),
+
+          // Simpan
+          SizedBox(
+            width: double.infinity,
+            height: 52,
+            child: ElevatedButton(
+              onPressed: _canSave ? _onSimpan : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: context.primary,
+                disabledBackgroundColor: const Color(0xFFD1D5DB),
+                foregroundColor: context.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 0,
+              ),
+              child: _isSaving
+                  ? SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: context.white,
+                      ),
+                    )
+                  : Text(
+                      'siap_bantu.save_services'.tr(),
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: context.white,
+                      ),
+                    ),
+            ),
+          ),
+          const SizedBox(height: 12),
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────
+// SMALL WIDGETS
+// ─────────────────────────────────────────
+class _ToggleBtn extends StatelessWidget {
+  final String label;
+  final bool isActive;
+  final VoidCallback onTap;
+
+  const _ToggleBtn({
+    required this.label,
+    required this.isActive,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            color: isActive ? context.bgContent : Colors.transparent,
+            borderRadius: BorderRadius.circular(9),
+            boxShadow: isActive
+                ? [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 4,
+                      offset: const Offset(0, 1),
+                    ),
+                  ]
+                : [],
+          ),
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: isActive ? context.primary : context.textSecondary,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AiBadge extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: context.primary.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.auto_awesome, size: 10, color: context.primary),
+          const SizedBox(width: 3),
+          Text(
+            'AI',
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              color: context.primary,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -697,9 +973,6 @@ class _LayananCard extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────
-// HELPERS
-// ─────────────────────────────────────────
 class _FieldLabel extends StatelessWidget {
   final String text;
   const _FieldLabel(this.text);

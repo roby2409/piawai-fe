@@ -52,9 +52,7 @@ class _InformasiPribadiPageState extends State<InformasiPribadiPage> {
     });
 
     try {
-      await _workerService.updateProfile({
-        'email_contact': _emailCtrl.text.trim(),
-      });
+      await _workerService.updateProfile({'email': _emailCtrl.text.trim()});
       if (mounted) {
         setState(() {
           _successMessage = 'success_messages.email_updated'.tr();

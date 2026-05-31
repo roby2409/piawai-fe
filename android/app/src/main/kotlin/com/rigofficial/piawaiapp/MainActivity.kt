@@ -1,4 +1,4 @@
-package com.rigofficial.piawai
+package com.rigofficial.piawaiapp
 
 import io.flutter.embedding.android.FlutterActivity
 

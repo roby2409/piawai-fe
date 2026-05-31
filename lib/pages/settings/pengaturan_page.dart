@@ -126,7 +126,7 @@ class _PengaturanPageState extends State<PengaturanPage> {
                   context,
                   MaterialPageRoute(
                     builder: (_) => InformasiPribadiPage(
-                      currentEmail: _profile!.emailContact ?? "",
+                      currentEmail: _profile!.email ?? "",
                     ),
                   ),
                 );
@@ -333,7 +333,7 @@ class ProfileCard extends StatelessWidget {
                   '@${profile.username}',
                   style: TextStyle(fontSize: 12, color: context.textSecondary),
                 ),
-                if (profile.emailContact != null) ...[
+                if (profile.email != null) ...[
                   const SizedBox(height: 4),
                   Row(
                     children: [
@@ -345,7 +345,7 @@ class ProfileCard extends StatelessWidget {
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          profile.emailContact!,
+                          profile.email!,
                           style: TextStyle(
                             fontSize: 12,
                             color: context.textSecondary,

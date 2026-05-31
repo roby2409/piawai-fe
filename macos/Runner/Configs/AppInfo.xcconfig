@@ -8,7 +8,7 @@
 PRODUCT_NAME = piawai
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.rigofficial.piawai
+PRODUCT_BUNDLE_IDENTIFIER = com.rigofficial.piawaiapp
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2026 com.rigofficial. All rights reserved.

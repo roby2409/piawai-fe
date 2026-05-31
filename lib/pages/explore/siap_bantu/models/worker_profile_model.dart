@@ -7,7 +7,7 @@ class WorkerProfileModel {
   final String fullName;
   final String? avatarUrl;
   final String? phoneWa; // nullable
-  final String? emailContact; // nullable
+  final String? email; // nullable
   final String? instagram;
   final String? bio;
   final double? lat; // nullable
@@ -28,7 +28,7 @@ class WorkerProfileModel {
     required this.fullName,
     this.avatarUrl,
     this.phoneWa,
-    this.emailContact,
+    this.email,
     this.instagram,
     this.bio,
     this.lat,
@@ -51,7 +51,7 @@ class WorkerProfileModel {
         fullName: json['full_name'],
         avatarUrl: json['avatar_url'],
         phoneWa: json['phone_wa'],
-        emailContact: json['email_contact'],
+        email: json['email'],
         instagram: json['instagram'],
         bio: json['bio'],
         lat: json['lat'] != null ? double.parse(json['lat'].toString()) : null,
@@ -73,7 +73,7 @@ class WorkerProfileModel {
     'full_name': fullName,
     'avatar_url': avatarUrl,
     'phone_wa': phoneWa,
-    'email_contact': emailContact,
+    'email': email,
     'instagram': instagram,
     'bio': bio,
     'lat': lat,

@@ -7,7 +7,7 @@ TileLayer buildTileLayer(BuildContext context) {
 
   return TileLayer(
     urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-    userAgentPackageName: 'com.rigofficial.piawai',
+    userAgentPackageName: 'com.rigofficial.piawaiapp',
     tileProvider: NetworkTileProvider(),
     errorTileCallback: (tile, error, stackTrace) {},
 

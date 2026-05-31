@@ -131,7 +131,7 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
     }
 
     // Radius — tampil kalau bukan default (15 km)
-    if (f.radiusKm != 15) {
+    if (f.radiusKm != 5) {
       chips.add(
         _ActiveChipData(
           icon: Icons.location_on_outlined,
@@ -491,6 +491,32 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                               ),
                             ),
                           ],
+                        ),
+                      ),
+                    ] else ...[
+                      const SizedBox(height: 10),
+                      Container(
+                        padding: const EdgeInsets.only(
+                          left: 10,
+                          right: 6,
+                          top: 6,
+                          bottom: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: context.bgContent,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: context.primary.withOpacity(0.3),
+                          ),
+                        ),
+
+                        child: Text(
+                          'Default ${'general.radius'.tr()} - ${'general.radius_display'.tr(args: ['${_activeFilter?.radiusKm.round() ?? 5}'])}',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: context.primary,
+                          ),
                         ),
                       ),
                     ],

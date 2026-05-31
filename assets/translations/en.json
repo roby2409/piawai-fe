@@ -69,7 +69,10 @@
     "service_count": "Services {}",
     "radius": "Radius",
     "whatsapp": "WhatsApp",
-    "service": "Service"
+    "service": "Service",
+    "no_description": "No description yet",
+    "voice": "Voice",
+    "form": "Form"
   },
   "fields": {
     "email": "Email",
@@ -172,6 +175,11 @@
     "activate_to_start": "Activate to start being visible to service seekers near you.",
     "status_is_active": "When status is active, your profile will appear in customer search results according to the area and services you have set.",
     "status_is_not_active": "Status inactive. Your profile will not appear in customer searches.",
+    "voice_hint": "Tell us about the service you want to add",
+    "tap_to_record": "Tap to start recording",
+    "recording": "Recording... tap to stop",
+    "processing": "Processing with AI...",
+    "voice_empty": "No voice detected, please try again",
     "sidebar": {
       "profil": "Profile",
       "contact": "Contact",

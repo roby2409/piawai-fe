@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:piawai/core/app_colors.dart';
+import 'package:piawai/core/helper.dart';
 import 'package:piawai/pages/explore/siap_bantu/models/worker_profile_model.dart';
 import 'package:piawai/services/worker_services.dart';
 import 'models/worker_model.dart';
@@ -147,7 +148,10 @@ class _ProfilePageState extends State<ProfilePage> {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: profile.avatarUrl != null
-                  ? Image.network(profile.avatarUrl!, fit: BoxFit.cover)
+                  ? Image.network(
+                      imageUrl(profile.avatarUrl!),
+                      fit: BoxFit.cover,
+                    )
                   : Stack(
                       children: [
                         Center(
@@ -325,27 +329,40 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ),
 
-        const SizedBox(height: 14),
+        const SizedBox(height: 20),
 
-        // Service Description Card
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: 16),
-          padding: const EdgeInsets.all(16),
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: context.bgCard,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: context.black87),
-          ),
-          child: Text(
-            selected.deskripsi ?? "",
-            style: TextStyle(
-              fontSize: 13.5,
-              color: context.black87,
-              height: 1.55,
+        if ((selected.deskripsi ?? "").isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Text(
+              'general.no_description'.tr(),
+              style: TextStyle(
+                fontSize: 13.5,
+                fontStyle: FontStyle.italic,
+                color: context.black45,
+              ),
+            ),
+          )
+        else
+          // Service Description Card
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.all(16),
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: context.bgCard,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: context.divider),
+            ),
+            child: Text(
+              selected.deskripsi ?? "",
+              style: TextStyle(
+                fontSize: 13.5,
+                color: context.black87,
+                height: 1.55,
+              ),
             ),
           ),
-        ),
       ],
     );
   }

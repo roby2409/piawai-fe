@@ -62,7 +62,7 @@ class _FilterPageState extends State<FilterPage> {
     final init = widget.initialFilter;
     _gender = init?.gender ?? 'Semua';
     _ageRange = init?.ageRange ?? const RangeValues(18, 55);
-    _radius = init?.radiusKm ?? 15;
+    _radius = init?.radiusKm ?? 5;
     _currentLocation = init?.locationLatLng ?? widget.myLocation;
     _locationLabel = init?.location ?? 'my_location'.tr();
     _loadAd();

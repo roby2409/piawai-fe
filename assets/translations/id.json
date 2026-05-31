@@ -68,7 +68,10 @@
     "services_offered": "LAYANAN YANG DITAWARKAN",
     "service": "Layanan",
     "radius": "Radius",
-    "whatsapp": "WhatsApp"
+    "whatsapp": "WhatsApp",
+    "no_description": "Belum ada deskripsi",
+    "voice": "Suara",
+    "form": "Form"
   },
   "fields": {
     "email": "Email",
@@ -171,6 +174,11 @@
     "activate_to_start": "Aktifkan untuk mulai terlihat oleh pencari jasa di sekitar Anda.",
     "status_is_active": "Saat status aktif, profil Anda akan muncul di hasil pencarian pelanggan sesuai dengan area dan layanan yang Anda atur.",
     "status_is_not_active": "Status tidak aktif. Profil Anda tidak akan muncul di pencarian pelanggan.",
+    "voice_hint": "Ceritakan layanan yang ingin kamu tambahkan",
+    "tap_to_record": "Tap untuk mulai rekam",
+    "recording": "Merekam... tap untuk berhenti",
+    "processing": "Memproses dengan AI...",
+    "voice_empty": "Tidak ada suara terdeteksi, coba lagi",
     "sidebar": {
       "profil": "Profil",
       "contact": "Kontak",
